@@ -49,9 +49,9 @@ export default function MetadataSection() {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "center center",
-        end: "+=380%",
+        end: "+=330%",
         pin: true,
-        scrub: 1.7,
+        scrub: 1.5,
       }
     });
 
@@ -65,9 +65,9 @@ export default function MetadataSection() {
       gsap.set(rightSide, { clipPath: 'inset(0 100% 0 0)' });
       gsap.set(desc, { opacity: 0, filter: 'blur(6px)' });
 
-      tl.to(leftSide, { opacity: 0.25, duration: 0.48, ease: "power2.inOut" }, index * 1.4)
-        .to(rightSide, { clipPath: 'inset(0 0% 0 0)', duration: 1.4, ease: "power3.out" }, index * 1.4)
-        .to(desc, { opacity: 1, filter: 'blur(0px)', duration: 0.95, ease: "power2.out" }, index * 1.4 + 0.45);
+      tl.to(leftSide, { opacity: 0.25, duration: 0.52, ease: "power2.inOut" }, index * 1.5)
+        .to(rightSide, { clipPath: 'inset(0 0% 0 0)', duration: 1.5, ease: "power3.out" }, index * 1.5)
+        .to(desc, { opacity: 1, filter: 'blur(0px)', duration: 1.0, ease: "power2.out" }, index * 1.5 + 0.5);
     });
 
     tl.to({}, { duration: 1.8 });

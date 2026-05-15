@@ -59,17 +59,17 @@ export default function ManifestoSection() {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "+=480%",
+        end: "+=410%",
         pin: true,
-        scrub: 2.3,
+        scrub: 1.7,
       }
     });
 
     let cursor = 0;
-    const PAUSE = 0.65;
-    const PHRASE_DURATION = 0.42;
-    const WORD_STAGGER = 0.087;
-    const WORD_DURATION = 0.48;
+    const PAUSE = 1.2;
+    const PHRASE_DURATION = 0.5;
+    const WORD_STAGGER = 0.11;
+    const WORD_DURATION = 0.65;
 
     PHRASES.forEach((phrase, phraseIdx) => {
       const phraseEl = phraseRefs.current[phraseIdx];

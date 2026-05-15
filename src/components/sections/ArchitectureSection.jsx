@@ -53,9 +53,9 @@ export default function ArchitectureSection() {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "top top",
-        end: "+=380%",
+        end: "+=375%",
         pin: true,
-        scrub: prefersReduced ? 0 : 1.8,
+        scrub: prefersReduced ? 0 : 1.6,
         onUpdate: (self) => {
           let index = Math.floor(self.progress * layers.length);
           if (index >= layers.length) index = layers.length - 1;

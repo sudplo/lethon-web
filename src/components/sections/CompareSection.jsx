@@ -31,7 +31,7 @@ export default function CompareSection() {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "center center",
-        end: "+=400%", // 4 viewports to scroll through the table
+        end: "+=380%", // 3.8 viewports para tabla + scanline
         pin: true,
         scrub: 1.5, // heavy scrub
       }

@@ -26,9 +26,9 @@ export default function CommunitiesSection() {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "center center",
-        end: "+=290%",
+        end: "+=300%",
         pin: true,
-        scrub: prefersReduced ? 0 : 1.6,
+        scrub: prefersReduced ? 0 : 1.5,
       }
     });
     tlRef.current = tl;

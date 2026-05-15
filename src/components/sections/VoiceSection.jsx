@@ -39,7 +39,7 @@ export default function VoiceSection() {
         start: 'top top',
         end: '+=280%',
         pin: true,
-        scrub: 1.7,
+        scrub: 1.4,
         onUpdate: (self) => {
           const raw = self.progress * 5;
           const rounded = Math.min(5, Math.round(raw));

@@ -49,30 +49,30 @@ export default function HeroSection() {
     tl.to(spans, {
       opacity: 1,
       duration: 0.001,
-      stagger: 0.055,
+      stagger: 0.065, // ligeramente más lento — más dramático
       ease: "none",
-    }, 1.2);
+    }, 1.2); // empieza 1.2s después del inicio de tl
 
-    // Pausa narrativa — tiempo para absorber
-    tl.to({}, { duration: 2.6 });
+    // Pausa larga para que el usuario lea y sienta la frase
+    tl.to({}, { duration: 3.5 });
 
     // --- FASE 2: Fade out del texto, aparece "Not by us." ---
-    tl.to(line1Ref.current, { opacity: 0, duration: 0.6, ease: "power2.inOut" })
+    tl.to(line1Ref.current, { opacity: 0, duration: 0.8, ease: "power2.inOut" })
       .fromTo(line2Ref.current,
-        { opacity: 0, filter: 'blur(18px)', scale: 1.06 },
-        { opacity: 1, filter: 'blur(0px)', scale: 1, duration: 2.2, ease: "power3.out" },
-        "+=0.3"
+        { opacity: 0, filter: 'blur(20px)', scale: 1.08 },
+        { opacity: 1, filter: 'blur(0px)', scale: 1, duration: 2.5, ease: "expo.out" },
+        "+=0.4"
       )
-      // Canvas fade sincronizado con "Not by us."
-      .to(canvasContainer, { opacity: 1, duration: 2.8, ease: "power2.inOut" }, "-=1.8")
+      // Canvas sube muy suavemente mientras aparece "Not by us."
+      .to(canvasContainer, { opacity: 1, duration: 3, ease: "power2.inOut" }, "-=2")
 
-      // --- FASE 3: Entrada progresiva de contenido ---
-      .to({}, { duration: 1.2 })
-      .to(navEl, { y: 0, opacity: 1, duration: 1.6, ease: "power3.out" }, "-=0.4")
-      .to(subheadRef.current, { y: 0, opacity: 1, duration: 1.6, ease: "power3.out" }, "-=1.3")
+      // --- FASE 3: El resto del contenido entra lentamente ---
+      .to({}, { duration: 1.5 }) // pausa para que respiren
+      .to(navEl, { y: 0, opacity: 1, duration: 1.8, ease: "expo.out" }, "-=0.5")
+      .to(subheadRef.current, { y: 0, opacity: 1, duration: 1.8, ease: "expo.out" }, "-=1.5")
       .to([cta1Ref.current, cta2Ref.current], {
-        y: 0, opacity: 1, duration: 1.4, stagger: 0.25, ease: "power3.out"
-      }, "-=1");
+        y: 0, opacity: 1, duration: 1.5, stagger: 0.3, ease: "expo.out"
+      }, "-=1.2");
 
     // Pin hero — más largo para que el usuario absorba
     ScrollTrigger.create({

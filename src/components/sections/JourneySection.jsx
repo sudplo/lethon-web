@@ -52,9 +52,9 @@ export default function JourneySection() {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "center center",
-        end: "+=380%",
+        end: "+=375%",
         pin: true,
-        scrub: 1.8,
+        scrub: 1.6,
       }
     });
 

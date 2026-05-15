@@ -1,9 +1,0 @@
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /_next/
-
-Sitemap: https://lethon-protocol.dev/sitemap.xml
-
-# Crawl-delay for respectful crawling
-Crawl-delay: 1

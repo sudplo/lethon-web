@@ -46,9 +46,9 @@ export default function StatementSection() {
       scrollTrigger: {
         trigger: containerRef.current,
         start: "center center",
-        end: "+=420%",
+        end: "+=360%",
         pin: true,
-        scrub: 2.2,
+        scrub: 1.5,
       }
     });
 
@@ -57,43 +57,43 @@ export default function StatementSection() {
       opacity: 1,
       y: 0,
       filter: 'blur(0px)',
-      duration: 0.55,
-      stagger: 0.14,
+      duration: 0.65,
+      stagger: 0.18,
       ease: "power3.out"
     }, 0)
 
-      // Pausa narrativa
-      .to({}, { duration: 0.7 })
+      // Pausa narrativa — el usuario lee la primera línea
+      .to({}, { duration: 1.2 })
 
-      // --- FASE 2: Segunda línea con timing offset ---
+      // --- FASE 2: Segunda línea completa el pensamiento ---
       .to(els2, {
         opacity: 1,
         y: 0,
         filter: 'blur(0px)',
-        duration: 0.5,
-        stagger: 0.11,
+        duration: 0.6,
+        stagger: 0.15,
         ease: "power3.out"
       })
 
-      // Tiempo para absorber
-      .to({}, { duration: 1 })
+      // Pausa para absorber la frase completa
+      .to({}, { duration: 1.4 })
 
-      // --- FASE 3: Transición hacia subtext ---
+      // --- FASE 3: Transición suave hacia subtext ---
       .to([...els1, ...els2], {
-        opacity: 0.2,
+        opacity: 0.25,
         filter: 'blur(4px)',
-        duration: 0.65,
+        duration: 0.7,
         ease: "power2.inOut"
       })
       .to(subRef.current, {
         opacity: 1,
         y: 0,
-        duration: 0.75,
+        duration: 0.8,
         ease: "power3.out"
-      }, "-=0.35")
+      }, "-=0.4")
 
       // Cierre
-      .to({}, { duration: 0.9 });
+      .to({}, { duration: 1 });
 
     return () => {
       ScrollTrigger.getAll().forEach(t => t.kill());
