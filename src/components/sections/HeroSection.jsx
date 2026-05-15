@@ -114,7 +114,7 @@ export default function HeroSection() {
             </a>
             <a
               ref={cta2Ref}
-              href="https://github.com/sudplo/Ibri"
+              href="https://github.com/sudplo/lethon"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.secondaryCta}

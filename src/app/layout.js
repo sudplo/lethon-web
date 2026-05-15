@@ -48,7 +48,7 @@ export default function RootLayout({ children }) {
               name: "Lethon Protocol",
               url: "https://lethon-protocol.dev",
               description: "Privacy by architecture, not by trust.",
-              sameAs: ["https://github.com/sudplo/Ibri"]
+              sameAs: ["https://github.com/sudplo/lethon"]
             })
           }}
         />

@@ -135,13 +135,13 @@ export default function ManifestoSection() {
           <div className={styles.ctaGrid}>
             <div className={styles.ctaItem}>
               <span className={styles.ctaLabel}>Don't trust us.</span>
-              <a href="https://github.com/sudplo/Ibri" target="_blank" rel="noopener noreferrer" className={styles.ctaLink} data-interactive="true">
+              <a href="https://github.com/sudplo/lethon" target="_blank" rel="noopener noreferrer" className={styles.ctaLink} data-interactive="true">
                 Read the code.
               </a>
             </div>
             <div className={styles.ctaItem}>
               <span className={styles.ctaLabel}>Join the build.</span>
-              <a href="https://github.com/sudplo/Ibri" target="_blank" rel="noopener noreferrer" className={styles.ctaLink} data-interactive="true">
+              <a href="https://github.com/sudplo/lethon" target="_blank" rel="noopener noreferrer" className={styles.ctaLink} data-interactive="true">
                 Star on GitHub.
               </a>
             </div>

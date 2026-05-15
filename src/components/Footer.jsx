@@ -44,7 +44,7 @@ export default function Footer() {
             <ul>
               <li>
                 <a 
-                  href="https://github.com/sudplo/Ibri" 
+                  href="https://github.com/sudplo/lethon" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   data-interactive="true"
@@ -54,7 +54,7 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://github.com/sudplo/Ibri/blob/main/CONTRIBUTING.md" 
+                  href="https://github.com/sudplo/lethon/blob/main/CONTRIBUTING.md" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   data-interactive="true"
@@ -64,7 +64,7 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://github.com/sudplo/Ibri/blob/main/README.md" 
+                  href="https://github.com/sudplo/lethon/blob/main/README.md" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   data-interactive="true"
@@ -80,7 +80,7 @@ export default function Footer() {
             <ul>
               <li>
                 <a 
-                  href="https://github.com/sudplo/Ibri/blob/main/SECURITY_PATCHES_APPLIED.md" 
+                  href="https://github.com/sudplo/lethon/blob/main/SECURITY_PATCHES_APPLIED.md" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   data-interactive="true"
@@ -90,7 +90,7 @@ export default function Footer() {
               </li>
               <li>
                 <a 
-                  href="https://github.com/sudplo/Ibri/blob/main/LICENSE.txt" 
+                  href="https://github.com/sudplo/lethon/blob/main/LICENSE.txt" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   data-interactive="true"
@@ -111,7 +111,7 @@ export default function Footer() {
             <ul>
               <li>
                 <a 
-                  href="https://github.com/sudplo/Ibri/blob/main/informe_arquitectura.md" 
+                  href="https://github.com/sudplo/lethon/blob/main/informe_arquitectura.md" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   data-interactive="true"

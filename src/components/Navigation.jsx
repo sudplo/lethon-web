@@ -29,7 +29,7 @@ export default function Navigation() {
       <div className={`container ${styles.navContainer}`}>
         <div className={styles.logo}>Lethon</div>
         <a 
-          href="https://github.com/sudplo/Ibri" 
+          href="https://github.com/sudplo/lethon" 
           target="_blank" 
           rel="noopener noreferrer" 
           className={styles.githubLink}
