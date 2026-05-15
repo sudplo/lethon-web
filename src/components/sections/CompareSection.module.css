@@ -1,0 +1,137 @@
+.compareSection {
+  min-height: 100vh;
+  padding: 8rem 0;
+  display: flex;
+  align-items: center;
+}
+
+.header {
+  margin-bottom: 4rem;
+}
+
+.header h2 {
+  font-family: var(--font-sans);
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 500;
+  line-height: 1.2;
+  margin-bottom: 0.5rem;
+}
+
+.subhead {
+  font-family: var(--font-mono);
+  color: var(--color-amber);
+  font-size: 1rem;
+  margin-bottom: 2rem;
+}
+
+.context {
+  font-family: var(--font-sans);
+  color: var(--text-muted);
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.context p {
+  margin-bottom: 0.5rem;
+}
+
+.tableContainer {
+  position: relative;
+  width: 100%;
+}
+
+.tableHeader {
+  display: flex;
+  border-bottom: 1px solid var(--text-lethon);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-muted);
+}
+
+.tableRow {
+  display: flex;
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  transition: background-color 0.2s ease;
+}
+
+.tableRow:hover {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.highlightedRow {
+  border-left: 1px solid var(--color-accent);
+  padding-left: 1rem;
+  margin-left: -1rem; /* keep alignment */
+}
+
+.colCap {
+  flex: 1.5;
+  padding-right: 1rem;
+}
+
+.colLethon {
+  flex: 2;
+  position: relative;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  padding-right: 1rem;
+}
+
+.colOther {
+  flex: 1;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
+
+.accentText {
+  color: var(--color-accent);
+}
+
+.amberText {
+  color: var(--color-amber);
+}
+
+.tooltipContainer {
+  cursor: help;
+}
+
+.tooltip {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background-color: var(--bg-dark);
+  border: 1px solid var(--text-lethon);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s ease, visibility 0.2s ease;
+  z-index: 10;
+}
+
+.tooltipContainer:hover .tooltip {
+  opacity: 1;
+  visibility: visible;
+}
+
+.scanline {
+  position: absolute;
+  left: calc((100% / 7) * 2); /* Approximate position of Lethon column */
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, transparent, var(--color-accent), transparent);
+  box-shadow: 0 0 8px var(--color-accent);
+  pointer-events: none;
+  z-index: 5;
+}

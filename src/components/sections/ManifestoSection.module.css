@@ -1,0 +1,126 @@
+.manifestoSection {
+  height: 100vh;
+  background-color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 100%;
+  max-width: 900px;
+  width: 100%;
+  gap: 0;
+}
+
+.phrasesStack {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.2rem;
+}
+
+.phrase {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  display: block;
+  min-height: 1em;
+}
+
+.phrase0 {
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
+}
+
+.phrase1 {
+  font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+}
+
+.phrase2 {
+  font-size: clamp(1.8rem, 3.6vw, 3.2rem);
+}
+
+/* Word construction */
+.wordWrap {
+  display: inline-flex;
+  vertical-align: top;
+  overflow: visible;
+}
+
+.wordInner {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+}
+
+/* CTAs */
+.ctaBlock {
+  padding-bottom: 6vh;
+  will-change: transform, opacity;
+}
+
+.dividerLine {
+  height: 1px;
+  background: linear-gradient(to right, var(--color-accent), transparent);
+  margin-bottom: 2.5rem;
+  width: 100%;
+}
+
+.ctaGrid {
+  display: flex;
+  gap: 4rem;
+}
+
+.ctaItem {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.ctaLabel {
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.ctaLink {
+  font-family: var(--font-mono);
+  color: var(--text-primary);
+  text-decoration: none;
+  font-size: 0.9rem;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.ctaLink::after {
+  content: '';
+  position: absolute;
+  bottom: -3px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.12);
+  transition: background-color 0.2s ease;
+}
+
+.ctaLink:hover {
+  color: var(--color-accent);
+}
+
+.ctaLink:hover::after {
+  background-color: var(--color-accent);
+}
+
+@media (max-width: 600px) {
+  .ctaGrid {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}

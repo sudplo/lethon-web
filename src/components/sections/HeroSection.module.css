@@ -1,0 +1,115 @@
+.heroSection {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+/* Overlay negro que cubre todo al inicio */
+.blackOverlay {
+  position: absolute;
+  inset: 0;
+  background-color: #000;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.content {
+  max-width: 820px;
+  position: relative;
+  z-index: 1;
+}
+
+.mainHeadline {
+  font-family: var(--font-sans);
+  font-size: clamp(2.8rem, 6.5vw, 5rem);
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  margin-bottom: 2.8rem;
+}
+
+.line1 {
+  color: var(--text-primary);
+  min-height: 1.2em;
+  display: block;
+}
+
+.line2 {
+  color: var(--color-accent);
+  display: block;
+  /* Sutil text-shadow para el efecto de brillo */
+  text-shadow: 0 0 60px rgba(0, 245, 160, 0.25);
+}
+
+.subheadline {
+  font-family: var(--font-mono);
+  font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+  color: var(--text-muted);
+  line-height: 1.7;
+  margin-bottom: 3.5rem;
+  max-width: 560px;
+}
+
+.subheadline p {
+  margin-bottom: 0.4rem;
+}
+
+.ctas {
+  display: flex;
+  gap: 2rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.primaryCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--color-accent);
+  color: #000;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.9rem;
+  padding: 1rem 1.75rem;
+  text-decoration: none;
+  letter-spacing: 0.02em;
+  transition: transform 0.25s ease, background-color 0.25s ease, box-shadow 0.25s ease;
+}
+
+.primaryCta:hover {
+  background-color: #00df90;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 245, 160, 0.2);
+}
+
+.secondaryCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-decoration: none;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.secondaryCta::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.15);
+  transition: background-color 0.2s ease, width 0.2s ease;
+}
+
+.secondaryCta:hover {
+  color: var(--text-primary);
+}
+
+.secondaryCta:hover::after {
+  background-color: var(--color-accent);
+}

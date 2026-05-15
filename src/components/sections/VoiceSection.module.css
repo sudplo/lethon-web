@@ -1,0 +1,201 @@
+.voiceSection {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 0;
+  /* zero — ScrollTrigger pinSpacing handles the offset */
+  position: relative;
+  overflow: hidden;
+}
+
+.headline {
+  font-family: var(--font-sans);
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  font-weight: 500;
+  line-height: 1.2;
+  margin-bottom: 1.2rem;
+}
+
+.subhead {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 2rem;
+  max-width: 560px;
+}
+
+/* ── Interactive area ───────────────────────── */
+.interactiveArea {
+  background-color: rgba(3, 5, 8, 0.5);
+  border: 1px solid var(--text-lethon);
+  border-radius: 4px;
+  padding: 1.5rem 1.75rem;
+  margin-bottom: 2.5rem;
+}
+
+/* ── Intensity display ───────────────────────── */
+.intensityDisplay {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.intensityNum {
+  font-family: var(--font-mono);
+  font-size: clamp(3rem, 6vw, 5rem);
+  font-weight: 600;
+  color: var(--color-accent);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  /* Fix width so layout never jumps between 0 and 5 */
+  width: 1.2ch;
+  display: inline-block;
+  text-align: right;
+  text-shadow: 0 0 40px rgba(0, 245, 160, 0.3);
+  will-change: contents;
+}
+
+.intensityMeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.intensityLabel {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--text-primary);
+  will-change: opacity, transform, filter;
+}
+
+.intensityDesc {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  will-change: opacity, transform, filter;
+}
+
+/* ── Stage track ────────────────────────────── */
+.stageTrack {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.75rem;
+  padding-bottom: 0.6rem;
+}
+
+.stageTrack::before {
+  content: '';
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--text-lethon);
+  border-radius: 2px;
+}
+
+.stageProgressLine {
+  position: absolute;
+  bottom: 0.5rem;
+  left: 0;
+  height: 2px;
+  background-color: var(--color-accent);
+  border-radius: 2px;
+  box-shadow: 0 0 8px rgba(0, 245, 160, 0.5);
+  pointer-events: none;
+}
+
+.stageMarker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+  z-index: 1;
+}
+
+.stageMarkerDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--text-lethon);
+  border: 1px solid var(--text-lethon);
+  transition: background-color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.stageActive .stageMarkerDot {
+  background-color: var(--color-accent);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 8px rgba(0, 245, 160, 0.5);
+}
+
+.stageMarkerLabel {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-lethon);
+  transition: color 0.25s ease;
+  white-space: nowrap;
+}
+
+.stageActive .stageMarkerLabel {
+  color: var(--text-muted);
+}
+
+/* ── Waveforms ──────────────────────────────── */
+.waveformsContainer {
+  display: flex;
+  gap: 2rem;
+}
+
+.waveformBlock {
+  flex: 1;
+}
+
+.waveLabel {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.waveLabelAccent {
+  color: var(--color-accent);
+}
+
+.waveform {
+  height: 80px;
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.bar {
+  flex: 1;
+  background-color: var(--text-primary);
+  border-radius: 1px;
+}
+
+.processedWaveform .bar {
+  background-color: var(--color-accent);
+}
+
+/* ── Closing ─────────────────────────────────── */
+.closingStatement {
+  font-family: var(--font-sans);
+  font-size: 1.1rem;
+  line-height: 1.5;
+  max-width: 520px;
+}
+
+.closingSmall {
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.7;
+}

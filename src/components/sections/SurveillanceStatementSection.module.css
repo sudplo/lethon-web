@@ -1,0 +1,65 @@
+.section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background-color: var(--bg-base);
+  position: relative;
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  max-width: 900px;
+}
+
+.line1 {
+  font-family: var(--font-sans);
+  font-size: clamp(2.2rem, 5.5vw, 4.5rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--text-primary);
+  margin: 0 0 0.05em;
+  display: block;
+  min-height: 1.2em;
+}
+
+.line2 {
+  font-family: var(--font-sans);
+  font-size: clamp(2.2rem, 5.5vw, 4.5rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  margin: 0 0 2.5rem;
+  display: block;
+  min-height: 1.2em;
+}
+
+.smallGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+}
+
+.line3,
+.line4 {
+  font-family: var(--font-mono);
+  font-size: clamp(1rem, 1.8vw, 1.4rem);
+  margin: 0;
+  display: block;
+  min-height: 1.4em;
+}
+
+.wordWrap {
+  display: inline-flex;
+  vertical-align: top;
+  overflow: visible;
+  padding-bottom: 0.05em;
+  margin-bottom: -0.05em;
+}
+
+.wordInner {
+  display: inline-block;
+  will-change: transform, opacity, filter;
+}

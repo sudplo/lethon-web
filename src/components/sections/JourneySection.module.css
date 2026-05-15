@@ -1,0 +1,92 @@
+.journeySection {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+}
+
+.journeyContainer {
+  display: flex;
+  height: 80vh;
+  gap: 4rem;
+}
+
+.headline {
+  flex: 1;
+  font-family: var(--font-sans);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 500;
+  line-height: 1.2;
+  padding-top: 10vh;
+}
+
+.mapArea {
+  flex: 1.5;
+  position: relative;
+  height: 100%;
+}
+
+.trackContainer {
+  position: relative;
+  height: 100%;
+  margin-left: 2rem;
+}
+
+.track {
+  position: absolute;
+  top: 10%;
+  bottom: 10%;
+  left: 0;
+  width: 2px;
+  background-color: var(--text-lethon);
+}
+
+.travelingDot {
+  position: absolute;
+  top: 0;
+  left: -4px; /* center on 2px line (10px dot -> 5px offset - 1px line radius = 4) */
+  width: 10px;
+  height: 10px;
+  background-color: var(--color-accent);
+  border-radius: 50%;
+  z-index: 10;
+  box-shadow: 0 0 15px var(--color-accent);
+  transform: translateY(-50%); /* center vertically on current Y */
+}
+
+.nodeStop {
+  position: absolute;
+  left: -3px; /* center 8px point on 2px line */
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+}
+
+.nodePoint {
+  width: 8px;
+  height: 8px;
+  background-color: var(--text-lethon);
+  border-radius: 50%;
+  z-index: 5;
+}
+
+.nodeLabel {
+  margin-left: 2rem;
+  width: 400px;
+  opacity: 0;
+}
+
+.nodeLabel h4 {
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+}
+
+.nodeLabel pre {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  white-space: pre-wrap;
+  margin: 0;
+  line-height: 1.5;
+}

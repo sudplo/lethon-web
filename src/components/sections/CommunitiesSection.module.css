@@ -1,0 +1,139 @@
+.communitiesSection {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 6rem 0;
+}
+
+.headline {
+  font-family: var(--font-sans);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 500;
+  margin-bottom: 2rem;
+}
+
+.subheadline {
+  font-family: var(--font-mono);
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin-bottom: 4rem;
+}
+
+.subheadline p {
+  margin-bottom: 0.25rem;
+}
+
+.diagramArea {
+  display: flex;
+  gap: 4rem;
+  flex-wrap: wrap;
+}
+
+.diagramCol {
+  flex: 1;
+  min-width: 300px;
+}
+
+.diagramHeader {
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 2rem;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--text-lethon);
+  padding-bottom: 0.5rem;
+}
+
+.diagramBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 300px;
+}
+
+.server {
+  padding: 1rem 2rem;
+  border: 1px solid #ef4444; /* red */
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+  font-family: var(--font-mono);
+  font-weight: bold;
+  border-radius: 4px;
+}
+
+.clientNode {
+  padding: 0.5rem 1.5rem;
+  border: 1px solid var(--text-lethon);
+  font-family: var(--font-mono);
+  border-radius: 4px;
+}
+
+.lineVert {
+  width: 2px;
+  height: 40px;
+  background-color: var(--text-lethon);
+  margin: 0.5rem 0;
+}
+
+.permsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  width: 100%;
+  align-items: center;
+}
+
+.permSignal {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-amber);
+  background-color: rgba(245, 158, 11, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border-left: 2px solid var(--color-amber);
+  width: 80%;
+  text-align: center;
+}
+
+.meshNodes {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.lethonNode {
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--color-accent);
+  background-color: rgba(0, 245, 160, 0.05);
+  font-family: var(--font-mono);
+  color: var(--color-accent);
+  border-radius: 4px;
+}
+
+.lethonLineH {
+  height: 2px;
+  width: 30px;
+  background-color: var(--color-accent);
+}
+
+.permLethon {
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  color: var(--color-green);
+  background-color: rgba(99, 153, 34, 0.1);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  border-left: 2px solid var(--color-green);
+  width: 80%;
+  text-align: center;
+}
+
+.resultMark {
+  text-align: center;
+  margin-top: 2rem;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+}
