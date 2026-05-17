@@ -41,13 +41,16 @@ const LAYERS = [
 
 export default function ArchitectureSection() {
   const sectionRef = useRef(null);
+  const containerRef = useRef(null);
   const cardRefs = useRef([]);
   const barRefs = useRef([]);
   const lockRefs = useRef([]);
+  const headlineRef = useRef(null);
   const [activeIdx, setActiveIdx] = useState(0);
 
   useGSAP(() => {
     const mm = gsap.matchMedia();
+    const q = gsap.utils.selector(sectionRef);
 
     mm.add(
       {
@@ -58,126 +61,214 @@ export default function ArchitectureSection() {
       (context) => {
         const { isDesktop, reduceMotion } = context.conditions;
 
-        /* On mobile, show all cards statically — no pin */
-        if (!isDesktop) {
-          cardRefs.current.forEach((card) => {
-            if (!card) return;
-            gsap.set(card, { y: 0, autoAlpha: 1, scale: 1, filter: 'blur(0px)' });
-          });
-          barRefs.current.forEach((bar) => {
-            if (!bar) return;
-            gsap.set(bar, { scaleY: 1 });
-          });
-          lockRefs.current.forEach((lock) => {
-            if (!lock) return;
-            gsap.set(lock, { autoAlpha: 1 });
-          });
+        if (reduceMotion) return;
 
-          /* Simple staggered entrance on mobile */
+        // ── 1. PREPARATION ──
+        if (isDesktop) {
+          gsap.set(cardRefs.current, { 
+            y: 400, z: 0, rotationX: 10, autoAlpha: 0, scale: 0.9, filter: 'blur(15px)', transformPerspective: 1200
+          });
+          gsap.set(barRefs.current, { scaleY: 0, transformOrigin: 'top' });
+          gsap.set(lockRefs.current, { autoAlpha: 0, x: -30 });
+          
+          // Ensure all descriptions start hidden so GSAP has full control
+          gsap.set(q(`.${styles.desc}`), { autoAlpha: 0 });
+          gsap.set(q(`.${styles.descTitle}`), { autoAlpha: 0, x: -20 });
+          gsap.set(q(`.${styles.descLine}`), { autoAlpha: 0, x: -10 });
+        }
+
+        // ── 2. HEADLINE NARRATIVE ──
+        const words = headlineRef.current.querySelectorAll('span');
+        gsap.to(words, {
+          autoAlpha: 1,
+          y: 0,
+          rotateX: 0,
+          stagger: 0.04,
+          duration: 1.4,
+          ease: 'expo.out',
+          scrollTrigger: {
+            trigger: headlineRef.current,
+            start: 'top 85%',
+          }
+        });
+
+        if (!isDesktop) {
+          // Mobile: Cards just animate up as you scroll to them.
+          // CSS handles the text visibility directly.
           cardRefs.current.forEach((card, i) => {
             if (!card) return;
-            gsap.from(card, {
-              scrollTrigger: {
-                trigger: card,
-                start: 'top 85%',
-                toggleActions: 'play none none none',
-              },
-              y: 40,
-              autoAlpha: 0,
-              duration: 0.7,
-              delay: i * 0.08,
-              ease: 'power3.out',
-            });
+            gsap.fromTo(card, 
+              { y: 60, autoAlpha: 0 },
+              {
+                scrollTrigger: {
+                  trigger: card,
+                  start: 'top 90%',
+                  toggleActions: 'play none none none',
+                },
+                y: 0,
+                autoAlpha: 1,
+                duration: 0.9,
+                ease: 'power3.out',
+              }
+            );
           });
           return;
         }
 
-        /* Desktop: pinned scrolltelling */
-        const tl = gsap.timeline({
+        // ── 3. CORE 3D SEQUENCE (THE NARRATIVE STACK) ──
+        const mainTimeline = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
             start: 'top top',
-            end: '+=380%',
-            pin: !reduceMotion,
-            pinSpacing: true,
-            scrub: reduceMotion ? false : 1.8,
+            end: '+=450%',
+            pin: true,
+            scrub: 1.2,
             anticipatePin: 1,
-            invalidateOnRefresh: true,
             onUpdate: (self) => {
-              const idx = Math.min(LAYERS.length - 1, Math.floor(self.progress * LAYERS.length));
-              setActiveIdx(idx);
+              const progress = self.progress;
+              // Map progress precisely to active index for the vertical progress bar
+              const idx = gsap.utils.clamp(0, LAYERS.length - 1, Math.floor(progress * LAYERS.length));
+              if (idx !== activeIdx) setActiveIdx(idx);
+              
+              gsap.to(sectionRef.current, {
+                '--layer-color': LAYERS[idx].color,
+                duration: 0.6,
+                overwrite: 'auto'
+              });
             },
           },
         });
 
-        if (!reduceMotion) {
-          cardRefs.current.forEach((card, i) => {
-            if (!card) return;
-            const bar = barRefs.current[i];
-            const lock = lockRefs.current[i];
+        LAYERS.forEach((_, i) => {
+          const card = cardRefs.current[i];
+          const bar = barRefs.current[i];
+          const lock = lockRefs.current[i];
+          
+          // Selectors strictly scoped to the current layer index
+          const descBox = q(`.${styles.desc}`)[i];
+          const descTitle = q(`.${styles.descTitle}`)[i];
+          const descLines = q(`.${styles.desc}:nth-child(${i + 1}) .${styles.descLine}`);
 
-            gsap.set(card, { y: 160, autoAlpha: 0, scale: 0.94, filter: 'blur(10px)' });
-            gsap.set(bar, { scaleY: 0, transformOrigin: 'top' });
-            gsap.set(lock, { autoAlpha: 0 });
+          // Added extra spacing multiplier to give text time to be read
+          const startTime = i * 2.8; 
 
-            const t0 = i * 0.9;
+          mainTimeline.addLabel(`layer-${i}`, startTime);
+          
+          // --- ENTRANCE NARRATIVE ---
+          
+          // 1. Reveal Text Container & Title
+          mainTimeline.to(descBox, { autoAlpha: 1, duration: 0.1 }, `layer-${i}`)
+                      .to(descTitle, { autoAlpha: 1, x: 0, duration: 0.6, ease: 'power3.out' }, `layer-${i}`);
+          
+          // 2. Text lines slide in sequentially (Line by Line)
+          mainTimeline.to(descLines, { 
+            autoAlpha: 1, x: 0, stagger: 0.15, duration: 0.8, ease: 'power2.out' 
+          }, `layer-${i}+=0.3`);
 
-            tl.to(card, { y: 0, autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: 0.5, ease: 'power3.out' }, t0)
-              .to(bar, { scaleY: 1, duration: 0.4, ease: 'power2.out' }, t0 + 0.15)
-              .to(lock, { autoAlpha: 1, duration: 0.35, ease: 'power2.out' }, t0 + 0.4);
+          // 3. As text finishes revealing, the card slides in
+          mainTimeline.to(card, { 
+            y: 0, autoAlpha: 1, scale: 1, rotationX: 0, filter: 'blur(0px)', duration: 1.2, ease: 'power4.out' 
+          }, `layer-${i}+=0.8`)
+          
+          // 4. The security lock bar grows and lock text hits
+          .to(bar, { scaleY: 1, duration: 0.8, ease: 'expo.out' }, `layer-${i}+=1.2`)
+          .to(lock, { autoAlpha: 1, x: 0, duration: 0.6, ease: 'back.out(1.5)' }, `layer-${i}+=1.4`);
 
-            /* Push previous cards up + dim */
-            for (let j = 0; j < i; j++) {
-              tl.to(cardRefs.current[j], {
-                opacity: 0.16,
-                y: -40 * (i - j),
-                scale: 0.94,
-                filter: 'blur(4px)',
-                duration: 0.5,
-                ease: 'power2.inOut',
-              }, t0);
-            }
-          });
+          // --- EXIT NARRATIVE ---
+          if (i < LAYERS.length - 1) {
+            // Fade out current text before next one comes
+            mainTimeline.to([descTitle, descLines], {
+              autoAlpha: 0, x: -10, duration: 0.4, ease: 'power2.in', stagger: 0.05
+            }, `layer-${i}+=2.5`);
+            
+            mainTimeline.to(descBox, { autoAlpha: 0, duration: 0.1 }, `layer-${i}+=3.0`);
 
-          /* Hold at end and fade out content for clean transition */
-          tl.to({}, { duration: 0.7 })
-            .to(sectionRef.current.querySelector(`.${styles.pinWrapper}`), {
-              autoAlpha: 0,
-              y: -50,
-              duration: 0.8,
-              ease: 'power2.in'
-            });
-        }
+            // Push the card back into the 3D stack
+            mainTimeline.to(card, {
+              y: -50, z: -150, rotationX: -15, scale: 0.88, autoAlpha: 0.3, filter: 'blur(6px)', duration: 1.2, ease: 'power2.inOut'
+            }, `layer-${i}+=2.6`);
+          }
+
+          // --- CASCADE EFFECT --- (Older cards go deeper)
+          for (let j = 0; j < i; j++) {
+            mainTimeline.to(cardRefs.current[j], {
+              y: (i - j) * -40 - 50,
+              z: (i - j) * -100 - 150,
+              rotationX: (i - j) * -5 - 15,
+              autoAlpha: Math.max(0.05, 0.3 / (i - j + 1)),
+              scale: 0.88 - (i - j) * 0.05,
+              filter: `blur(${6 + (i - j) * 2}px)`,
+              duration: 1.2,
+              ease: 'power2.inOut'
+            }, `layer-${i}+=2.6`);
+          }
+        });
+
+        // ── 4. FINAL CLOSURE ──
+        mainTimeline.to(containerRef.current, {
+          autoAlpha: 0,
+          y: -120,
+          scale: 0.95,
+          filter: 'blur(20px)',
+          duration: 1.5,
+          ease: 'power3.in'
+        }, '+=0.5');
       }
     );
   }, { scope: sectionRef });
 
   return (
     <section ref={sectionRef} className={styles.section} id="architecture" data-scroll-section>
-      <div className={`container ${styles.pinWrapper}`}>
+      <div className={`container ${styles.pinWrapper}`} ref={containerRef}>
 
-        {/* ── Left ── */}
+        {/* ── Vertical Dashboard (Instrumentation) ── */}
+        <div className={styles.progressIndicator}>
+          <div className={styles.progressTrack} />
+          <div 
+            className={styles.progressFill} 
+            style={{ 
+              height: `${(activeIdx / (LAYERS.length - 1)) * 100}%`,
+              transition: 'height 0.8s cubic-bezier(0.16, 1, 0.3, 1)' 
+            }}
+          />
+          {LAYERS.map((_, i) => (
+            <div 
+              key={i} 
+              className={`${styles.stepNum} ${activeIdx >= i ? styles.stepNumActive : ''}`}
+            >
+              0{i + 1}
+            </div>
+          ))}
+        </div>
+
+        {/* ── Narrative Column ── */}
         <div className={styles.leftCol}>
-          <h2 className={styles.headline}>
-            Four locks.<br />
-            One fails, three remain.<br />
-            You can&apos;t break all four simultaneously.
+          <h2 className={styles.headline} ref={headlineRef}>
+            {'Four locks. One fails, three remain. You can\'t break all four simultaneously.'.split(' ').map((word, i) => (
+              <span key={i} style={{ display: 'inline-block', transform: 'translateY(50px) rotateX(-60deg)', margin: '0 0.25em 0 0' }}>
+                {word}
+              </span>
+            ))}
           </h2>
 
           <div className={styles.descWrap}>
             {LAYERS.map((layer, i) => (
               <div key={i} className={`${styles.desc} ${activeIdx === i ? styles.descActive : ''}`}>
                 <h3 className={styles.descTitle} style={{ color: layer.color }}>{layer.title}</h3>
-                <pre className={styles.descBody}>{layer.body}</pre>
+                <div className={styles.descBodyWrap}>
+                  {layer.body.split('\n').map((line, j) => (
+                    <p key={j} className={styles.descLine}>{line || '\u00A0'}</p>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
         </div>
 
-        {/* ── Right ── */}
+        {/* ── 3D Staging Area ── */}
         <div className={styles.rightCol}>
           {LAYERS.map((layer, i) => (
-            <div key={i} className={styles.card} ref={el => cardRefs.current[i] = el} data-gsap-scan>
+            <div key={i} className={styles.card} ref={el => cardRefs.current[i] = el}>
               <div
                 className={styles.cardBar}
                 ref={el => barRefs.current[i] = el}
