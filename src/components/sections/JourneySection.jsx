@@ -64,14 +64,14 @@ export default function JourneySection() {
           scrollTrigger: {
             trigger: sectionRef.current,
             start: 'top top',
-            end: '+=200%', // Optimized duration
+            end: '+=400%', // More space for professional feel
             scrub: 1,
             pin: true,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
               const raw = self.progress * (NODES.length - 1);
-              const idx = Math.min(NODES.length - 1, Math.round(raw));
+              const idx = gsap.utils.clamp(0, NODES.length - 1, Math.round(raw));
               if (idx !== activeIdxRef.current) {
                 activeIdxRef.current = idx;
                 setActiveIdx(idx);
@@ -80,46 +80,58 @@ export default function JourneySection() {
           },
         });
 
-        // Animate the main path line and dot
-        tl.to(progressLineRef.current, { height: '100%', ease: 'none', duration: NODES.length });
-        tl.to(dotRef.current, { top: '100%', ease: 'none', duration: NODES.length }, 0);
+        // Initialize cards
+        gsap.set(contentRefs.current, { autoAlpha: 0, x: 40, scale: 0.9, filter: 'blur(10px)' });
+
+        // Animate the main path line and dot across the whole timeline
+        tl.to(progressLineRef.current, { height: '100%', ease: 'none', duration: NODES.length * 4 }, 0);
+        tl.to(dotRef.current, { top: '100%', ease: 'none', duration: NODES.length * 4 }, 0);
 
         NODES.forEach((_, i) => {
-          const time = i;
+          const startTime = i * 4;
+          const label = `node-${i}`;
+          tl.addLabel(label, startTime);
           
-          // Animate node appearance
-          tl.to(stopRefs.current[i].querySelector(`.${styles.nodeCircle}`), {
+          const stopCircle = stopRefs.current[i].querySelector(`.${styles.nodeCircle}`);
+          const card = contentRefs.current[i];
+
+          // 1. Entrance
+          tl.to(stopCircle, {
             scale: 1.5,
             backgroundColor: 'var(--color-accent)',
             boxShadow: '0 0 30px rgba(0, 245, 160, 0.8)',
-            duration: 0.5,
-          }, time);
+            duration: 1,
+          }, label);
 
-          // Animate content reveal
-          tl.to(contentRefs.current[i], {
+          tl.to(card, {
             autoAlpha: 1,
             x: 0,
             scale: 1,
             filter: 'blur(0px)',
-            duration: 0.8,
-          }, time);
+            duration: 1.2,
+            ease: 'power3.out'
+          }, label);
 
-          // Animate content exit for previous node
-          if (i > 0) {
-            tl.to(contentRefs.current[i - 1], {
-              autoAlpha: 0.1,
-              x: -20,
-              scale: 0.95,
+          // 2. Persistence
+          tl.to({}, { duration: 1.5 }, `${label}+=1.2`);
+
+          // 3. Exit (if not last)
+          if (i < NODES.length - 1) {
+            tl.to(card, {
+              autoAlpha: 0,
+              x: -40,
+              scale: 0.9,
               filter: 'blur(10px)',
-              duration: 0.8,
-            }, time);
-            
-            tl.to(stopRefs.current[i - 1].querySelector(`.${styles.nodeCircle}`), {
+              duration: 1,
+              ease: 'power3.in'
+            }, `${label}+=2.7`);
+
+            tl.to(stopCircle, {
               scale: 1,
               backgroundColor: 'rgba(0, 245, 160, 0.4)',
               boxShadow: '0 0 10px rgba(0, 245, 160, 0.2)',
-              duration: 0.5,
-            }, time);
+              duration: 1,
+            }, `${label}+=2.7`);
           }
         });
       }

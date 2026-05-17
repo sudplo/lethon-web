@@ -1,25 +1,13 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { TextPlugin } from 'gsap/TextPlugin';
 import { useGSAP } from '@gsap/react';
 import styles from './HeroSection.module.css';
 
-gsap.registerPlugin(ScrollTrigger, useGSAP);
-
-function buildTypewriter(container, text) {
-  container.innerHTML = '';
-  const chars = [...text];
-  chars.forEach((ch) => {
-    const span = document.createElement('span');
-    span.textContent = ch === ' ' ? '\u00A0' : ch;
-    span.style.opacity = '0';
-    span.style.display = 'inline-block';
-    container.appendChild(span);
-  });
-  return container.querySelectorAll('span');
-}
+gsap.registerPlugin(ScrollTrigger, TextPlugin, useGSAP);
 
 export default function HeroSection() {
   const sectionRef = useRef(null);
@@ -30,6 +18,7 @@ export default function HeroSection() {
   const ctasRef = useRef(null);
   const overlayRef = useRef(null);
   const scrollHintRef = useRef(null);
+  const gridRef = useRef(null);
 
   useGSAP((context, contextSafe) => {
     const nav = document.querySelector('header');
@@ -38,65 +27,82 @@ export default function HeroSection() {
 
     // ── 1. INITIAL STATES ──
     gsap.set([nav, canvas], { autoAlpha: 0 });
-    gsap.set(line2Ref.current, { autoAlpha: 0, y: 20 });
-    gsap.set(subRef.current, { autoAlpha: 0, y: 30 });
+    gsap.set(line1Ref.current, { text: "" }); // Start empty for typing
+    gsap.set(line2Ref.current, { autoAlpha: 0, scale: 0.8, filter: 'blur(20px)' });
+    gsap.set(subRef.current, { autoAlpha: 0, y: 30, filter: 'blur(10px)' });
     gsap.set(ctasRef.current, { autoAlpha: 0, y: 20 });
     gsap.set(scrollHintRef.current, { autoAlpha: 0 });
     gsap.set(overlayRef.current, { autoAlpha: 1 });
-
-    const chars = buildTypewriter(line1Ref.current, 'You are being watched.');
+    gsap.set(gridRef.current, { opacity: 0 });
 
     // ── 2. ENTRANCE NARRATIVE ──
-    const master = gsap.timeline({ delay: 0.5 });
+    const master = gsap.timeline({ delay: 0.3 });
 
-    master.to(overlayRef.current, { autoAlpha: 0, duration: 1.5, ease: 'power2.inOut' })
-      .to(chars, {
-        opacity: 1,
-        y: 0,
-        stagger: 0.04,
-        duration: 0.1,
-        ease: 'none',
-      }, '-=0.5')
-      .to({}, { duration: 1 }) // Breath
-      .to(line1Ref.current, { 
-        autoAlpha: 0, 
-        filter: 'blur(10px)', 
-        scale: 1.1, 
-        duration: 0.8, 
-        ease: 'power2.in' 
+    master
+      .to(overlayRef.current, { autoAlpha: 0, duration: 1.5, ease: 'power2.inOut' })
+      .to(gridRef.current, { opacity: 0.15, duration: 2 }, '-=1')
+      .to(line1Ref.current, {
+        duration: 1.5,
+        text: {
+          value: "You are being watched.",
+          delimiter: ""
+        },
+        ease: "none"
       })
-      .fromTo(line2Ref.current,
-        { autoAlpha: 0, filter: 'blur(20px)', scale: 0.9, y: 20 },
-        { autoAlpha: 1, filter: 'blur(0px)', scale: 1, y: 0, duration: 1.2, ease: 'expo.out' },
-        '+=0.2'
-      )
-      .to(canvas, { autoAlpha: 1, duration: 2, ease: 'power2.inOut' }, '-=1')
-      .to(subRef.current, { autoAlpha: 1, y: 0, duration: 1, ease: 'power3.out' }, '-=0.8')
-      .to(ctasRef.current, { autoAlpha: 1, y: 0, duration: 1, ease: 'power3.out' }, '-=0.6')
-      .to(scrollHintRef.current, { autoAlpha: 1, y: 0, duration: 1.2, ease: 'back.out(1.7)' }, '-=0.4')
+      .to(line1Ref.current, {
+        autoAlpha: 0,
+        filter: 'blur(10px)',
+        scale: 1.05,
+        duration: 0.8,
+        ease: 'power2.inIn',
+        delay: 0.5
+      })
+      .to(line2Ref.current, {
+        autoAlpha: 1,
+        scale: 1,
+        filter: 'blur(0px)',
+        duration: 1.5,
+        ease: 'expo.out'
+      }, "-=0.2")
+      .to(canvas, { autoAlpha: 1, duration: 2, ease: 'power2.inOut' }, '-=1.2')
+      .to(subRef.current, { 
+        autoAlpha: 1, 
+        y: 0, 
+        filter: 'blur(0px)',
+        duration: 1.2, 
+        ease: 'power3.out' 
+      }, '-=1')
+      .to(ctasRef.current, { autoAlpha: 1, y: 0, duration: 1, ease: 'power3.out' }, '-=0.8')
+      .to(scrollHintRef.current, { autoAlpha: 1, y: 0, duration: 1.2, ease: 'back.out(1.7)' }, '-=0.6')
       .to(nav, { autoAlpha: 1, duration: 1 }, '-=1');
 
-    // ── 3. MOUSE PARALLAX (Interactive Depth) ──
+    // ── 3. MOUSE PARALLAX & GRID ANIMATION ──
     const onMouseMove = contextSafe((e) => {
-      if (!isDesktop) return;
       const { clientX, clientY } = e;
-      const xPos = (clientX / window.innerWidth - 0.5) * 30;
-      const yPos = (clientY / window.innerHeight - 0.5) * 30;
+      const xPercent = (clientX / window.innerWidth - 0.5);
+      const yPercent = (clientY / window.innerHeight - 0.5);
 
       gsap.to(contentRef.current, {
-        x: xPos,
-        y: yPos,
-        duration: 1.2,
+        x: xPercent * 40,
+        y: yPercent * 40,
+        rotateY: xPercent * 10,
+        rotateX: -yPercent * 10,
+        duration: 1.5,
         ease: 'power2.out',
         overwrite: 'auto'
+      });
+
+      gsap.to(gridRef.current, {
+        x: -xPercent * 60,
+        y: -yPercent * 60,
+        duration: 2,
+        ease: 'power1.out'
       });
     });
 
     window.addEventListener('mousemove', onMouseMove);
 
-    // ── 4. RESPONSIVE SCROLL EFFECTS ──
-    const isDesktop = window.innerWidth > 760;
-    
+    // ── 4. SCROLL PERSPECTIVE ──
     mm.add({
       isDesktop: "(min-width: 761px)",
       isMobile: "(max-width: 760px)"
@@ -109,9 +115,16 @@ export default function HeroSection() {
         end: 'bottom top',
         scrub: true,
         onUpdate: (self) => {
+          const p = self.progress;
           gsap.set(contentRef.current, {
-            opacity: 1 - self.progress * 1.2,
-            y: self.progress * (isDesktop ? -100 : -50)
+            opacity: 1 - p * 1.5,
+            y: p * -150,
+            scale: 1 - p * 0.1,
+            rotateX: p * 20
+          });
+          gsap.set(gridRef.current, {
+            y: p * 100,
+            opacity: 0.15 * (1 - p)
           });
         }
       });
@@ -123,10 +136,11 @@ export default function HeroSection() {
   return (
     <section ref={sectionRef} className={styles.hero} id="hero" data-scroll-section>
       <div ref={overlayRef} className={styles.overlay} aria-hidden="true" />
+      <div ref={gridRef} className={styles.gridBackground} aria-hidden="true" />
 
       <div className={`container ${styles.content}`} ref={contentRef}>
         <div className={styles.headline}>
-          <p ref={line1Ref} className={styles.line1} aria-label="You are being watched." />
+          <p ref={line1Ref} className={styles.line1}>You are being watched.</p>
           <h1 ref={line2Ref} className={styles.line2}>Not by us.</h1>
         </div>
 
@@ -137,7 +151,7 @@ export default function HeroSection() {
 
         <div className={styles.ctas} ref={ctasRef}>
           <a href="#architecture" className={styles.ctaPrimary} data-interactive="true">
-            Explore the architecture
+            Explore architecture
           </a>
           <a
             href="https://github.com/sudplo/lethon"
@@ -146,7 +160,7 @@ export default function HeroSection() {
             className={styles.ctaSecondary}
             data-interactive="true"
           >
-            Star on GitHub ↗
+            Open Source ↗
           </a>
         </div>
       </div>

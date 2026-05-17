@@ -120,19 +120,19 @@ export default function ArchitectureSection() {
           scrollTrigger: {
             trigger: sectionRef.current,
             start: 'top top',
-            end: '+=450%',
+            end: '+=500%',
             pin: true,
-            scrub: 1.2,
+            scrub: 1,
             anticipatePin: 1,
             onUpdate: (self) => {
               const progress = self.progress;
-              // Map progress precisely to active index for the vertical progress bar
-              const idx = gsap.utils.clamp(0, LAYERS.length - 1, Math.floor(progress * LAYERS.length));
+              // Precise index calculation with slight buffer
+              const idx = gsap.utils.clamp(0, LAYERS.length - 1, Math.floor(progress * LAYERS.length * 0.99));
               if (idx !== activeIdx) setActiveIdx(idx);
               
               gsap.to(sectionRef.current, {
                 '--layer-color': LAYERS[idx].color,
-                duration: 0.6,
+                duration: 0.4,
                 overwrite: 'auto'
               });
             },
@@ -144,63 +144,61 @@ export default function ArchitectureSection() {
           const bar = barRefs.current[i];
           const lock = lockRefs.current[i];
           
-          // Selectors strictly scoped to the current layer index
           const descBox = q(`.${styles.desc}`)[i];
           const descTitle = q(`.${styles.descTitle}`)[i];
           const descLines = q(`.${styles.desc}:nth-child(${i + 1}) .${styles.descLine}`);
 
-          // Added extra spacing multiplier to give text time to be read
-          const startTime = i * 2.8; 
+          // Give each layer a dedicated block of time
+          const startTime = i * 4; 
 
           mainTimeline.addLabel(`layer-${i}`, startTime);
           
-          // --- ENTRANCE NARRATIVE ---
-          
-          // 1. Reveal Text Container & Title
-          mainTimeline.to(descBox, { autoAlpha: 1, duration: 0.1 }, `layer-${i}`)
-                      .to(descTitle, { autoAlpha: 1, x: 0, duration: 0.6, ease: 'power3.out' }, `layer-${i}`);
-          
-          // 2. Text lines slide in sequentially (Line by Line)
-          mainTimeline.to(descLines, { 
-            autoAlpha: 1, x: 0, stagger: 0.15, duration: 0.8, ease: 'power2.out' 
-          }, `layer-${i}+=0.3`);
+          // --- ENTRANCE ---
+          mainTimeline
+            .fromTo(descBox, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.1 }, `layer-${i}`)
+            .fromTo(descTitle, { autoAlpha: 0, x: -30 }, { autoAlpha: 1, x: 0, duration: 0.8, ease: 'power3.out' }, `layer-${i}`)
+            .fromTo(descLines, { autoAlpha: 0, x: -20 }, { 
+              autoAlpha: 1, x: 0, stagger: 0.1, duration: 0.8, ease: 'power2.out' 
+            }, `layer-${i}+=0.3`)
+            .fromTo(card, { 
+              y: 400, autoAlpha: 0, scale: 0.8, rotationX: 15, filter: 'blur(15px)'
+            }, { 
+              y: 0, autoAlpha: 1, scale: 1, rotationX: 0, filter: 'blur(0px)', duration: 1.2, ease: 'expo.out',
+              immediateRender: false
+            }, `layer-${i}+=0.5`)
+            .fromTo(bar, { scaleY: 0 }, { scaleY: 1, duration: 0.8, ease: 'expo.out' }, `layer-${i}+=1.2`)
+            .fromTo(lock, { autoAlpha: 0, x: -20 }, { autoAlpha: 1, x: 0, duration: 0.6, ease: 'back.out(1.5)' }, `layer-${i}+=1.4`);
 
-          // 3. As text finishes revealing, the card slides in
-          mainTimeline.to(card, { 
-            y: 0, autoAlpha: 1, scale: 1, rotationX: 0, filter: 'blur(0px)', duration: 1.2, ease: 'power4.out' 
-          }, `layer-${i}+=0.8`)
-          
-          // 4. The security lock bar grows and lock text hits
-          .to(bar, { scaleY: 1, duration: 0.8, ease: 'expo.out' }, `layer-${i}+=1.2`)
-          .to(lock, { autoAlpha: 1, x: 0, duration: 0.6, ease: 'back.out(1.5)' }, `layer-${i}+=1.4`);
+          // --- PERSISTENCE --- (Keep it visible for a while)
+          mainTimeline.to({}, { duration: 1.5 }, `layer-${i}+=2`);
 
-          // --- EXIT NARRATIVE ---
+          // --- EXIT --- (Only if not last layer)
           if (i < LAYERS.length - 1) {
-            // Fade out current text before next one comes
-            mainTimeline.to([descTitle, descLines], {
-              autoAlpha: 0, x: -10, duration: 0.4, ease: 'power2.in', stagger: 0.05
-            }, `layer-${i}+=2.5`);
-            
-            mainTimeline.to(descBox, { autoAlpha: 0, duration: 0.1 }, `layer-${i}+=3.0`);
+            mainTimeline
+              .to([descTitle, descLines], {
+                autoAlpha: 0, x: 20, duration: 0.6, ease: 'power2.in', stagger: 0.05
+              }, `layer-${i}+=3.5`)
+              .to(descBox, { autoAlpha: 0, duration: 0.1 }, `layer-${i}+=4.1`)
+              .to(card, {
+                y: -60, z: -100, rotationX: -10, scale: 0.92, autoAlpha: 0.4, filter: 'blur(8px)', duration: 1, ease: 'power2.inOut'
+              }, `layer-${i}+=3.8`);
 
-            // Push the card back into the 3D stack
-            mainTimeline.to(card, {
-              y: -50, z: -150, rotationX: -15, scale: 0.88, autoAlpha: 0.3, filter: 'blur(6px)', duration: 1.2, ease: 'power2.inOut'
-            }, `layer-${i}+=2.6`);
-          }
-
-          // --- CASCADE EFFECT --- (Older cards go deeper)
-          for (let j = 0; j < i; j++) {
-            mainTimeline.to(cardRefs.current[j], {
-              y: (i - j) * -40 - 50,
-              z: (i - j) * -100 - 150,
-              rotationX: (i - j) * -5 - 15,
-              autoAlpha: Math.max(0.05, 0.3 / (i - j + 1)),
-              scale: 0.88 - (i - j) * 0.05,
-              filter: `blur(${6 + (i - j) * 2}px)`,
-              duration: 1.2,
-              ease: 'power2.inOut'
-            }, `layer-${i}+=2.6`);
+            // Push ALL previous cards deeper
+            for (let j = 0; j <= i; j++) {
+              const prevCard = cardRefs.current[j];
+              const depth = i - j + 1;
+              mainTimeline.to(prevCard, {
+                y: depth * -40 - 60,
+                z: depth * -120 - 100,
+                rotationX: depth * -8 - 10,
+                autoAlpha: Math.max(0, 0.4 / (depth + 1)),
+                scale: 0.92 - depth * 0.04,
+                filter: `blur(${8 + depth * 3}px)`,
+                duration: 1,
+                ease: 'power2.inOut',
+                immediateRender: false
+              }, `layer-${i}+=3.8`);
+            }
           }
         });
 

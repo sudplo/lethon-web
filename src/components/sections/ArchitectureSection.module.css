@@ -111,10 +111,12 @@
   inset: 0 auto auto 0;
   max-width: 37rem;
   pointer-events: none;
+  visibility: hidden; /* Ensure it doesn't block clicks when not active */
 }
 
 .descActive {
   pointer-events: auto;
+  visibility: visible;
 }
 
 .descTitle,

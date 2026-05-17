@@ -17,7 +17,6 @@ function buildWords(container, words) {
     const inner = document.createElement('span');
     inner.className = styles.wordInner;
     inner.textContent = word + (i < words.length - 1 ? '\u00A0' : '');
-    gsap.set(inner, { autoAlpha: 0, y: 28, filter: 'blur(12px)' });
     wrap.appendChild(inner);
     container.appendChild(wrap);
     spans.push(inner);
@@ -34,7 +33,10 @@ export default function StatementSection() {
   useGSAP(() => {
     const w1 = buildWords(line1Ref.current, ['The', 'network', 'carries']);
     const w2 = buildWords(line2Ref.current, ['what', 'it', 'doesn\'t', 'understand.']);
-    gsap.set(subRef.current, { autoAlpha: 0, y: 18 });
+    const allWords = [...w1, ...w2];
+    
+    gsap.set(allWords, { opacity: 0.1, filter: 'blur(12px)', scale: 0.9 });
+    gsap.set(subRef.current, { autoAlpha: 0, y: 20 });
 
     const mm = gsap.matchMedia();
 
@@ -42,50 +44,56 @@ export default function StatementSection() {
       {
         isDesktop: '(min-width: 761px)',
         isMobile: '(max-width: 760px)',
-        reduceMotion: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
-        const { isDesktop, reduceMotion } = context.conditions;
+        const { isDesktop } = context.conditions;
 
         if (!isDesktop) {
-          /* Mobile: show everything immediately */
-          gsap.set([...w1, ...w2], { autoAlpha: 1, y: 0, filter: 'blur(0px)' });
+          gsap.set(allWords, { opacity: 1, filter: 'blur(0px)', scale: 1 });
           gsap.set(subRef.current, { autoAlpha: 1, y: 0 });
           return;
         }
 
-        /* Desktop: scrub-driven reveal */
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: 'top 55%',
-            end: 'bottom 35%',
-            scrub: reduceMotion ? false : 0.7,
-            toggleActions: 'play none none reverse',
-            invalidateOnRefresh: true,
-            fastScrollEnd: true,
+            start: 'top top',
+            end: '+=150%',
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1,
           },
         });
 
-        tl
-          /* Line 1 falls in */
-          .to(w1, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.6, stagger: 0.16, ease: 'power3.out' }, 0)
-          .to({}, { duration: 0.35 })
+        // Dynamic focus effect
+        allWords.forEach((word, i) => {
+          tl.to(word, {
+            opacity: 1,
+            filter: 'blur(0px)',
+            scale: 1,
+            color: '#fff',
+            duration: 0.5,
+          }, i * 0.2)
+          .to(word, {
+            opacity: 0.15,
+            filter: 'blur(8px)',
+            scale: 0.95,
+            duration: 0.5,
+          }, (i * 0.2) + 0.5);
+        });
 
-          /* Line 2 completes the thought */
-          .to(w2, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.55, stagger: 0.13, ease: 'power3.out' })
-          .to({}, { duration: 0.35 })
-
-          /* Dim both, surface subline */
-          .to([...w1, ...w2], { autoAlpha: 0.18, filter: 'blur(5px)', y: -10, duration: 0.65, ease: 'power2.inOut' })
-          .to(subRef.current, { autoAlpha: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '-=0.4')
-          .to({}, { duration: 0.9 });
+        tl.to(subRef.current, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 1,
+          ease: 'power3.out'
+        }, '>-=0.5');
       }
     );
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className={styles.section} data-scroll-section>
+    <section ref={sectionRef} className={styles.section} id="statement" data-scroll-section>
       <div className="container">
         <div className={styles.block}>
           <h2 ref={line1Ref} className={styles.line1} aria-label="The network carries" />

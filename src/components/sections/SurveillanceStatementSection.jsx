@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useGSAP } from '@gsap/react';
@@ -8,88 +8,115 @@ import styles from './SurveillanceStatementSection.module.css';
 
 gsap.registerPlugin(ScrollTrigger, useGSAP);
 
-function buildWords(container, text, color) {
-  container.innerHTML = '';
-  const words = text.split(' ');
-  const spans = [];
-  words.forEach((word, i) => {
-    const wrap = document.createElement('span');
-    wrap.className = styles.wordWrap;
-    const inner = document.createElement('span');
-    inner.className = styles.wordInner;
-    if (color) inner.style.color = color;
-    inner.textContent = word + (i < words.length - 1 ? '\u00A0' : '');
-    gsap.set(inner, { autoAlpha: 0, y: 34, filter: 'blur(14px)' });
-    wrap.appendChild(inner);
-    container.appendChild(wrap);
-    spans.push(inner);
-  });
-  return spans;
+const LINES = [
+  { text: 'Metadata is where surveillance lives.', color: null, className: styles.line1 },
+  { text: 'Lethon makes it invisible.', color: 'var(--color-accent)', className: styles.line2 },
+  { text: 'Not by encryption.', color: 'rgba(240,244,248,0.5)', className: styles.line3 },
+  { text: 'By architecture.', color: null, className: styles.line4 },
+];
+
+function Word({ word, color, index }) {
+  return (
+    <span className={styles.wordWrap}>
+      <span 
+        className={`${styles.wordInner} js-word`} 
+        style={{ color: color }}
+      >
+        {word}{'\u00A0'}
+      </span>
+    </span>
+  );
 }
 
 export default function SurveillanceStatementSection() {
   const sectionRef = useRef(null);
-  const b1 = useRef(null), b2 = useRef(null), b3 = useRef(null), b4 = useRef(null);
+  const containerRef = useRef(null);
 
   useGSAP(() => {
-    const w1 = buildWords(b1.current, 'Metadata is where surveillance lives.', null);
-    const w2 = buildWords(b2.current, 'Lethon makes it invisible.', 'var(--color-accent)');
-    const w3 = buildWords(b3.current, 'Not by encryption.', 'rgba(240,244,248,0.55)');
-    const w4 = buildWords(b4.current, 'By architecture.', null);
-
+    const q = gsap.utils.selector(sectionRef);
     const mm = gsap.matchMedia();
+
+    // Group words by their line index
+    const lineWords = LINES.map((_, i) => q(`.js-line-${i} .js-word`));
 
     mm.add(
       {
         isDesktop: '(min-width: 761px)',
         isMobile: '(max-width: 760px)',
-        reduceMotion: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
-        const { isDesktop, reduceMotion } = context.conditions;
+        const { isDesktop } = context.conditions;
 
         if (!isDesktop) {
-          /* Mobile: show everything immediately */
-          gsap.set([...w1, ...w2, ...w3, ...w4], { autoAlpha: 1, y: 0, filter: 'blur(0px)' });
+          gsap.set(q('.js-word'), { opacity: 1, filter: 'blur(0px)', y: 0 });
           return;
         }
 
-        /* Desktop: scrub-driven sequential reveal */
+        // Desktop: High-impact sequence
+        gsap.set(q('.js-word'), { opacity: 0.1, filter: 'blur(12px)', y: 20 });
+
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: 'top 55%',
-            end: 'bottom 30%',
-            scrub: reduceMotion ? false : 0.7,
-            toggleActions: 'play none none reverse',
-            invalidateOnRefresh: true,
+            start: 'top top',
+            end: '+=300%',
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1,
           },
         });
 
-        tl
-          .to(w1, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.55, stagger: 0.12, ease: 'expo.out' }, 0)
-          .to({}, { duration: 0.25 })
+        lineWords.forEach((words, idx) => {
+          const label = `line-${idx}`;
+          tl.addLabel(label);
 
-          .to(w1, { autoAlpha: 0.18, filter: 'blur(3px)', y: -10, duration: 0.38, ease: 'power2.inOut' })
-          .to(w2, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.55, stagger: 0.13, ease: 'expo.out' }, '-=0.2')
-          .to({}, { duration: 0.25 })
+          // 1. Reveal Group
+          tl.to(words, {
+            opacity: 1,
+            filter: 'blur(0px)',
+            y: 0,
+            stagger: 0.04,
+            duration: 0.8,
+            ease: 'power3.out'
+          }, label);
 
-          .to([...w1, ...w2], { autoAlpha: 0.06, filter: 'blur(5px)', duration: 0.45, ease: 'power2.inOut' })
-          .to(w3, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.4, stagger: 0.10, ease: 'expo.out' }, '-=0.25')
-          .to(w4, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.5, stagger: 0.11, ease: 'expo.out' }, '-=0.05')
-          .to({}, { duration: 0.75 });
+          // 2. Persistence
+          tl.to({}, { duration: 0.8 }, `${label}+=0.8`);
+
+          // 3. Exit if not last
+          if (idx < lineWords.length - 1) {
+            tl.to(words, {
+              opacity: 0.05,
+              filter: 'blur(15px)',
+              y: -25,
+              stagger: 0.02,
+              duration: 0.6,
+              ease: 'power2.in'
+            }, `${label}+=1.6`);
+          }
+        });
       }
     );
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className={styles.section} data-scroll-section>
-      <div className={`container ${styles.inner}`}>
-        <p ref={b1} className={styles.line1} />
-        <p ref={b2} className={styles.line2} />
+    <section ref={sectionRef} className={styles.section} id="surveillance" data-scroll-section>
+      <div className={`container ${styles.inner}`} ref={containerRef}>
+        {LINES.slice(0, 2).map((line, i) => (
+          <p key={i} className={`${line.className} js-line-${i}`}>
+            {line.text.split(' ').map((word, j) => (
+              <Word key={j} word={word} color={line.color} />
+            ))}
+          </p>
+        ))}
         <div className={styles.smallGroup}>
-          <p ref={b3} className={styles.line3} />
-          <p ref={b4} className={styles.line4} />
+          {LINES.slice(2).map((line, i) => (
+            <p key={i + 2} className={`${line.className} js-line-${i + 2}`}>
+              {line.text.split(' ').map((word, j) => (
+                <Word key={j} word={word} color={line.color} />
+              ))}
+            </p>
+          ))}
         </div>
       </div>
     </section>

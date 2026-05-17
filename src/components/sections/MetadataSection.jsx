@@ -74,7 +74,7 @@ export default function MetadataSection() {
           scrollTrigger: {
             trigger: sectionRef.current,
             start: 'top top',
-            end: `+=${ITEMS.length * 100}%`,
+            end: `+=${ITEMS.length * 120}%`,
             scrub: 1,
             pin: true,
             anticipatePin: 1,
@@ -89,7 +89,7 @@ export default function MetadataSection() {
           const rightBlock = row.querySelector(`.${styles.dataRight}`);
           const scanner = row.querySelector(`.${styles.scanner}`);
           
-          gsap.set(row, { autoAlpha: i === 0 ? 1 : 0.3, scale: i === 0 ? 1 : 0.98 });
+          gsap.set(row, { autoAlpha: i === 0 ? 1 : 0.2, scale: i === 0 ? 1 : 0.96 });
           gsap.set(rightBlock, { clipPath: 'inset(0 100% 0 0)' });
           gsap.set(scanner, { left: '0%', autoAlpha: 0 });
         });
@@ -101,19 +101,25 @@ export default function MetadataSection() {
           const rightBlock = row.querySelector(`.${styles.dataRight}`);
           const scanner = row.querySelector(`.${styles.scanner}`);
           
-          // Focus current row
-          tl.to(row, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'power2.out' });
+          const label = `row-${i}`;
+          tl.addLabel(label);
 
-          // Scanner sweeping effect
-          tl.to(scanner, { autoAlpha: 1, duration: 0.2 })
-            .to(scanner, { left: '100%', duration: 1.5, ease: 'power1.inOut' })
-            .to(rightBlock, { clipPath: 'inset(0 0% 0 0)', duration: 1.5, ease: 'power1.inOut' }, '<')
-            .to(leftBlock, { filter: 'blur(4px)', opacity: 0.3, duration: 1, ease: 'power2.in' }, '<0.5')
-            .to(scanner, { autoAlpha: 0, duration: 0.2 });
+          // 1. Focus current row
+          tl.to(row, { autoAlpha: 1, scale: 1, duration: 0.8, ease: 'power2.out' }, label);
 
-          // Dim previous row
+          // 2. Scanner sweeping effect
+          tl.to(scanner, { autoAlpha: 1, duration: 0.3 }, `${label}+=0.3`)
+            .to(scanner, { left: '100%', duration: 1.8, ease: 'power1.inOut' }, `${label}+=0.3`)
+            .to(rightBlock, { clipPath: 'inset(0 0% 0 0)', duration: 1.8, ease: 'power1.inOut' }, `${label}+=0.3`)
+            .to(leftBlock, { filter: 'blur(8px)', opacity: 0.2, duration: 1.2, ease: 'power2.in' }, `${label}+=0.8`)
+            .to(scanner, { autoAlpha: 0, duration: 0.3 }, `${label}+=2.1`);
+
+          // 3. Persistence
+          tl.to({}, { duration: 1 }, `${label}+=2.4`);
+
+          // 4. Dim row if not last
           if (i < ITEMS.length - 1) {
-            tl.to(row, { autoAlpha: 0.3, scale: 0.98, duration: 0.5, ease: 'power2.inOut' });
+            tl.to(row, { autoAlpha: 0.2, scale: 0.96, duration: 0.8, ease: 'power2.inOut' }, `${label}+=3.4`);
           }
         });
       }
