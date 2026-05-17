@@ -4,7 +4,8 @@
   align-items: center;
   position: relative;
   overflow: clip;
-  padding-block: clamp(7rem, 12vh, 10rem);
+  padding-block: clamp(7rem, 15vh, 12rem);
+  background: radial-gradient(circle at 10% 20%, rgba(0, 245, 160, 0.05) 0%, transparent 50%);
 }
 
 .overlay {
@@ -17,14 +18,14 @@
 
 .content {
   width: 100%;
-  max-width: 880px;
+  max-width: 1100px;
   position: relative;
   z-index: 1;
 }
 
 .headline {
-  min-height: clamp(7.6rem, 16vw, 11.5rem);
-  margin-bottom: clamp(1.8rem, 4vw, 3rem);
+  min-height: clamp(8rem, 18vw, 13rem);
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
 }
 
 .line1,
@@ -32,133 +33,142 @@
   display: block;
   margin: 0;
   font-family: var(--font-sans);
-  font-size: clamp(3rem, 8vw, 6.8rem);
-  font-weight: 620;
-  line-height: 0.98;
-  letter-spacing: 0;
+  font-size: clamp(3.5rem, 10vw, 8.5rem);
+  font-weight: 650;
+  line-height: 0.9;
+  letter-spacing: -0.03em;
   text-wrap: balance;
   overflow-wrap: anywhere;
 }
 
 .line1 {
   color: var(--text-primary);
+  margin-bottom: 0.1em;
 }
 
 .line2 {
   color: var(--color-accent);
-  text-shadow: 0 0 70px rgba(0, 245, 160, 0.28);
+  text-shadow: 0 0 80px rgba(0, 245, 160, 0.35);
 }
 
 .sub {
-  max-width: 680px;
-  margin: 0 0 clamp(2rem, 5vw, 3.5rem);
+  max-width: 600px;
+  margin: 0 0 clamp(3rem, 6vw, 4.5rem);
   font-family: var(--font-mono);
-  font-size: clamp(0.95rem, 1.45vw, 1.08rem);
-  line-height: 1.75;
+  font-size: clamp(1rem, 1.2vw, 1.15rem);
+  line-height: 1.8;
   color: var(--text-muted);
+  border-left: 1px solid rgba(0, 245, 160, 0.2);
+  padding-left: 2rem;
 }
 
 .ctas {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 1rem;
+  gap: 2rem;
 }
 
 .ctaPrimary,
 .ctaSecondary {
   display: inline-flex;
-  min-height: 3rem;
+  min-height: 3.5rem;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-md);
   font-family: var(--font-mono);
-  font-size: 0.88rem;
+  font-size: 0.9rem;
+  font-weight: 500;
   line-height: 1;
-  transition: color 0.25s ease, background-color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .ctaPrimary {
-  padding: 0.95rem 1.25rem;
+  padding: 0 2rem;
   background: var(--color-accent);
   color: #000;
   border: 1px solid var(--color-accent);
-  box-shadow: 0 0 28px rgba(0, 245, 160, 0.16);
+  box-shadow: 0 10px 30px rgba(0, 245, 160, 0.15);
 }
 
 .ctaSecondary {
-  padding: 0.95rem 0;
+  padding: 0;
   color: var(--text-muted);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 0;
 }
 
 .ctaPrimary:hover {
   background: #4dffc0;
-  box-shadow: 0 12px 44px rgba(0, 245, 160, 0.24);
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(0, 245, 160, 0.25);
 }
 
 .ctaSecondary:hover {
-  color: var(--text-primary);
+  color: var(--color-accent);
   border-bottom-color: var(--color-accent);
+  transform: translateX(5px);
 }
 
 .scrollHint {
   position: absolute;
   right: clamp(1rem, 5vw, 4rem);
-  bottom: clamp(1.25rem, 5vh, 3rem);
+  bottom: clamp(1.25rem, 5vh, 4rem);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
   z-index: 2;
   color: var(--text-muted);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
+  letter-spacing: 0.1em;
 }
 
 .scrollLine {
   width: 1px;
-  height: 42px;
+  height: 60px;
   background: linear-gradient(to bottom, transparent, var(--color-accent), transparent);
 }
 
-@media (max-width: 720px) {
+@media (max-width: 760px) {
   .hero {
     align-items: center;
-    min-height: 100svh;
-    padding-block: 6rem 5rem;
+    padding-block: 8rem 5rem;
   }
 
   .content {
-    max-width: calc(100vw - 2rem);
+    max-width: 100%;
   }
 
   .headline {
-    min-height: clamp(6rem, 24vw, 8.4rem);
+    min-height: auto;
+    margin-bottom: 2rem;
   }
 
   .line1,
   .line2 {
-    font-size: clamp(2.65rem, 12vw, 4rem);
-  }
-
-  .brDesktop {
-    display: none;
+    font-size: clamp(3rem, 15vw, 5rem);
   }
 
   .sub {
-    max-width: 100%;
-    line-height: 1.65;
+    padding-left: 1.5rem;
+    margin-bottom: 3rem;
   }
 
   .ctas {
+    flex-direction: column;
     align-items: stretch;
+    gap: 1rem;
   }
 
-  .ctaPrimary,
-  .ctaSecondary {
+  .ctaPrimary {
     width: 100%;
+  }
+
+  .ctaSecondary {
+    width: fit-content;
+    padding: 0.5rem 0;
   }
 
   .scrollHint {

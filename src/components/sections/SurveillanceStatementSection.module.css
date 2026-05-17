@@ -1,54 +1,68 @@
 .section {
-  min-height: 84svh;
+  min-height: 100svh;
   display: flex;
   align-items: center;
   background-color: var(--bg-base);
   position: relative;
+  overflow: hidden;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 245, 160, 0.02) 0%, transparent 70%);
 }
 
 .inner {
   display: flex;
   flex-direction: column;
   gap: 0;
-  max-width: 900px;
+  max-width: 1200px;
+  width: 100%;
+}
+
+.line1,
+.line2 {
+  font-family: var(--font-sans);
+  font-size: clamp(3rem, 7.5vw, 6.2rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  display: block;
+  min-height: 1.1em;
 }
 
 .line1 {
-  font-family: var(--font-sans);
-  font-size: clamp(2.2rem, 5.5vw, 4.5rem);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
   color: var(--text-primary);
-  margin: 0 0 0.05em;
-  display: block;
-  min-height: 1.2em;
+  margin: 0 0 0.1em;
 }
 
 .line2 {
-  font-family: var(--font-sans);
-  font-size: clamp(2.2rem, 5.5vw, 4.5rem);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.025em;
-  margin: 0 0 2.5rem;
-  display: block;
-  min-height: 1.2em;
+  color: var(--color-accent);
+  margin: 0 0 clamp(4rem, 8vw, 6rem);
+  text-shadow: 0 0 80px rgba(0, 245, 160, 0.25);
 }
 
 .smallGroup {
   display: flex;
   flex-direction: column;
-  gap: 0.15em;
+  gap: 0.5rem;
+  padding-left: clamp(2rem, 5vw, 5rem);
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .line3,
 .line4 {
   font-family: var(--font-mono);
-  font-size: clamp(1rem, 1.8vw, 1.4rem);
+  font-size: clamp(1.1rem, 2vw, 1.6rem);
   margin: 0;
   display: block;
   min-height: 1.4em;
+  letter-spacing: 0.02em;
+}
+
+.line3 {
+  color: rgba(240, 244, 248, 0.5);
+}
+
+.line4 {
+  color: var(--text-primary);
+  font-weight: 500;
 }
 
 .wordWrap {
@@ -64,9 +78,27 @@
   will-change: transform, opacity, filter;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 760px) {
   .section {
-    min-height: 76svh;
-    padding-block: 5rem;
+    min-height: 90svh;
+    padding-block: 8rem;
+  }
+
+  .line1,
+  .line2 {
+    font-size: clamp(2.2rem, 12vw, 4.5rem);
+  }
+
+  .line2 {
+    margin-bottom: 4rem;
+  }
+
+  .smallGroup {
+    padding-left: 1.5rem;
+  }
+
+  .line3,
+  .line4 {
+    font-size: 1.1rem;
   }
 }

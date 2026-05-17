@@ -70,7 +70,10 @@ export default function Home() {
 
     /* Also refresh on window load (images etc.) */
     window.addEventListener('load', refresh);
-    return () => window.removeEventListener('load', refresh);
+
+    return () => {
+      window.removeEventListener('load', refresh);
+    };
   }, []);
 
   return (

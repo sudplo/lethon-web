@@ -11,7 +11,7 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 const PHRASES = [
   { words: ['Privacy', 'is', 'not', 'a', 'feature.'], color: 'var(--text-primary)', cls: styles.phrase0 },
   { words: ['It\'s', 'the', 'foundation.'], color: 'var(--text-primary)', cls: styles.phrase1 },
-  { words: ['Privacy', 'by', 'architecture,', 'not', 'by', 'trust.'], color: 'var(--color-accent)', cls: styles.phrase2, glow: true },
+  { words: ['Privacy', 'by', 'architecture,', 'not', 'by', 'trust.'], color: 'var(--color-teal)', cls: styles.phrase2, glow: true },
 ];
 
 function buildPhrase(container, words) {
@@ -23,7 +23,7 @@ function buildPhrase(container, words) {
     const inner = document.createElement('span');
     inner.className = styles.wordInner;
     inner.textContent = word + (i < words.length - 1 ? '\u00A0' : '');
-    gsap.set(inner, { autoAlpha: 0, y: 28, filter: 'blur(10px)' });
+    gsap.set(inner, { autoAlpha: 0, y: 50, rotateX: -60, filter: 'blur(10px)' });
     wrap.appendChild(inner);
     container.appendChild(wrap);
     spans.push(inner);
@@ -38,111 +38,97 @@ export default function ManifestoSection() {
   const dividerRef = useRef(null);
 
   useGSAP(() => {
+    const q = gsap.utils.selector(sectionRef);
     const allSpans = phraseRefs.current.map((el, i) =>
       el ? buildPhrase(el, PHRASES[i].words) : []
     );
 
-    gsap.set(ctasRef.current, { autoAlpha: 0, y: 24 });
-    gsap.set(dividerRef.current, { scaleX: 0, transformOrigin: 'left' });
+    gsap.set(ctasRef.current, { autoAlpha: 0, y: 30 });
+    gsap.set(dividerRef.current, { scaleX: 0, transformOrigin: 'center' });
 
     const mm = gsap.matchMedia();
 
     mm.add(
       {
-        isDesktop: '(min-width: 681px)',
-        isMobile: '(max-width: 680px)',
+        isDesktop: '(min-width: 901px)',
+        isMobile: '(max-width: 900px)',
         reduceMotion: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
         const { isDesktop, reduceMotion } = context.conditions;
 
-        /* Mobile: simple scroll-triggered reveal, no pin */
         if (!isDesktop) {
-          /* Show all words immediately */
           allSpans.forEach(spans => {
-            gsap.set(spans, { autoAlpha: 1, y: 0, filter: 'blur(0px)' });
+            gsap.set(spans, { autoAlpha: 1, y: 0, rotateX: 0, filter: 'blur(0px)' });
           });
-
-          /* Fade in CTAs on scroll */
-          gsap.to(dividerRef.current, {
-            scrollTrigger: {
-              trigger: ctasRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none none',
-            },
-            scaleX: 1,
-            duration: 0.8,
-            ease: 'expo.out',
-          });
-
-          gsap.to(ctasRef.current, {
-            scrollTrigger: {
-              trigger: ctasRef.current,
-              start: 'top 85%',
-              toggleActions: 'play none none none',
-            },
+          gsap.to([dividerRef.current, ctasRef.current], {
             autoAlpha: 1,
+            scaleX: 1,
             y: 0,
             duration: 1,
-            ease: 'expo.out',
-            delay: 0.2,
+            stagger: 0.2,
+            scrollTrigger: {
+              trigger: ctasRef.current,
+              start: 'top 90%',
+            }
           });
-
           return;
         }
 
-        /* Desktop: pinned cinematic reveal */
+        // ── CINEMATIC TIMELINE ──
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
             start: 'top top',
-            end: '+=430%',
-            pin: !reduceMotion,
-            pinSpacing: true,
-            scrub: reduceMotion ? false : 1.8,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
+            end: '+=400%',
+            pin: true,
+            scrub: 1.5,
           },
         });
 
-        let cursor = 0;
-        const PAUSE = 1.0;
-        const STAGGER = 0.10;
-        const DURATION = 0.60;
-
         PHRASES.forEach((phrase, idx) => {
           const spans = allSpans[idx];
-          if (!spans.length) return;
+          const startTime = idx * 3;
 
-          /* Dim previous phrases */
-          if (idx > 0) {
-            for (let p = 0; p < idx; p++) {
-              tl.to(allSpans[p], {
-                autoAlpha: 0.06,
-                filter: 'blur(5px)',
-                y: -14,
-                duration: 0.45,
-                ease: 'power2.inOut',
-              }, cursor);
-            }
-          }
+          tl.addLabel(`phrase-${idx}`, startTime);
 
-          /* Reveal current */
+          // Reveal current
           tl.to(spans, {
             autoAlpha: 1,
             y: 0,
+            rotateX: 0,
             filter: 'blur(0px)',
-            duration: DURATION,
-            stagger: STAGGER,
-            ease: 'power3.out',
-          }, cursor);
+            duration: 1.5,
+            stagger: 0.12,
+            ease: 'expo.out',
+          }, `phrase-${idx}`);
 
-          cursor += 0.4 + spans.length * STAGGER + PAUSE;
+          // Pulse glow if needed
+          if (phrase.glow) {
+            tl.to(phraseRefs.current[idx], {
+              textShadow: '0 0 50px rgba(0, 245, 160, 0.4)',
+              duration: 1,
+              repeat: 1,
+              yoyo: true
+            }, `phrase-${idx}+=1`);
+          }
+
+          // Dim and push back previous
+          if (idx < PHRASES.length - 1) {
+            tl.to(spans, {
+              autoAlpha: 0.1,
+              y: -30,
+              z: -100,
+              filter: 'blur(5px)',
+              duration: 1.2,
+              ease: 'power2.inOut'
+            }, `phrase-${idx}+=2.5`);
+          }
         });
 
-        tl.to(dividerRef.current, { scaleX: 1, duration: 0.8, ease: 'expo.out' }, cursor)
-          .to(ctasRef.current, { autoAlpha: 1, y: 0, duration: 1, ease: 'expo.out' }, cursor + 0.25)
-          .to({}, { duration: 1 });
+        // Final Resolution
+        tl.to(dividerRef.current, { scaleX: 1, duration: 1, ease: 'expo.inOut' }, '+=0.5')
+          .to(ctasRef.current, { autoAlpha: 1, y: 0, duration: 1.2, ease: 'back.out(1.7)' }, '-=0.4');
       }
     );
   }, { scope: sectionRef });
@@ -157,10 +143,7 @@ export default function ManifestoSection() {
               key={i}
               ref={el => phraseRefs.current[i] = el}
               className={`${styles.phrase} ${ph.cls}`}
-              style={{
-                color: ph.color,
-                ...(ph.glow ? { textShadow: '0 0 72px rgba(0,245,160,0.18)' } : {}),
-              }}
+              style={{ color: ph.color }}
               aria-label={ph.words.join(' ')}
             />
           ))}
@@ -171,23 +154,13 @@ export default function ManifestoSection() {
           <div className={styles.ctaGrid}>
             <div className={styles.ctaItem}>
               <span className={styles.ctaItemLabel}>Don&apos;t trust us.</span>
-              <a
-                href="https://github.com/sudplo/lethon"
-                target="_blank" rel="noopener noreferrer"
-                className={styles.ctaLink}
-                data-interactive="true"
-              >
+              <a href="https://github.com/sudplo/lethon" target="_blank" rel="noopener noreferrer" className={styles.ctaLink}>
                 Read the code.
               </a>
             </div>
             <div className={styles.ctaItem}>
               <span className={styles.ctaItemLabel}>Join the build.</span>
-              <a
-                href="https://github.com/sudplo/lethon"
-                target="_blank" rel="noopener noreferrer"
-                className={styles.ctaLink}
-                data-interactive="true"
-              >
+              <a href="https://github.com/sudplo/lethon" target="_blank" rel="noopener noreferrer" className={styles.ctaLink}>
                 Star on GitHub.
               </a>
             </div>

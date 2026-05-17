@@ -12,7 +12,7 @@ const ITEMS = [
   {
     title: 'Who you\'re talking to',
     left: 'From: Alice (+1-555-0123)\nTo:   Bob (+1-555-0456)',
-    right: 'Topic: 0x7f3a9c2e (unique, never repeated)\nFrom: [hidden by Tor]\nTo:   [hidden by Tor]',
+    right: 'Topic: 0x7f3a9c2e (unique)\nFrom: [hidden by Tor]\nTo:   [hidden by Tor]',
     desc: 'Tor hides your IP. The mesh doesn\'t care who you are. Topic is ephemeral — exists one conversation only.',
   },
   {
@@ -23,7 +23,7 @@ const ITEMS = [
   },
   {
     title: 'How often',
-    left: 'Frequency: 12 messages/day\nPattern: Daily at 14:00',
+    left: 'Frequency: 12 msgs/day\nPattern: Daily at 14:00',
     right: 'Frequency: [isolated events]\nPattern: [obfuscated]',
     desc: 'Ephemeral topics reset. No conversation thread visible. Each message is an isolated event.',
   },
@@ -33,109 +33,134 @@ const ITEMS = [
     right: 'Location: [not visible]\nIP: [hidden by Tor]',
     desc: 'Tor exit node location, not your location. I2P further obscures.',
   },
-  {
-    title: 'What device you\'re using',
-    left: 'Device: iPhone 15 Pro\nOS: iOS 17.2',
-    right: 'Device: [not visible]\nOS: [not visible]',
-    desc: 'TLS fingerprinting defeated by Tor. Voice analysis prevented by DSP pipeline.',
-  },
 ];
 
 export default function MetadataSection() {
   const sectionRef = useRef(null);
   const rowRefs = useRef([]);
-
+  
   useGSAP(() => {
     const mm = gsap.matchMedia();
 
     mm.add(
       {
-        isDesktop: '(min-width: 761px)',
-        isMobile: '(max-width: 760px)',
-        reduceMotion: '(prefers-reduced-motion: reduce)',
+        isDesktop: '(min-width: 901px)',
+        isMobile: '(max-width: 900px)',
       },
       (context) => {
-        const { isDesktop, reduceMotion } = context.conditions;
+        const { isDesktop } = context.conditions;
 
         if (!isDesktop) {
-          /* Mobile: staggered entrance per row */
-          rowRefs.current.forEach((row, i) => {
+          // Mobile animation: Simple fade up without pinning
+          rowRefs.current.forEach((row) => {
             if (!row) return;
             gsap.from(row, {
               scrollTrigger: {
                 trigger: row,
-                start: 'top 88%',
+                start: 'top 85%',
                 toggleActions: 'play none none none',
               },
               y: 30,
               autoAlpha: 0,
-              duration: 0.65,
-              delay: i * 0.05,
+              duration: 0.8,
               ease: 'power3.out',
             });
           });
           return;
         }
 
-        /* Desktop: scrub-driven clip-path reveal */
+        // Desktop: High-tech Dashboard Pinning Experience
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: 'top 52%',
-            end: 'bottom 26%',
-            scrub: reduceMotion ? false : 0.75,
+            start: 'top top',
+            end: `+=${ITEMS.length * 100}%`,
+            scrub: 1,
+            pin: true,
+            anticipatePin: 1,
             invalidateOnRefresh: true,
           },
         });
 
+        // Initialize states
         rowRefs.current.forEach((row, i) => {
           if (!row) return;
-          const right = row.querySelector(`.${styles.rightSide}`);
-          const left = row.querySelector(`.${styles.leftSide}`);
-          const desc = row.querySelector(`.${styles.rowDesc}`);
-
-          gsap.set(right, { clipPath: 'inset(0 100% 0 0)' });
-          gsap.set(desc, { autoAlpha: 0, filter: 'blur(5px)' });
-
-          tl
-            .to(left, { opacity: 0.2, duration: 0.5, ease: 'power2.inOut' }, i * 1.4)
-            .to(right, { clipPath: 'inset(0 0% 0 0)', duration: 1.4, ease: 'power3.out' }, i * 1.4)
-            .to(desc, { autoAlpha: 1, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' }, i * 1.4 + 0.45);
+          const leftBlock = row.querySelector(`.${styles.dataLeft}`);
+          const rightBlock = row.querySelector(`.${styles.dataRight}`);
+          const scanner = row.querySelector(`.${styles.scanner}`);
+          
+          gsap.set(row, { autoAlpha: i === 0 ? 1 : 0.3, scale: i === 0 ? 1 : 0.98 });
+          gsap.set(rightBlock, { clipPath: 'inset(0 100% 0 0)' });
+          gsap.set(scanner, { left: '0%', autoAlpha: 0 });
         });
 
-        tl.to({}, { duration: 1.6 });
+        // Sequential Redaction Animation
+        rowRefs.current.forEach((row, i) => {
+          if (!row) return;
+          const leftBlock = row.querySelector(`.${styles.dataLeft}`);
+          const rightBlock = row.querySelector(`.${styles.dataRight}`);
+          const scanner = row.querySelector(`.${styles.scanner}`);
+          
+          // Focus current row
+          tl.to(row, { autoAlpha: 1, scale: 1, duration: 0.5, ease: 'power2.out' });
+
+          // Scanner sweeping effect
+          tl.to(scanner, { autoAlpha: 1, duration: 0.2 })
+            .to(scanner, { left: '100%', duration: 1.5, ease: 'power1.inOut' })
+            .to(rightBlock, { clipPath: 'inset(0 0% 0 0)', duration: 1.5, ease: 'power1.inOut' }, '<')
+            .to(leftBlock, { filter: 'blur(4px)', opacity: 0.3, duration: 1, ease: 'power2.in' }, '<0.5')
+            .to(scanner, { autoAlpha: 0, duration: 0.2 });
+
+          // Dim previous row
+          if (i < ITEMS.length - 1) {
+            tl.to(row, { autoAlpha: 0.3, scale: 0.98, duration: 0.5, ease: 'power2.inOut' });
+          }
+        });
       }
     );
   }, { scope: sectionRef });
 
   return (
-    <section ref={sectionRef} className={styles.section} data-scroll-section>
+    <section ref={sectionRef} className={styles.section} id="metadata" data-scroll-section>
       <div className="container">
-        <div className={styles.header}>
-          <h2>Metadata is not the message.</h2>
-          <p className={styles.headerSub}>It&apos;s everything around the message.</p>
-        </div>
+        <header className={styles.header}>
+          <div className={styles.tag}>METADATA OBFUSCATION</div>
+          <h2 className={styles.headline}>
+            Metadata is not the message.<br />
+            <span>It&apos;s everything around it.</span>
+          </h2>
+        </header>
 
-        <div className={styles.grid}>
-          <div className={styles.gridHead}>
-            <span>Standard Encryption</span>
-            <span>Lethon Architecture</span>
+        <div className={styles.dashboard}>
+          <div className={styles.dashHeader}>
+            <div>Vector / Category</div>
+            <div>Standard Reality</div>
+            <div className={styles.accentText}>Lethon Reality</div>
           </div>
 
-          {ITEMS.map((item, i) => (
-            <div key={i} className={styles.row} ref={el => rowRefs.current[i] = el} data-gsap-scan>
-              <div className={styles.rowTitle}>{item.title}</div>
-              <div className={styles.rowCols}>
-                <div className={styles.leftSide}>
-                  <pre>{item.left}</pre>
-                </div>
-                <div className={styles.rightSide}>
-                  <pre>{item.right}</pre>
+          <div className={styles.dashBody}>
+            {ITEMS.map((item, i) => (
+              <div key={i} className={styles.row} ref={el => rowRefs.current[i] = el}>
+                <div className={styles.rowMeta}>
+                  <h3 className={styles.rowTitle}>{item.title}</h3>
                   <p className={styles.rowDesc}>{item.desc}</p>
                 </div>
+                
+                <div className={styles.dataBlock} aria-label="Standard metadata">
+                  <div className={styles.dataLeft}>
+                    <pre>{item.left}</pre>
+                  </div>
+                </div>
+
+                <div className={styles.dataBlock} aria-label="Lethon metadata">
+                  <div className={styles.scanner} />
+                  <div className={styles.dataRight}>
+                    <pre>{item.right}</pre>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </section>

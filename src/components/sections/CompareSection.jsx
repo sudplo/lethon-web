@@ -13,7 +13,7 @@ const ROWS = [
   { cap: 'No central server', lethon: '✓ 100%', briar: '✓', signal: '✗', wa: '✗', },
   { cap: 'Metadata protection', lethon: '✓ Ephemeral topics + Tor', briar: '✓ Tor', signal: '~ Partial', wa: '✗', hl: true },
   { cap: 'IP hidden', lethon: '✓ Tor + I2P', briar: '✓ Tor', signal: '✗', wa: '✗', },
-  { cap: 'Groups with perms', lethon: '✓ Client-enforced RBAC', briar: '✗ Small groups', signal: '✓ Server', wa: '✓', hl: true, tip: 'Owner/Admin/Member via Ed25519 signatures' },
+  { cap: 'Groups with perms', lethon: '✓ Client-enforced RBAC', briar: '✗ Small groups', signal: '✓ Server', wa: '✓', hl: true, tip: 'Owner/Admin/Member' },
   { cap: 'Offline-first', lethon: '✓ Full sync on reconnect', briar: '✓ Bluetooth', signal: '✗', wa: '✗', hl: true },
   { cap: 'Anti-voice-biometric', lethon: '✓ DSP pipeline', briar: '✗', signal: '✗', wa: '✗', },
   { cap: 'No phone number', lethon: '✓', briar: '✓', signal: '✗', wa: '✗', },
@@ -26,70 +26,67 @@ export default function CompareSection() {
   const rowRefs = useRef([]);
   const lethonRefs = useRef([]);
   const scanlineRef = useRef(null);
-  const cardRefs = useRef([]);
+  const tableRef = useRef(null);
 
   useGSAP(() => {
+    const q = gsap.utils.selector(sectionRef);
     const mm = gsap.matchMedia();
+
+    gsap.set(rowRefs.current, { autoAlpha: 0, x: -20, filter: 'blur(10px)' });
+    gsap.set(lethonRefs.current, { backgroundColor: 'transparent' });
 
     mm.add(
       {
-        isDesktop: '(min-width: 761px)',
-        isMobile: '(max-width: 760px)',
+        isDesktop: '(min-width: 901px)',
+        isMobile: '(max-width: 900px)',
         reduceMotion: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
         const { isDesktop, reduceMotion } = context.conditions;
 
         if (!isDesktop) {
-          /* Mobile: stagger-reveal each card */
-          cardRefs.current.forEach((card, i) => {
-            if (!card) return;
-            gsap.from(card, {
-              scrollTrigger: {
-                trigger: card,
-                start: 'top 90%',
-                toggleActions: 'play none none none',
-              },
-              y: 30,
-              autoAlpha: 0,
-              duration: 0.6,
-              delay: i * 0.04,
-              ease: 'power3.out',
-            });
-          });
+          gsap.set(rowRefs.current, { autoAlpha: 1, x: 0, filter: 'blur(0px)' });
           return;
         }
 
-        /* Desktop: scrub-driven table reveal */
-        rowRefs.current.forEach(r => r && gsap.set(r, { autoAlpha: 0, y: 18, filter: 'blur(4px)' }));
-        lethonRefs.current.forEach(r => r && gsap.set(r, { autoAlpha: 0, x: -8, filter: 'blur(4px)' }));
-        gsap.set(scanlineRef.current, { top: 0, autoAlpha: 0 });
-
+        // ── SCANLINE TIMELINE ──
         const tl = gsap.timeline({
           scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top 52%',
-            end: 'bottom 22%',
-            scrub: reduceMotion ? false : 0.75,
-            invalidateOnRefresh: true,
+            trigger: tableRef.current,
+            start: 'top 60%',
+            end: 'bottom 20%',
+            scrub: 1,
           },
         });
 
-        ROWS.forEach((_, i) => {
-          tl.to(rowRefs.current[i], {
-            autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.9, ease: 'expo.out',
-          }, i * 0.48);
-          tl.to(lethonRefs.current[i], {
-            autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out',
-          }, i * 0.44 + 0.12);
+        // 1. Entrance of the table
+        tl.to(rowRefs.current, {
+          autoAlpha: 1,
+          x: 0,
+          filter: 'blur(0px)',
+          stagger: 0.1,
+          duration: 1,
+          ease: 'power3.out'
         });
 
-        const endTime = ROWS.length * 0.48;
+        // 2. The Scanline "Analysis"
+        tl.fromTo(scanlineRef.current, 
+          { top: '0%', autoAlpha: 0 },
+          { top: '100%', autoAlpha: 1, duration: 4, ease: 'none' },
+          '+=0.2'
+        );
 
-        tl.to(scanlineRef.current, { autoAlpha: 1, duration: 0.35 }, endTime + 0.3)
-          .to(scanlineRef.current, { top: '100%', duration: 2.6, ease: 'power2.inOut' }, endTime + 0.3)
-          .to(scanlineRef.current, { autoAlpha: 0, duration: 0.35 }, endTime + 2.95)
-          .to({}, { duration: 1.2 });
+        // 3. Highlighting Lethon as it's scanned
+        lethonRefs.current.forEach((el, i) => {
+          if (!el) return;
+          tl.to(el, {
+            backgroundColor: 'rgba(0, 245, 160, 0.05)',
+            duration: 0.2,
+            ease: 'power2.inOut'
+          }, `<+=${(i / ROWS.length) * 4}`);
+        });
+
+        tl.to(scanlineRef.current, { autoAlpha: 0, duration: 0.5 });
       }
     );
   }, { scope: sectionRef });
@@ -101,8 +98,7 @@ export default function CompareSection() {
           <h2>The complete picture.<br />Where architecture meets reality.</h2>
         </div>
 
-        {/* Desktop: full table */}
-        <div className={styles.tableWrap} data-gsap-scan>
+        <div className={styles.tableWrap} ref={tableRef}>
           <div className={styles.scanline} ref={scanlineRef} aria-hidden="true" />
 
           <table className={styles.table}>
@@ -139,40 +135,6 @@ export default function CompareSection() {
               ))}
             </tbody>
           </table>
-        </div>
-
-        {/* Mobile: card stack */}
-        <div className={styles.cardStack}>
-          {ROWS.map((row, i) => (
-            <div
-              key={i}
-              ref={el => cardRefs.current[i] = el}
-              className={`${styles.card} ${row.hl ? styles.cardHighlighted : ''}`}
-            >
-              <div className={styles.cardCap}>{row.cap}</div>
-              <div className={styles.cardLethon}>
-                <span className={styles.cardLethonLabel}>Lethon</span>
-                <span className={`${styles.cardLethonVal} ${row.audit ? styles.cardLethonAmber : ''}`}>
-                  {row.lethon}
-                </span>
-              </div>
-              <div className={styles.cardOthers}>
-                <div className={styles.cardOther}>
-                  <span className={styles.cardOtherLabel}>Briar</span>
-                  <span>{row.briar}</span>
-                </div>
-                <div className={styles.cardOther}>
-                  <span className={styles.cardOtherLabel}>Signal</span>
-                  <span>{row.signal}</span>
-                </div>
-                <div className={styles.cardOther}>
-                  <span className={styles.cardOtherLabel}>WA</span>
-                  <span>{row.wa}</span>
-                </div>
-              </div>
-              {row.tip && <div className={styles.cardTip}>{row.tip}</div>}
-            </div>
-          ))}
         </div>
       </div>
     </section>

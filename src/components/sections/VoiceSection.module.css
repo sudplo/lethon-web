@@ -1,207 +1,340 @@
 .section {
-  min-height: 100svh;
+  min-height: 120vh;
   display: flex;
   align-items: center;
-  padding-block: clamp(5rem, 10vh, 8rem);
+  padding-block: clamp(6rem, 15vh, 12rem);
   overflow: clip;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 245, 160, 0.03) 0%, transparent 70%);
+}
+
+.header {
+  margin-bottom: clamp(3rem, 6vw, 5rem);
+  position: relative;
+}
+
+.tag {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.2em;
+  color: var(--color-accent);
+  margin-bottom: 1.5rem;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.tag::before {
+  content: '';
+  width: 12px;
+  height: 1px;
+  background: currentColor;
 }
 
 .headline {
-  margin: 0 0 1.15rem;
+  margin: 0;
   font-family: var(--font-sans);
-  font-size: clamp(2rem, 4.1vw, 3.35rem);
-  font-weight: 540;
-  line-height: 1.14;
-  letter-spacing: 0;
+  font-size: clamp(2.5rem, 5.5vw, 4.8rem);
+  font-weight: 600;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.headline span {
+  color: var(--color-accent);
+  display: block;
 }
 
 .sub {
-  max-width: 680px;
-  margin: 0 0 clamp(2rem, 4vw, 3rem);
+  max-width: 600px;
+  margin: 2rem 0 0;
   font-family: var(--font-mono);
-  font-size: clamp(0.86rem, 1.25vw, 0.98rem);
-  line-height: 1.65;
+  font-size: clamp(0.9rem, 1.1vw, 1.05rem);
+  line-height: 1.7;
   color: var(--text-muted);
 }
 
 .card {
-  padding: clamp(1rem, 2.4vw, 1.8rem);
-  border: 1px solid var(--border-faint);
-  border-radius: var(--radius-md);
-  background: rgba(3, 5, 8, 0.68);
-  backdrop-filter: blur(18px);
+  position: relative;
+  background: linear-gradient(145deg, rgba(15, 20, 25, 0.4), rgba(5, 8, 12, 0.6));
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  padding: 2px; /* For the gradient border effect */
+  overflow: hidden;
+}
+
+.cardInner {
+  background: rgba(3, 5, 8, 0.85);
+  backdrop-filter: blur(30px);
+  border-radius: 22px;
+  padding: clamp(1.5rem, 4vw, 3.5rem);
 }
 
 .intensityRow {
   display: flex;
-  align-items: center;
-  gap: 1.4rem;
-  margin-bottom: 1.7rem;
+  align-items: flex-end;
+  gap: 2.5rem;
+  margin-bottom: clamp(2rem, 5vw, 4rem);
+}
+
+.numWrapper {
+  display: flex;
+  flex-direction: column;
+  line-height: 0.9;
+}
+
+.numLabel {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 0.5rem;
 }
 
 .intensityNum {
-  width: 1.2ch;
-  display: inline-block;
-  text-align: right;
   font-family: var(--font-mono);
-  font-size: clamp(3rem, 7vw, 5.4rem);
-  font-weight: 650;
-  line-height: 1;
+  font-size: clamp(4rem, 10vw, 8rem);
+  font-weight: 700;
   color: var(--color-accent);
   font-variant-numeric: tabular-nums;
-  text-shadow: 0 0 42px rgba(0, 245, 160, 0.32);
+  text-shadow: 0 0 50px rgba(0, 245, 160, 0.4);
 }
 
 .intensityMeta {
   display: grid;
-  gap: 0.3rem;
+  gap: 0.5rem;
+  padding-bottom: 1rem;
 }
 
 .stageLabel {
-  font-family: var(--font-mono);
-  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+  font-family: var(--font-sans);
+  font-size: clamp(1.2rem, 2vw, 1.6rem);
+  font-weight: 500;
   color: var(--text-primary);
 }
 
 .stageDesc {
   font-family: var(--font-mono);
-  font-size: 0.84rem;
+  font-size: 0.9rem;
   color: var(--text-muted);
+  max-width: 300px;
+}
+
+.trackContainer {
+  margin-bottom: clamp(2rem, 5vw, 4rem);
 }
 
 .track {
   position: relative;
-  display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
-  padding-bottom: 1.7rem;
-  margin-bottom: 1.6rem;
-}
-
-.track::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0.65rem;
   height: 2px;
-  background: var(--border-faint);
+  background: rgba(255, 255, 255, 0.05);
+  margin-bottom: 1.5rem;
 }
 
 .trackFill {
   position: absolute;
   left: 0;
-  bottom: 0.65rem;
-  height: 2px;
+  top: 0;
+  height: 100%;
   background: var(--color-accent);
-  box-shadow: 0 0 12px rgba(0, 245, 160, 0.56);
-  transition: width 0.35s ease;
+  box-shadow: 0 0 20px rgba(0, 245, 160, 0.6);
+  transition: width 0.8s cubic-bezier(0.19, 1, 0.22, 1);
 }
 
 .marker {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  justify-items: center;
-  gap: 0.42rem;
-  min-width: 0;
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
+.marker:nth-child(2) { left: 0%; }
+.marker:nth-child(3) { left: 20%; }
+.marker:nth-child(4) { left: 40%; }
+.marker:nth-child(5) { left: 60%; }
+.marker:nth-child(6) { left: 80%; }
+.marker:nth-child(7) { left: 100%; }
+
 .markerDot {
-  width: 0.52rem;
-  height: 0.52rem;
-  border: 1px solid var(--border-faint);
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
-  background: var(--bg-base);
-  transition: background-color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+  transition: all 0.4s ease;
 }
 
 .markerActive .markerDot {
   background: var(--color-accent);
-  border-color: var(--color-accent);
-  box-shadow: 0 0 12px rgba(0, 245, 160, 0.62);
+  transform: scale(1.5);
+  box-shadow: 0 0 10px var(--color-accent);
+}
+
+.trackLabels {
+  display: flex;
+  justify-content: space-between;
 }
 
 .markerLabel {
   font-family: var(--font-mono);
-  font-size: clamp(0.58rem, 1vw, 0.72rem);
+  font-size: 0.65rem;
   color: var(--text-muted);
-  text-align: center;
-  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.4;
+  transition: all 0.4s ease;
+}
+
+.markerLabelActive {
+  opacity: 1;
+  color: var(--color-accent);
 }
 
 .waveforms {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(1rem, 3vw, 2rem);
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2rem;
 }
 
 .waveBlock {
-  min-width: 0;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  transition: all 0.6s ease;
 }
 
-.waveLabel {
-  margin-bottom: 0.65rem;
+.waveBlockActive {
+  background: rgba(0, 245, 160, 0.03);
+  border-color: rgba(0, 245, 160, 0.1);
+}
+
+.waveHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.waveStatus {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   font-family: var(--font-mono);
-  font-size: 0.76rem;
-  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
   color: var(--text-muted);
 }
 
-.waveLabelAccent {
+.statusDot {
+  width: 4px;
+  height: 4px;
+  background: currentColor;
+  border-radius: 50%;
+}
+
+.waveStatusAccent {
   color: var(--color-accent);
 }
 
+.statusDotActive {
+  width: 6px;
+  height: 6px;
+  background: var(--color-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--color-accent);
+}
+
+.stageIndicator {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--color-accent);
+  padding: 2px 8px;
+  border: 1px solid rgba(0, 245, 160, 0.2);
+  border-radius: 4px;
+}
+
 .waveform {
-  height: clamp(4.5rem, 12vw, 6.2rem);
+  height: 120px;
   display: flex;
-  align-items: flex-end;
-  gap: 2px;
+  align-items: center;
+  gap: 3px;
 }
 
 .bar {
   flex: 1;
-  min-width: 2px;
-  border-radius: 1px;
-  background: rgba(240, 244, 248, 0.74);
-  transition: height 0.35s ease, opacity 0.35s ease;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .barProcessed {
-  background: var(--color-accent);
-  box-shadow: 0 0 10px rgba(0, 245, 160, 0.18);
+  background: linear-gradient(to top, var(--color-accent), #00fff2);
+  box-shadow: 0 0 15px rgba(0, 245, 160, 0.2);
 }
 
 .closing {
-  margin-top: clamp(2rem, 4vw, 3rem);
-  max-width: 640px;
+  margin-top: clamp(4rem, 8vw, 8rem);
+}
+
+.closingGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+}
+
+.closingLeft {
   font-family: var(--font-sans);
-  font-size: clamp(1rem, 1.8vw, 1.25rem);
-  line-height: 1.55;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.accentText {
+  color: var(--color-accent);
+}
+
+.closingRight {
+  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  padding-left: 3rem;
 }
 
 .closingSub {
-  margin-top: 1rem;
   font-family: var(--font-mono);
-  font-size: 0.82rem;
+  font-size: clamp(0.9rem, 1vw, 1rem);
+  line-height: 1.7;
   color: var(--text-muted);
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .section {
+    padding-block: 6rem;
     min-height: auto;
   }
 
-  .track {
-    overflow-x: auto;
-    padding-bottom: 2rem;
-  }
-
-  .marker {
-    min-width: 5.5rem;
+  .intensityRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1.5rem;
   }
 
   .waveforms {
     grid-template-columns: 1fr;
+  }
+
+  .closingGrid {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+  }
+
+  .closingRight {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 2rem;
+  }
+
+  .markerLabel {
+    display: none;
   }
 }
