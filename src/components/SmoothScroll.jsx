@@ -5,40 +5,38 @@ import Lenis from 'lenis';
 import gsap from 'gsap';
 import ScrollTrigger from 'gsap/ScrollTrigger';
 
+gsap.registerPlugin(ScrollTrigger);
+
+/* Exponential ease-out — p=2 gives a cinematic deceleration */
+const easeExpoOut = (t) => (t === 1 ? 1 : 1 - Math.pow(2, -10 * t));
+
 export default function SmoothScroll({ children }) {
   const lenisRef = useRef(null);
 
   useEffect(() => {
-    gsap.registerPlugin(ScrollTrigger);
-
     const lenis = new Lenis({
-      duration: 1.8,            // más lento — sensación más pesada y cinematográfica
-      easing: (t) => {
-        // Curva personalizada — arranque lento, suave al final
-        return t === 1 ? 1 : 1 - Math.pow(2, -10 * t);
-      },
-      direction: 'vertical',
-      gestureDirection: 'vertical',
-      smooth: true,
-      mouseMultiplier: 0.8,    // menos multiplicador = más resistencia = más control
-      smoothTouch: false,
-      touchMultiplier: 1.5,
+      duration: 2.0,
+      easing: easeExpoOut,
+      smoothWheel: true,
+      wheelMultiplier: 0.88,
+      touchMultiplier: 1.6,
       infinite: false,
+      orientation: 'vertical',
     });
 
     lenisRef.current = lenis;
 
-    lenis.on('scroll', ScrollTrigger.update);
+    /* Keep ScrollTrigger in sync */
+    lenis.on('scroll', () => ScrollTrigger.update());
 
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
-
-    gsap.ticker.lagSmoothing(0);
+    /* Drive Lenis via GSAP ticker for frame-perfect sync */
+    const ticker = (time) => lenis.raf(time * 1000);
+    gsap.ticker.add(ticker);
+    gsap.ticker.lagSmoothing(0);   /* prevent stutter after tab switch */
 
     return () => {
+      gsap.ticker.remove(ticker);
       lenis.destroy();
-      gsap.ticker.remove(lenis.raf);
     };
   }, []);
 

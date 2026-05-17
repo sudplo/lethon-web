@@ -41,7 +41,21 @@ const ManifestoSection = dynamic(() => import("@/components/sections/ManifestoSe
   ssr: true
 });
 
+import { useEffect } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
 export default function Home() {
+  useEffect(() => {
+    // Refresh all ScrollTriggers after initial mount to fix spacer heights
+    const timer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <main>
       <HeroSection />

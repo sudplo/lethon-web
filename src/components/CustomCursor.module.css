@@ -45,3 +45,10 @@
   height: 52px;
   background-color: rgba(0, 245, 160, 0.1);
 }
+
+@media (hover: none), (pointer: coarse) {
+  .dot,
+  .ring {
+    display: none;
+  }
+}

@@ -3,7 +3,11 @@
 import { useRef, useMemo } from 'react';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import gsap from 'gsap';
+
+const seededRandom = (seed) => {
+  const x = Math.sin(seed * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+};
 
 export default function WakuMeshScene() {
   const pointsRef = useRef();
@@ -18,16 +22,14 @@ export default function WakuMeshScene() {
     const velocities = [];
     
     for(let i=0; i<nodeCount; i++) {
-      // Random positions in a volume
-      positions[i*3] = (Math.random() - 0.5) * 800;
-      positions[i*3+1] = (Math.random() - 0.5) * 800;
-      positions[i*3+2] = (Math.random() - 0.5) * 200 - 100;
+      positions[i*3] = (seededRandom(i + 1) - 0.5) * 800;
+      positions[i*3+1] = (seededRandom(i + 101) - 0.5) * 800;
+      positions[i*3+2] = (seededRandom(i + 201) - 0.5) * 200 - 100;
       
-      // Random drift velocities
       velocities.push(new THREE.Vector3(
-        (Math.random() - 0.5) * 0.5,
-        (Math.random() - 0.5) * 0.5,
-        (Math.random() - 0.5) * 0.2
+        (seededRandom(i + 301) - 0.5) * 0.5,
+        (seededRandom(i + 401) - 0.5) * 0.5,
+        (seededRandom(i + 501) - 0.5) * 0.2
       ));
     }
     
@@ -37,7 +39,7 @@ export default function WakuMeshScene() {
   // For lines (we'll generate them dynamically based on distance)
   // Max lines = nodeCount * nodeCount / 2, but we only connect close ones
   const maxLines = nodeCount * 4;
-  const linePositions = useMemo(() => new Float32Array(maxLines * 6), [maxLines]);
+  const initialLinePositions = useMemo(() => new Float32Array(maxLines * 6), [maxLines]);
 
   useFrame((state) => {
     if (!pointsRef.current || !linesRef.current) return;
@@ -45,9 +47,7 @@ export default function WakuMeshScene() {
     const posAttr = pointsRef.current.geometry.attributes.position;
     const scrollY = window.scrollY;
     
-    // Parallax effect based on scroll Y
-    // Velocidad scrollY * 0.3 en animación canvas
-    groupRef.current.position.y = scrollY * 0.3;
+    groupRef.current.position.y = scrollY * 0.24;
 
     // Update node positions (drift)
     for(let i=0; i<nodeCount; i++) {
@@ -74,6 +74,7 @@ export default function WakuMeshScene() {
 
         // Connect if close enough (e.g. distance < 150)
         if(distSq < 22500 && lineIdx < maxLines) {
+          const linePositions = linesRef.current.geometry.attributes.position.array;
           linePositions[lineIdx*6] = posAttr.array[i*3];
           linePositions[lineIdx*6+1] = posAttr.array[i*3+1];
           linePositions[lineIdx*6+2] = posAttr.array[i*3+2];
@@ -86,19 +87,12 @@ export default function WakuMeshScene() {
     }
     
     // Fill the rest with 0s to hide unused lines
+    const linePositions = linesRef.current.geometry.attributes.position.array;
     for(let i=lineIdx; i<maxLines; i++) {
       linePositions[i*6] = linePositions[i*6+1] = linePositions[i*6+2] = linePositions[i*6+3] = linePositions[i*6+4] = linePositions[i*6+5] = 0;
     }
 
     linesRef.current.geometry.attributes.position.needsUpdate = true;
-    
-    // Simulate message passing "pulso verde" randomly
-    if(Math.random() > 0.98) {
-      // We could use a custom shader for colors per point, 
-      // but for simplicity we'll just pulse the whole material slightly,
-      // or rely on the visual "chaos" looking alive.
-      // Given constraints, a simple representation is enough.
-    }
   });
 
   return (
@@ -120,7 +114,7 @@ export default function WakuMeshScene() {
           <bufferAttribute
             attach="attributes-position"
             count={maxLines * 2}
-            array={linePositions}
+            array={initialLinePositions}
             itemSize={3}
           />
         </bufferGeometry>

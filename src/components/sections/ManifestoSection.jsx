@@ -8,140 +8,155 @@ import styles from './ManifestoSection.module.css';
 gsap.registerPlugin(ScrollTrigger);
 
 const PHRASES = [
-  {
-    words: ["Privacy", "is", "not", "a", "feature."],
-    color: "var(--text-primary)",
-    size: "large"
-  },
-  {
-    words: ["It's", "the", "foundation."],
-    color: "var(--text-primary)",
-    size: "large"
-  },
-  {
-    words: ["Privacy", "by", "architecture,", "not", "by", "trust."],
-    color: "var(--color-accent)",
-    size: "medium",
-    glow: true
-  }
+  { words: ['Privacy', 'is', 'not', 'a', 'feature.'], color: 'var(--text-primary)', cls: styles.phrase0 },
+  { words: ['It\'s', 'the', 'foundation.'], color: 'var(--text-primary)', cls: styles.phrase1 },
+  { words: ['Privacy', 'by', 'architecture,', 'not', 'by', 'trust.'], color: 'var(--color-accent)', cls: styles.phrase2, glow: true },
 ];
 
+function buildPhrase(container, words) {
+  container.innerHTML = '';
+  const spans = [];
+  words.forEach((word, i) => {
+    const wrap = document.createElement('span');
+    wrap.className = styles.wordWrap;
+    const inner = document.createElement('span');
+    inner.className = styles.wordInner;
+    inner.textContent = word + (i < words.length - 1 ? '\u00A0' : '');
+    gsap.set(inner, { autoAlpha: 0, y: 28, filter: 'blur(10px)' });
+    wrap.appendChild(inner);
+    container.appendChild(wrap);
+    spans.push(inner);
+  });
+  return spans;
+}
+
 export default function ManifestoSection() {
-  const containerRef = useRef(null);
+  const sectionRef = useRef(null);
   const phraseRefs = useRef([]);
   const ctasRef = useRef(null);
-  const lineRef = useRef(null);
+  const dividerRef = useRef(null);
+  const tlRef = useRef(null);
 
   useEffect(() => {
-    phraseRefs.current.forEach((phraseEl, phraseIdx) => {
-      if (!phraseEl) return;
-      phraseEl.innerHTML = '';
-      const phrase = PHRASES[phraseIdx];
+    const allSpans = phraseRefs.current.map((el, i) =>
+      el ? buildPhrase(el, PHRASES[i].words) : []
+    );
 
-      phrase.words.forEach((word, wordIdx) => {
-        const wrap = document.createElement('span');
-        wrap.className = styles.wordWrap;
-        const span = document.createElement('span');
-        span.className = styles.wordInner;
-        span.textContent = word + (wordIdx < phrase.words.length - 1 ? '\u00A0' : '');
-        wrap.appendChild(span);
-        phraseEl.appendChild(wrap);
-      });
+    gsap.set(ctasRef.current, { autoAlpha: 0, y: 24 });
+    gsap.set(dividerRef.current, { scaleX: 0, transformOrigin: 'left' });
 
-      const spans = phraseEl.querySelectorAll(`.${styles.wordInner}`);
-      gsap.set(spans, { opacity: 0, y: 30, filter: 'blur(9px)' });
-    });
+    const mm = gsap.matchMedia();
 
-    gsap.set(ctasRef.current, { opacity: 0, y: 32 });
-    gsap.set(lineRef.current, { scaleX: 0, transformOrigin: 'left' });
+    mm.add(
+      {
+        isDesktop: '(min-width: 681px)',
+        reduceMotion: '(prefers-reduced-motion: reduce)',
+      },
+      (context) => {
+        const { isDesktop, reduceMotion } = context.conditions;
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: isDesktop ? 'top top' : 'top 76%',
+            end: isDesktop ? '+=430%' : 'bottom 20%',
+            pin: isDesktop && !reduceMotion,
+            pinSpacing: true,
+            scrub: reduceMotion ? false : isDesktop ? 1.8 : 0.6,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+        tlRef.current = tl;
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "top top",
-        end: "+=410%",
-        pin: true,
-        scrub: 1.7,
-      }
-    });
+        let cursor = 0;
+        const PAUSE = isDesktop ? 1.0 : 0.55;
+        const STAGGER = 0.10;
+        const DURATION = 0.60;
 
-    let cursor = 0;
-    const PAUSE = 1.2;
-    const PHRASE_DURATION = 0.5;
-    const WORD_STAGGER = 0.11;
-    const WORD_DURATION = 0.65;
+        PHRASES.forEach((phrase, idx) => {
+      const spans = allSpans[idx];
+      if (!spans.length) return;
 
-    PHRASES.forEach((phrase, phraseIdx) => {
-      const phraseEl = phraseRefs.current[phraseIdx];
-      if (!phraseEl) return;
-      const spans = phraseEl.querySelectorAll(`.${styles.wordInner}`);
-
-      if (phraseIdx > 0) {
-        for (let prev = 0; prev < phraseIdx; prev++) {
-          const prevEl = phraseRefs.current[prev];
-          if (!prevEl) continue;
-          const prevSpans = prevEl.querySelectorAll(`.${styles.wordInner}`);
-          tl.to(prevSpans, {
-            opacity: 0.08,
+      /* Dim previous phrases */
+      if (idx > 0) {
+        for (let p = 0; p < idx; p++) {
+          tl.to(allSpans[p], {
+            autoAlpha: 0.06,
             filter: 'blur(5px)',
-            y: -18,
-            duration: PHRASE_DURATION,
-            ease: "power2.inOut"
+            y: -14,
+            duration: 0.45,
+            ease: 'power2.inOut',
           }, cursor);
         }
       }
 
+      /* Reveal current */
       tl.to(spans, {
-        opacity: 1,
+        autoAlpha: 1,
         y: 0,
         filter: 'blur(0px)',
-        duration: WORD_DURATION,
-        stagger: WORD_STAGGER,
-        ease: "power3.out"
+        duration: DURATION,
+        stagger: STAGGER,
+        ease: 'power3.out',
       }, cursor);
 
-      cursor += PHRASE_DURATION + spans.length * WORD_STAGGER + PAUSE;
-    });
+      cursor += 0.4 + spans.length * STAGGER + PAUSE;
+        });
 
-    tl.to(lineRef.current, { scaleX: 1, duration: 0.8, ease: "expo.out" }, cursor)
-      .to(ctasRef.current, { opacity: 1, y: 0, duration: 1, ease: "expo.out" }, cursor + 0.3)
-      .to({}, { duration: 1 });
+        tl.to(dividerRef.current, { scaleX: 1, duration: 0.8, ease: 'expo.out' }, cursor)
+          .to(ctasRef.current, { autoAlpha: 1, y: 0, duration: 1, ease: 'expo.out' }, cursor + 0.25)
+          .to({}, { duration: 1 });
+
+        return () => tl.kill();
+      }
+    );
 
     return () => {
-      ScrollTrigger.getAll().forEach(t => t.kill());
+      mm.revert();
     };
   }, []);
 
   return (
-    <section ref={containerRef} className={styles.manifestoSection} id="manifesto">
+    <section ref={sectionRef} className={styles.section} id="manifesto" data-scroll-section>
       <div className={`container ${styles.inner}`}>
 
-        <div className={styles.phrasesStack}>
-          {PHRASES.map((phrase, i) => (
-            <div
+        <div className={styles.stack}>
+          {PHRASES.map((ph, i) => (
+            <p
               key={i}
               ref={el => phraseRefs.current[i] = el}
-              className={`${styles.phrase} ${styles[`phrase${i}`]}`}
+              className={`${styles.phrase} ${ph.cls}`}
               style={{
-                color: phrase.color,
-                ...(phrase.glow ? { textShadow: '0 0 60px rgba(0,245,160,0.2)' } : {})
+                color: ph.color,
+                ...(ph.glow ? { textShadow: '0 0 72px rgba(0,245,160,0.18)' } : {}),
               }}
+              aria-label={ph.words.join(' ')}
             />
           ))}
         </div>
 
         <div className={styles.ctaBlock} ref={ctasRef}>
-          <div ref={lineRef} className={styles.dividerLine} />
+          <div ref={dividerRef} className={styles.divider} />
           <div className={styles.ctaGrid}>
             <div className={styles.ctaItem}>
-              <span className={styles.ctaLabel}>Don't trust us.</span>
-              <a href="https://github.com/sudplo/lethon" target="_blank" rel="noopener noreferrer" className={styles.ctaLink} data-interactive="true">
+              <span className={styles.ctaItemLabel}>Don&apos;t trust us.</span>
+              <a
+                href="https://github.com/sudplo/lethon"
+                target="_blank" rel="noopener noreferrer"
+                className={styles.ctaLink}
+                data-interactive="true"
+              >
                 Read the code.
               </a>
             </div>
             <div className={styles.ctaItem}>
-              <span className={styles.ctaLabel}>Join the build.</span>
-              <a href="https://github.com/sudplo/lethon" target="_blank" rel="noopener noreferrer" className={styles.ctaLink} data-interactive="true">
+              <span className={styles.ctaItemLabel}>Join the build.</span>
+              <a
+                href="https://github.com/sudplo/lethon"
+                target="_blank" rel="noopener noreferrer"
+                className={styles.ctaLink}
+                data-interactive="true"
+              >
                 Star on GitHub.
               </a>
             </div>

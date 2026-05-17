@@ -7,188 +7,191 @@ import styles from './VoiceSection.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const dspStages = [
-  { level: 0, label: "Plaintext", desc: "Original voice. Recognizable." },
-  { level: 1, label: "Vocoder", desc: "Spectrally flattened." },
-  { level: 2, label: "Ring Mod", desc: "Sidebands added." },
-  { level: 3, label: "Pitch LFO", desc: "Pitch-shifted." },
-  { level: 4, label: "Noise Inject", desc: "SNR lowered." },
-  { level: 5, label: "CBR Masking", desc: "Constant bitrate. Silence sounds like speech." }
+const STAGES = [
+  { label: 'Plaintext', desc: 'Original voice. Recognizable.' },
+  { label: 'Vocoder', desc: 'Spectrally flattened.' },
+  { label: 'Ring Mod', desc: 'Sidebands added.' },
+  { label: 'Pitch LFO', desc: 'Pitch-shifted.' },
+  { label: 'Noise Inject', desc: 'SNR lowered.' },
+  { label: 'CBR Masking', desc: 'Constant bitrate. Silence = speech.' },
 ];
 
+const BAR_COUNT = 36;
+
+/* Deterministic pseudo-random (no hydration mismatch) */
+const rng = (seed) => {
+  const x = Math.sin(seed * 9301 + 49297) * 233280;
+  return x - Math.floor(x);
+};
+
+function computeBar(i, isOriginal, lvl) {
+  let h = Math.sin(i * 0.38) * 48 + 50;
+  if (!isOriginal) {
+    if (lvl >= 1) h = h * 0.78 + 18;
+    if (lvl >= 2) h += Math.cos(i * 1.4) * 22;
+    if (lvl >= 3) h += Math.sin(i * 0.09) * 28;
+    if (lvl >= 4) h += (rng(i + 7) - 0.5) * 38;
+    if (lvl >= 5) h = 78 + (rng(i + 3) - 0.5) * 24;
+  }
+  return Math.max(4, Math.min(100, h));
+}
+
 export default function VoiceSection() {
-  const containerRef = useRef(null);
+  const sectionRef = useRef(null);
+  const numRef = useRef(null);
+  const labelRef = useRef(null);
+  const descRef = useRef(null);
   const closingRef = useRef(null);
-  const stageNumRef = useRef(null);   // animates the big digit
-  const stageLabelRef = useRef(null);
-  const stageDescRef = useRef(null);
+  const stageRef = useRef({ val: 0 });
+  const [stage, setStage] = useState(0);
 
-  // Use a ref for internal intensity so ScrollTrigger can read it
-  const intensityRef = useRef(0);
-  const [intensity, setIntensity] = useState(0);
-
-  // We animate the number display separately for smoothness
-  const displayIntensity = useRef({ val: 0 });
+  const stageValueRef = useRef(0);
 
   useEffect(() => {
-    gsap.set(closingRef.current, { opacity: 0, filter: 'blur(10px)', y: 20 });
+    gsap.set(closingRef.current, { autoAlpha: 0, filter: 'blur(8px)', y: 16 });
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: 'top top',
-        end: '+=280%',
-        pin: true,
-        scrub: 1.4,
-        onUpdate: (self) => {
+    const mm = gsap.matchMedia();
+
+    mm.add(
+      {
+        isDesktop: '(min-width: 761px)',
+        reduceMotion: '(prefers-reduced-motion: reduce)',
+      },
+      (context) => {
+        const { isDesktop, reduceMotion } = context.conditions;
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: isDesktop ? 'top 52%' : 'top 78%',
+            end: 'bottom 24%',
+            pin: false,
+            scrub: reduceMotion ? false : 0.75,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => {
           const raw = self.progress * 5;
           const rounded = Math.min(5, Math.round(raw));
 
-          // Smooth the big digit with a quick tween
-          gsap.to(displayIntensity.current, {
+          /* Smooth counter using GSAP for the number display */
+          gsap.to(stageRef.current, {
             val: raw,
-            duration: 0.16,
+            duration: 0.15,
             ease: 'power2.out',
             onUpdate: () => {
-              if (stageNumRef.current) {
-                stageNumRef.current.textContent = Math.round(displayIntensity.current.val);
-              }
-            }
+              if (numRef.current) numRef.current.textContent = Math.round(stageRef.current.val);
+            },
           });
 
-          if (rounded !== intensityRef.current) {
-            intensityRef.current = rounded;
-            setIntensity(rounded);
+          /* Update React state only when stage changes to avoid unnecessary re-renders */
+          if (rounded !== stageValueRef.current) {
+            stageValueRef.current = rounded;
+            setStage(rounded);
 
-            // Crossfade label + desc
             gsap.fromTo(
-              [stageLabelRef.current, stageDescRef.current],
-              { opacity: 0, y: 7, filter: 'blur(5px)' },
-              { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.32, ease: 'power3.out' }
+              [labelRef.current, descRef.current],
+              { autoAlpha: 0, y: 6, filter: 'blur(4px)' },
+              { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.3, ease: 'power3.out', overwrite: true }
             );
           }
-        }
-      }
-    });
+            },
+          },
+        });
 
-    tl.to(closingRef.current, {
-      opacity: 1,
-      filter: 'blur(0px)',
-      y: 0,
-      duration: 0.95,
-      ease: 'power3.out'
-    }, 0.85);
+        tl.to(closingRef.current, {
+          autoAlpha: 1,
+          filter: 'blur(0px)',
+          y: 0,
+          duration: 0.9,
+          ease: 'power3.out',
+        }, 0.85);
+
+        return () => tl.kill();
+      }
+    );
 
     return () => {
-      ScrollTrigger.getAll().forEach(t => t.kill());
+      mm.revert();
     };
   }, []);
 
-  // Deterministic random (no hydration mismatch)
-  const getRandom = (seed) => {
-    const x = Math.sin(seed * 9999) * 10000;
-    return x - Math.floor(x);
-  };
-
-  const generateWaveform = (isOriginal, lvl) => {
-    const bars = [];
-    for (let i = 0; i < 40; i++) {
-      let h = Math.sin(i * 0.4) * 50 + 50;
-      if (!isOriginal) {
-        if (lvl >= 1) h = h * 0.8 + 20;
-        if (lvl >= 2) h += Math.cos(i * 1.5) * 20;
-        if (lvl >= 3) h += Math.sin(i * 0.1) * 30;
-        if (lvl >= 4) h += (getRandom(i + 1) - 0.5) * 40;
-        if (lvl >= 5) h = 80 + (getRandom(i + 2) - 0.5) * 20;
-      }
-      const fh = Math.max(5, Math.min(100, h)).toFixed(2);
-      bars.push(
-        <div
-          key={i}
-          className={styles.bar}
-          style={{
-            height: `${fh}%`,
-            opacity: isOriginal && lvl === 5 ? 0.2 : 1,
-            transition: 'height 0.25s ease, opacity 0.4s ease',
-          }}
-        />
-      );
-    }
-    return bars;
-  };
-
   return (
-    <section ref={containerRef} className={styles.voiceSection} id="voice">
+    <section ref={sectionRef} className={styles.section} id="voice" data-scroll-section>
       <div className="container">
         <h2 className={styles.headline}>
           The voice that leaves your device<br />
-          isn't yours.
+          isn&apos;t yours.
         </h2>
 
-        <p className={styles.subhead}>
-          Five stages. Before the audio reaches the network,<br />
+        <p className={styles.sub}>
+          Five stages. Before audio reaches the network,<br />
           it stops being recognizable by voice analysis systems.
         </p>
 
-        <div className={styles.interactiveArea}>
+        <div className={styles.card} data-gsap-scan>
           {/* Intensity indicator */}
-          <div className={styles.intensityDisplay}>
-            <span ref={stageNumRef} className={styles.intensityNum}>0</span>
+          <div className={styles.intensityRow}>
+            <span ref={numRef} className={styles.intensityNum}>0</span>
             <div className={styles.intensityMeta}>
-              <span ref={stageLabelRef} className={styles.intensityLabel}>
-                {dspStages[intensity].label}
-              </span>
-              <span ref={stageDescRef} className={styles.intensityDesc}>
-                {dspStages[intensity].desc}
-              </span>
+              <span ref={labelRef} className={styles.stageLabel}>{STAGES[stage].label}</span>
+              <span ref={descRef} className={styles.stageDesc}>{STAGES[stage].desc}</span>
             </div>
           </div>
 
           {/* Stage track */}
-          <div className={styles.stageTrack}>
-            {dspStages.map((s, i) => (
-              <div
-                key={i}
-                className={`${styles.stageMarker} ${intensity >= i ? styles.stageActive : ''}`}
-              >
-                <div className={styles.stageMarkerDot} />
-                <span className={styles.stageMarkerLabel}>{s.label}</span>
+          <div className={styles.track}>
+            <div
+              className={styles.trackFill}
+              style={{ width: `${(stage / 5) * 100}%` }}
+            />
+            {STAGES.map((s, i) => (
+              <div key={i} className={`${styles.marker} ${stage >= i ? styles.markerActive : ''}`}>
+                <div className={styles.markerDot} />
+                <span className={styles.markerLabel}>{s.label}</span>
               </div>
             ))}
-            <div
-              className={styles.stageProgressLine}
-              style={{ width: `${(intensity / 5) * 100}%`, transition: 'width 0.25s ease' }}
-            />
           </div>
 
           {/* Waveforms */}
-          <div className={styles.waveformsContainer}>
-            <div className={styles.waveformBlock}>
+          <div className={styles.waveforms}>
+            <div className={styles.waveBlock}>
               <div className={styles.waveLabel}>Original</div>
               <div className={styles.waveform}>
-                {generateWaveform(true, intensity)}
+                {Array.from({ length: BAR_COUNT }, (_, i) => (
+                  <div
+                    key={i}
+                    className={styles.bar}
+                    style={{
+                      height: `${computeBar(i, true, 0).toFixed(4)}%`,
+                      opacity: stage === 5 ? '0.18' : '1',
+                    }}
+                  />
+                ))}
               </div>
             </div>
 
-            <div className={styles.waveformBlock}>
+            <div className={styles.waveBlock}>
               <div className={`${styles.waveLabel} ${styles.waveLabelAccent}`}>
-                Processed — Stage {intensity}
+                Processed - Stage {stage}
               </div>
-              <div className={`${styles.waveform} ${styles.processedWaveform}`}>
-                {generateWaveform(false, intensity)}
+              <div className={styles.waveform}>
+                {Array.from({ length: BAR_COUNT }, (_, i) => (
+                  <div
+                    key={i}
+                    className={`${styles.bar} ${styles.barProcessed}`}
+                    style={{ height: `${computeBar(i, false, stage).toFixed(4)}%` }}
+                  />
+                ))}
               </div>
             </div>
           </div>
         </div>
 
-        <div ref={closingRef} className={styles.closingStatement}>
-          <p>Encrypted wasn't enough.</p>
+        <div ref={closingRef} className={styles.closing}>
+          <p>Encrypted wasn&apos;t enough.</p>
           <p>Unrecognizable is the goal.</p>
-          <br />
-          <p className={styles.closingSmall}>
+          <p className={styles.closingSub}>
             No analysis system can derive a voice print from the output.<br />
-            That's not security theater.<br />
-            That's a different layer of privacy.
+            That&apos;s not security theater. That&apos;s a different layer of privacy.
           </p>
         </div>
       </div>

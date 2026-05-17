@@ -7,111 +7,123 @@ import styles from './MetadataSection.module.css';
 
 gsap.registerPlugin(ScrollTrigger);
 
-const metadataItems = [
+const ITEMS = [
   {
-    title: "Who you're talking to",
-    left: "From: Alice (+1-555-0123)\nTo: Bob (+1-555-0456)",
-    right: "Topic: 0x7f3a9c2e (unique, never repeated)\nFrom: [hidden by Tor]\nTo: [hidden by Tor]",
-    desc: "Tor hides your IP. The mesh doesn't care who you are. Topic is ephemeral — exists one conversation only."
+    title: 'Who you\'re talking to',
+    left: 'From: Alice (+1-555-0123)\nTo:   Bob (+1-555-0456)',
+    right: 'Topic: 0x7f3a9c2e (unique, never repeated)\nFrom: [hidden by Tor]\nTo:   [hidden by Tor]',
+    desc: 'Tor hides your IP. The mesh doesn\'t care who you are. Topic is ephemeral — exists one conversation only.',
   },
   {
-    title: "When you're talking",
-    left: "Sent: 14:32:17\nDuration: 4 minutes 32 seconds",
-    right: "Sent: [hidden by Tor]\nDuration: [not visible to network]",
-    desc: "Tor randomizes timing. CBR (constant bitrate) makes silence indistinguishable from speech. No pattern to extract."
+    title: 'When you\'re talking',
+    left: 'Sent: 14:32:17\nDuration: 4 min 32 sec',
+    right: 'Sent: [hidden by Tor]\nDuration: [not visible to network]',
+    desc: 'Tor randomizes timing. CBR makes silence indistinguishable from speech. No pattern to extract.',
   },
   {
-    title: "How often",
-    left: "Frequency: 12 messages/day\nPattern: Daily at 14:00",
-    right: "Frequency: [isolated events]\nPattern: [obfuscated]",
-    desc: "Ephemeral topics reset. No \"conversation thread\" visible to network. Each message appears as an isolated event."
+    title: 'How often',
+    left: 'Frequency: 12 messages/day\nPattern: Daily at 14:00',
+    right: 'Frequency: [isolated events]\nPattern: [obfuscated]',
+    desc: 'Ephemeral topics reset. No conversation thread visible. Each message is an isolated event.',
   },
   {
-    title: "Where you are",
-    left: "Location: San Francisco, CA\nIP: 192.168.1.1",
-    right: "Location: [not visible to network]\nIP: [hidden by Tor]",
-    desc: "Tor exit node location, not your location. I2P further obscures."
+    title: 'Where you are',
+    left: 'Location: San Francisco, CA\nIP: 192.168.1.1',
+    right: 'Location: [not visible]\nIP: [hidden by Tor]',
+    desc: 'Tor exit node location, not your location. I2P further obscures.',
   },
   {
-    title: "What device you're using",
-    left: "Device: iPhone 15 Pro\nOS: iOS 17.2",
-    right: "Device: [not visible to network]\nOS: [not visible to network]",
-    desc: "TLS fingerprinting defeated by Tor. Voice analysis prevented by DSP pipeline."
-  }
+    title: 'What device you\'re using',
+    left: 'Device: iPhone 15 Pro\nOS: iOS 17.2',
+    right: 'Device: [not visible]\nOS: [not visible]',
+    desc: 'TLS fingerprinting defeated by Tor. Voice analysis prevented by DSP pipeline.',
+  },
 ];
 
 export default function MetadataSection() {
-  const containerRef = useRef(null);
-  const rowsRef = useRef([]);
+  const sectionRef = useRef(null);
+  const rowRefs = useRef([]);
+  const tlRef = useRef(null);
 
   useEffect(() => {
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: containerRef.current,
-        start: "center center",
-        end: "+=330%",
-        pin: true,
-        scrub: 1.5,
-      }
-    });
+    const mm = gsap.matchMedia();
 
-    rowsRef.current.forEach((row, index) => {
+    mm.add(
+      {
+        isDesktop: '(min-width: 761px)',
+        reduceMotion: '(prefers-reduced-motion: reduce)',
+      },
+      (context) => {
+        const { isDesktop, reduceMotion } = context.conditions;
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: isDesktop ? 'top 52%' : 'top 78%',
+            end: 'bottom 26%',
+            pin: false,
+            pinSpacing: true,
+            scrub: reduceMotion ? false : 0.75,
+            anticipatePin: 1,
+            invalidateOnRefresh: true,
+          },
+        });
+        tlRef.current = tl;
+
+        rowRefs.current.forEach((row, i) => {
       if (!row) return;
+      const right = row.querySelector(`.${styles.rightSide}`);
+      const left = row.querySelector(`.${styles.leftSide}`);
+      const desc = row.querySelector(`.${styles.rowDesc}`);
 
-      const rightSide = row.querySelector(`.${styles.rightSide}`);
-      const leftSide = row.querySelector(`.${styles.leftSide}`);
-      const desc = row.querySelector(`.${styles.description}`);
+      gsap.set(right, { clipPath: 'inset(0 100% 0 0)' });
+      gsap.set(desc, { autoAlpha: 0, filter: 'blur(5px)' });
 
-      gsap.set(rightSide, { clipPath: 'inset(0 100% 0 0)' });
-      gsap.set(desc, { opacity: 0, filter: 'blur(6px)' });
+      tl
+        .to(left, { opacity: 0.2, duration: 0.5, ease: 'power2.inOut' }, i * 1.4)
+        .to(right, { clipPath: 'inset(0 0% 0 0)', duration: 1.4, ease: 'power3.out' }, i * 1.4)
+        .to(desc, { autoAlpha: 1, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' }, i * 1.4 + 0.45);
+        });
 
-      tl.to(leftSide, { opacity: 0.25, duration: 0.52, ease: "power2.inOut" }, index * 1.5)
-        .to(rightSide, { clipPath: 'inset(0 0% 0 0)', duration: 1.5, ease: "power3.out" }, index * 1.5)
-        .to(desc, { opacity: 1, filter: 'blur(0px)', duration: 1.0, ease: "power2.out" }, index * 1.5 + 0.5);
-    });
+        tl.to({}, { duration: 1.6 });
 
-    tl.to({}, { duration: 1.8 });
+        return () => tl.kill();
+      }
+    );
 
     return () => {
-      ScrollTrigger.getAll().forEach(t => t.kill());
+      mm.revert();
     };
   }, []);
 
   return (
-    <section ref={containerRef} className={styles.metadataSection}>
-      <div className="container h-full flex-col justify-center">
-
-        <div className={styles.headerRow}>
+    <section ref={sectionRef} className={styles.section} data-scroll-section>
+      <div className="container">
+        <div className={styles.header}>
           <h2>Metadata is not the message.</h2>
-          <p className={styles.subtext}>It's everything around the message.</p>
+          <p className={styles.headerSub}>It&apos;s everything around the message.</p>
         </div>
 
-        <div className={styles.comparisonGrid}>
-          <div className={styles.gridHeader}>
-            <div className={styles.leftCol}>Standard Encryption</div>
-            <div className={styles.rightCol}>Lethon Architecture</div>
+        <div className={styles.grid}>
+          <div className={styles.gridHead}>
+            <span>Standard Encryption</span>
+            <span>Lethon Architecture</span>
           </div>
 
-          {metadataItems.map((item, i) => (
-            <div
-              key={i}
-              className={styles.dataRow}
-              ref={el => rowsRef.current[i] = el}
-            >
+          {ITEMS.map((item, i) => (
+            <div key={i} className={styles.row} ref={el => rowRefs.current[i] = el} data-gsap-scan>
               <div className={styles.rowTitle}>{item.title}</div>
-              <div className={styles.splitContent}>
+              <div className={styles.rowCols}>
                 <div className={styles.leftSide}>
                   <pre>{item.left}</pre>
                 </div>
                 <div className={styles.rightSide}>
                   <pre>{item.right}</pre>
-                  <p className={styles.description}>{item.desc}</p>
+                  <p className={styles.rowDesc}>{item.desc}</p>
                 </div>
               </div>
             </div>
           ))}
         </div>
-
       </div>
     </section>
   );

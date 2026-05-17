@@ -1,139 +1,161 @@
-.communitiesSection {
-  min-height: 100vh;
+.section {
+  min-height: 100svh;
   display: flex;
   align-items: center;
-  padding: 6rem 0;
+  padding-block: clamp(5rem, 10vh, 8rem);
 }
 
 .headline {
+  margin: 0 0 1.4rem;
   font-family: var(--font-sans);
-  font-size: clamp(2rem, 4vw, 3.5rem);
-  font-weight: 500;
-  margin-bottom: 2rem;
+  font-size: clamp(2rem, 4.6vw, 3.8rem);
+  font-weight: 540;
+  line-height: 1.12;
+  letter-spacing: 0;
 }
 
-.subheadline {
+.sub {
+  display: grid;
+  gap: 0.25rem;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
   font-family: var(--font-mono);
-  font-size: 1.1rem;
-  color: var(--text-muted);
+  font-size: clamp(0.9rem, 1.3vw, 1.02rem);
   line-height: 1.6;
-  margin-bottom: 4rem;
+  color: var(--text-muted);
 }
 
-.subheadline p {
-  margin-bottom: 0.25rem;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 4vw, 3rem);
 }
 
-.diagramArea {
-  display: flex;
-  gap: 4rem;
-  flex-wrap: wrap;
+.col {
+  min-width: 0;
 }
 
-.diagramCol {
-  flex: 1;
-  min-width: 300px;
-}
-
-.diagramHeader {
+.colHeader {
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-faint);
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 2rem;
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--text-lethon);
-  padding-bottom: 0.5rem;
+  color: var(--text-muted);
 }
 
-.diagramBox {
+.diagram {
+  min-height: 23rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 300px;
+  padding: clamp(1rem, 2vw, 1.4rem);
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius-md);
+  background: rgba(3, 5, 8, 0.58);
+  backdrop-filter: blur(16px);
+}
+
+.server,
+.clientNode,
+.node {
+  min-width: 6rem;
+  padding: 0.65rem 1rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  text-align: center;
 }
 
 .server {
-  padding: 1rem 2rem;
-  border: 1px solid #ef4444; /* red */
-  background-color: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  font-family: var(--font-mono);
-  font-weight: bold;
-  border-radius: 4px;
+  border: 1px solid #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  color: #ff6b6b;
 }
 
 .clientNode {
-  padding: 0.5rem 1.5rem;
-  border: 1px solid var(--text-lethon);
-  font-family: var(--font-mono);
-  border-radius: 4px;
+  border: 1px solid var(--border-faint);
+  color: var(--text-primary);
 }
 
-.lineVert {
+.lineV {
   width: 2px;
-  height: 40px;
-  background-color: var(--text-lethon);
-  margin: 0.5rem 0;
+  height: 2.5rem;
+  margin: 0.55rem 0;
+  background: var(--border-faint);
 }
 
-.permsList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  margin-top: 1rem;
+.lineVAccent {
+  background: var(--color-accent);
+  box-shadow: 0 0 12px rgba(0, 245, 160, 0.45);
+}
+
+.perms {
   width: 100%;
-  align-items: center;
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+}
+
+.permSignal,
+.permLethon {
+  padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: clamp(0.72rem, 1.1vw, 0.84rem);
+  line-height: 1.35;
+  text-align: center;
 }
 
 .permSignal {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--color-amber);
-  background-color: rgba(245, 158, 11, 0.1);
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
   border-left: 2px solid var(--color-amber);
-  width: 80%;
-  text-align: center;
-}
-
-.meshNodes {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.lethonNode {
-  padding: 0.5rem 1rem;
-  border: 1px solid var(--color-accent);
-  background-color: rgba(0, 245, 160, 0.05);
-  font-family: var(--font-mono);
-  color: var(--color-accent);
-  border-radius: 4px;
-}
-
-.lethonLineH {
-  height: 2px;
-  width: 30px;
-  background-color: var(--color-accent);
+  background: rgba(245, 158, 11, 0.08);
+  color: var(--color-amber);
 }
 
 .permLethon {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--color-green);
-  background-color: rgba(99, 153, 34, 0.1);
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
   border-left: 2px solid var(--color-green);
-  width: 80%;
-  text-align: center;
+  background: rgba(82, 196, 26, 0.08);
+  color: var(--color-green);
 }
 
-.resultMark {
-  text-align: center;
-  margin-top: 2rem;
+.mesh {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+}
+
+.node {
+  border: 1px solid var(--color-accent);
+  color: var(--color-accent);
+  background: rgba(0, 245, 160, 0.05);
+}
+
+.lineH {
+  width: 2.2rem;
+  height: 2px;
+  background: var(--color-accent);
+}
+
+.result {
+  margin-top: auto;
+  padding-top: 1.5rem;
   font-family: var(--font-mono);
-  font-size: 0.9rem;
+  font-size: 0.86rem;
+}
+
+@media (max-width: 860px) {
+  .section {
+    min-height: auto;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .diagram {
+    min-height: 20rem;
+  }
 }

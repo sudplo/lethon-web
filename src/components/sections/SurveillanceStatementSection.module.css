@@ -1,5 +1,5 @@
 .section {
-  min-height: 100vh;
+  min-height: 84svh;
   display: flex;
   align-items: center;
   background-color: var(--bg-base);
@@ -62,4 +62,11 @@
 .wordInner {
   display: inline-block;
   will-change: transform, opacity, filter;
+}
+
+@media (max-width: 720px) {
+  .section {
+    min-height: 76svh;
+    padding-block: 5rem;
+  }
 }

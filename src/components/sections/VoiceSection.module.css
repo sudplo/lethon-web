@@ -1,167 +1,151 @@
-.voiceSection {
-  height: 100vh;
+.section {
+  min-height: 100svh;
   display: flex;
   align-items: center;
-  padding: 0;
-  /* zero — ScrollTrigger pinSpacing handles the offset */
-  position: relative;
-  overflow: hidden;
+  padding-block: clamp(5rem, 10vh, 8rem);
+  overflow: clip;
 }
 
 .headline {
+  margin: 0 0 1.15rem;
   font-family: var(--font-sans);
-  font-size: clamp(1.8rem, 3.5vw, 3rem);
-  font-weight: 500;
-  line-height: 1.2;
-  margin-bottom: 1.2rem;
+  font-size: clamp(2rem, 4.1vw, 3.35rem);
+  font-weight: 540;
+  line-height: 1.14;
+  letter-spacing: 0;
 }
 
-.subhead {
+.sub {
+  max-width: 680px;
+  margin: 0 0 clamp(2rem, 4vw, 3rem);
   font-family: var(--font-mono);
-  font-size: 0.95rem;
+  font-size: clamp(0.86rem, 1.25vw, 0.98rem);
+  line-height: 1.65;
   color: var(--text-muted);
-  line-height: 1.6;
-  margin-bottom: 2rem;
-  max-width: 560px;
 }
 
-/* ── Interactive area ───────────────────────── */
-.interactiveArea {
-  background-color: rgba(3, 5, 8, 0.5);
-  border: 1px solid var(--text-lethon);
-  border-radius: 4px;
-  padding: 1.5rem 1.75rem;
-  margin-bottom: 2.5rem;
+.card {
+  padding: clamp(1rem, 2.4vw, 1.8rem);
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius-md);
+  background: rgba(3, 5, 8, 0.68);
+  backdrop-filter: blur(18px);
 }
 
-/* ── Intensity display ───────────────────────── */
-.intensityDisplay {
+.intensityRow {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
-  margin-bottom: 1.5rem;
+  gap: 1.4rem;
+  margin-bottom: 1.7rem;
 }
 
 .intensityNum {
-  font-family: var(--font-mono);
-  font-size: clamp(3rem, 6vw, 5rem);
-  font-weight: 600;
-  color: var(--color-accent);
-  line-height: 1;
-  font-variant-numeric: tabular-nums;
-  /* Fix width so layout never jumps between 0 and 5 */
   width: 1.2ch;
   display: inline-block;
   text-align: right;
-  text-shadow: 0 0 40px rgba(0, 245, 160, 0.3);
-  will-change: contents;
+  font-family: var(--font-mono);
+  font-size: clamp(3rem, 7vw, 5.4rem);
+  font-weight: 650;
+  line-height: 1;
+  color: var(--color-accent);
+  font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 42px rgba(0, 245, 160, 0.32);
 }
 
 .intensityMeta {
-  display: flex;
-  flex-direction: column;
+  display: grid;
   gap: 0.3rem;
 }
 
-.intensityLabel {
+.stageLabel {
   font-family: var(--font-mono);
-  font-size: 1rem;
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem);
   color: var(--text-primary);
-  will-change: opacity, transform, filter;
 }
 
-.intensityDesc {
+.stageDesc {
   font-family: var(--font-mono);
-  font-size: 0.85rem;
+  font-size: 0.84rem;
   color: var(--text-muted);
-  will-change: opacity, transform, filter;
 }
 
-/* ── Stage track ────────────────────────────── */
-.stageTrack {
+.track {
   position: relative;
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 1.75rem;
-  padding-bottom: 0.6rem;
+  gap: 0.75rem;
+  padding-bottom: 1.7rem;
+  margin-bottom: 1.6rem;
 }
 
-.stageTrack::before {
+.track::before {
   content: '';
   position: absolute;
-  bottom: 0.5rem;
   left: 0;
   right: 0;
+  bottom: 0.65rem;
   height: 2px;
-  background-color: var(--text-lethon);
-  border-radius: 2px;
+  background: var(--border-faint);
 }
 
-.stageProgressLine {
+.trackFill {
   position: absolute;
-  bottom: 0.5rem;
   left: 0;
+  bottom: 0.65rem;
   height: 2px;
-  background-color: var(--color-accent);
-  border-radius: 2px;
-  box-shadow: 0 0 8px rgba(0, 245, 160, 0.5);
-  pointer-events: none;
+  background: var(--color-accent);
+  box-shadow: 0 0 12px rgba(0, 245, 160, 0.56);
+  transition: width 0.35s ease;
 }
 
-.stageMarker {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.4rem;
+.marker {
   position: relative;
   z-index: 1;
+  display: grid;
+  justify-items: center;
+  gap: 0.42rem;
+  min-width: 0;
 }
 
-.stageMarkerDot {
-  width: 8px;
-  height: 8px;
+.markerDot {
+  width: 0.52rem;
+  height: 0.52rem;
+  border: 1px solid var(--border-faint);
   border-radius: 50%;
-  background-color: var(--text-lethon);
-  border: 1px solid var(--text-lethon);
+  background: var(--bg-base);
   transition: background-color 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
 }
 
-.stageActive .stageMarkerDot {
-  background-color: var(--color-accent);
+.markerActive .markerDot {
+  background: var(--color-accent);
   border-color: var(--color-accent);
-  box-shadow: 0 0 8px rgba(0, 245, 160, 0.5);
+  box-shadow: 0 0 12px rgba(0, 245, 160, 0.62);
 }
 
-.stageMarkerLabel {
+.markerLabel {
   font-family: var(--font-mono);
-  font-size: 0.68rem;
-  color: var(--text-lethon);
-  transition: color 0.25s ease;
+  font-size: clamp(0.58rem, 1vw, 0.72rem);
+  color: var(--text-muted);
+  text-align: center;
   white-space: nowrap;
 }
 
-.stageActive .stageMarkerLabel {
-  color: var(--text-muted);
+.waveforms {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1rem, 3vw, 2rem);
 }
 
-/* ── Waveforms ──────────────────────────────── */
-.waveformsContainer {
-  display: flex;
-  gap: 2rem;
-}
-
-.waveformBlock {
-  flex: 1;
+.waveBlock {
+  min-width: 0;
 }
 
 .waveLabel {
+  margin-bottom: 0.65rem;
   font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
   color: var(--text-muted);
-  margin-bottom: 0.6rem;
 }
 
 .waveLabelAccent {
@@ -169,7 +153,7 @@
 }
 
 .waveform {
-  height: 80px;
+  height: clamp(4.5rem, 12vw, 6.2rem);
   display: flex;
   align-items: flex-end;
   gap: 2px;
@@ -177,25 +161,47 @@
 
 .bar {
   flex: 1;
-  background-color: var(--text-primary);
+  min-width: 2px;
   border-radius: 1px;
+  background: rgba(240, 244, 248, 0.74);
+  transition: height 0.35s ease, opacity 0.35s ease;
 }
 
-.processedWaveform .bar {
-  background-color: var(--color-accent);
+.barProcessed {
+  background: var(--color-accent);
+  box-shadow: 0 0 10px rgba(0, 245, 160, 0.18);
 }
 
-/* ── Closing ─────────────────────────────────── */
-.closingStatement {
+.closing {
+  margin-top: clamp(2rem, 4vw, 3rem);
+  max-width: 640px;
   font-family: var(--font-sans);
-  font-size: 1.1rem;
-  line-height: 1.5;
-  max-width: 520px;
+  font-size: clamp(1rem, 1.8vw, 1.25rem);
+  line-height: 1.55;
 }
 
-.closingSmall {
+.closingSub {
+  margin-top: 1rem;
   font-family: var(--font-mono);
   font-size: 0.82rem;
   color: var(--text-muted);
-  line-height: 1.7;
+}
+
+@media (max-width: 760px) {
+  .section {
+    min-height: auto;
+  }
+
+  .track {
+    overflow-x: auto;
+    padding-bottom: 2rem;
+  }
+
+  .marker {
+    min-width: 5.5rem;
+  }
+
+  .waveforms {
+    grid-template-columns: 1fr;
+  }
 }

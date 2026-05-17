@@ -1,54 +1,53 @@
-.manifestoSection {
-  height: 100vh;
-  background-color: #000;
+.section {
+  min-height: 100svh;
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  overflow: hidden;
+  padding-block: clamp(5rem, 10vh, 8rem);
+  background: #000;
+  overflow: clip;
 }
 
 .inner {
+  min-height: 86svh;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  height: 100%;
-  max-width: 900px;
+  max-width: 960px;
   width: 100%;
-  gap: 0;
 }
 
-.phrasesStack {
-  position: relative;
+.stack {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 1.2rem;
+  gap: clamp(0.75rem, 2vw, 1.3rem);
 }
 
 .phrase {
-  font-family: var(--font-sans);
-  font-weight: 500;
-  line-height: 1.15;
-  letter-spacing: -0.02em;
   display: block;
-  min-height: 1em;
+  min-height: 1.08em;
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 560;
+  line-height: 1.12;
+  letter-spacing: 0;
+  text-wrap: balance;
 }
 
 .phrase0 {
-  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  font-size: clamp(2.5rem, 6vw, 4.8rem);
 }
 
 .phrase1 {
-  font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+  font-size: clamp(2.3rem, 5.4vw, 4.2rem);
 }
 
 .phrase2 {
-  font-size: clamp(1.8rem, 3.6vw, 3.2rem);
+  font-size: clamp(2rem, 4.6vw, 3.7rem);
 }
 
-/* Word construction */
 .wordWrap {
   display: inline-flex;
   vertical-align: top;
@@ -60,31 +59,31 @@
   will-change: transform, opacity, filter;
 }
 
-/* CTAs */
 .ctaBlock {
-  padding-bottom: 6vh;
-  will-change: transform, opacity;
+  padding-bottom: clamp(0rem, 5vh, 3rem);
 }
 
-.dividerLine {
+.divider {
   height: 1px;
-  background: linear-gradient(to right, var(--color-accent), transparent);
-  margin-bottom: 2.5rem;
   width: 100%;
+  margin-bottom: 2rem;
+  background: linear-gradient(to right, var(--color-accent), transparent);
 }
 
 .ctaGrid {
-  display: flex;
-  gap: 4rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(1.5rem, 5vw, 4rem);
 }
 
 .ctaItem {
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1.25rem;
+  min-width: 0;
 }
 
-.ctaLabel {
+.ctaItemLabel {
   font-family: var(--font-mono);
   color: var(--text-muted);
   font-size: 0.85rem;
@@ -93,34 +92,31 @@
 .ctaLink {
   font-family: var(--font-mono);
   color: var(--text-primary);
-  text-decoration: none;
   font-size: 0.9rem;
-  position: relative;
-  transition: color 0.2s ease;
-}
-
-.ctaLink::after {
-  content: '';
-  position: absolute;
-  bottom: -3px;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background-color: rgba(255, 255, 255, 0.12);
-  transition: background-color 0.2s ease;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
+  transition: color 0.2s ease, border-color 0.2s ease;
 }
 
 .ctaLink:hover {
   color: var(--color-accent);
+  border-bottom-color: var(--color-accent);
 }
 
-.ctaLink:hover::after {
-  background-color: var(--color-accent);
-}
+@media (max-width: 680px) {
+  .section {
+    min-height: auto;
+  }
 
-@media (max-width: 600px) {
+  .inner {
+    min-height: auto;
+    gap: 3rem;
+  }
+
   .ctaGrid {
-    flex-direction: column;
-    gap: 1.5rem;
+    grid-template-columns: 1fr;
+  }
+
+  .ctaItem {
+    justify-content: space-between;
   }
 }

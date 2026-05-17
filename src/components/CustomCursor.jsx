@@ -7,10 +7,12 @@ import styles from './CustomCursor.module.css';
 export default function CustomCursor() {
   const dotRef = useRef(null);
   const ringRef = useRef(null);
-  const requestRef = useRef(null);
+  const xTo = useRef(null);
+  const yTo = useRef(null);
+  const ringXTo = useRef(null);
+  const ringYTo = useRef(null);
   
-  const mouse = useRef({ x: 0, y: 0 });
-  const ringPos = useRef({ x: 0, y: 0 });
+  const isVisibleRef = useRef(false);
   
   const [isHovering, setIsHovering] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
@@ -19,18 +21,34 @@ export default function CustomCursor() {
     // Hide native cursor completely
     document.body.style.cursor = 'none';
     
-    // Initial position centering
-    mouse.current = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    ringPos.current = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    const startX = window.innerWidth / 2;
+    const startY = window.innerHeight / 2;
+    gsap.set([dotRef.current, ringRef.current], { x: startX, y: startY });
+
+    xTo.current = gsap.quickTo(dotRef.current, 'x', { duration: 0.08, ease: 'power3.out' });
+    yTo.current = gsap.quickTo(dotRef.current, 'y', { duration: 0.08, ease: 'power3.out' });
+    ringXTo.current = gsap.quickTo(ringRef.current, 'x', { duration: 0.42, ease: 'expo.out' });
+    ringYTo.current = gsap.quickTo(ringRef.current, 'y', { duration: 0.42, ease: 'expo.out' });
 
     const onMouseMove = (e) => {
-      mouse.current.x = e.clientX;
-      mouse.current.y = e.clientY;
-      if (!isVisible) setIsVisible(true);
+      xTo.current(e.clientX);
+      yTo.current(e.clientY);
+      ringXTo.current(e.clientX);
+      ringYTo.current(e.clientY);
+      if (!isVisibleRef.current) {
+        isVisibleRef.current = true;
+        setIsVisible(true);
+      }
     };
 
-    const onMouseLeave = () => setIsVisible(false);
-    const onMouseEnter = () => setIsVisible(true);
+    const onMouseLeave = () => {
+      isVisibleRef.current = false;
+      setIsVisible(false);
+    };
+    const onMouseEnter = () => {
+      isVisibleRef.current = true;
+      setIsVisible(true);
+    };
 
     const onHoverEnter = () => setIsHovering(true);
     const onHoverLeave = () => setIsHovering(false);
@@ -62,29 +80,6 @@ export default function CustomCursor() {
 
     observer.observe(document.body, { childList: true, subtree: true });
 
-    // Render loop for smooth lag effect
-    const render = () => {
-      // Direct positioning for dot (no lag)
-      gsap.set(dotRef.current, {
-        x: mouse.current.x,
-        y: mouse.current.y,
-      });
-
-      // Linear interpolation for ring (12% lag as spec: "Ring 32px con lag 12%")
-      const lag = 0.12;
-      ringPos.current.x += (mouse.current.x - ringPos.current.x) * lag;
-      ringPos.current.y += (mouse.current.y - ringPos.current.y) * lag;
-
-      gsap.set(ringRef.current, {
-        x: ringPos.current.x,
-        y: ringPos.current.y,
-      });
-
-      requestRef.current = requestAnimationFrame(render);
-    };
-
-    requestRef.current = requestAnimationFrame(render);
-
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
       document.documentElement.removeEventListener('mouseleave', onMouseLeave);
@@ -96,7 +91,6 @@ export default function CustomCursor() {
       });
       
       observer.disconnect();
-      cancelAnimationFrame(requestRef.current);
     };
   }, []);
 

@@ -2,34 +2,38 @@ import "./globals.css";
 import Navigation from "@/components/Navigation";
 import GlobalCanvas from "@/components/canvas/GlobalCanvas";
 import SmoothScroll from "@/components/SmoothScroll";
+import PageChrome from "@/components/PageChrome";
 
 export const metadata = {
+  metadataBase: new URL("https://lethon-protocol.dev"),
   title: "Lethon | Privacy by Architecture",
-  description: "The network carries what it doesn't understand. Privacy by architecture, not by trust.",
-  viewport: "width=device-width, initial-scale=1.0, maximum-scale=5.0",
+  description:
+    "The network carries what it doesn't understand. Privacy by architecture, not by trust.",
   robots: "index, follow",
   authors: [{ name: "Lethon Protocol" }],
   openGraph: {
     title: "Lethon | Privacy by Architecture",
-    description: "The network carries what it doesn't understand. Privacy by architecture, not by trust.",
+    description:
+      "The network carries what it doesn't understand. Privacy by architecture, not by trust.",
     url: "https://lethon-protocol.dev",
     siteName: "Lethon Protocol",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Lethon Protocol - Privacy by Architecture"
-      }
-    ],
+    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Lethon Protocol" }],
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "Lethon | Privacy by Architecture",
-    description: "The network carries what it doesn't understand. Privacy by architecture, not by trust.",
-    images: ["/og-image.png"]
+    description:
+      "The network carries what it doesn't understand. Privacy by architecture, not by trust.",
+    images: ["/og-image.png"],
   },
+};
+
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#030508",
 };
 
 export default function RootLayout({ children }) {
@@ -47,17 +51,16 @@ export default function RootLayout({ children }) {
               name: "Lethon Protocol",
               url: "https://lethon-protocol.dev",
               description: "Privacy by architecture, not by trust.",
-              sameAs: ["https://github.com/sudplo/lethon"]
-            })
+              sameAs: ["https://github.com/sudplo/lethon"],
+            }),
           }}
         />
       </head>
       <body>
+        <PageChrome />
         <Navigation />
         <GlobalCanvas />
-        <SmoothScroll>
-          {children}
-        </SmoothScroll>
+        <SmoothScroll>{children}</SmoothScroll>
       </body>
     </html>
   );
