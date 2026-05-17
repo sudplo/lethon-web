@@ -18,6 +18,10 @@
   letter-spacing: 0;
 }
 
+/* ============================================================
+   Desktop: full table
+   ============================================================ */
+
 .tableWrap {
   position: relative;
   overflow-x: auto;
@@ -107,19 +111,108 @@
   pointer-events: none;
 }
 
+/* ============================================================
+   Mobile: card stack — hidden on desktop
+   ============================================================ */
+
+.cardStack {
+  display: none;
+}
+
 @media (max-width: 760px) {
   .section {
     min-height: auto;
   }
 
+  /* Hide the table on mobile */
   .tableWrap {
-    margin-inline: -1rem;
-    border-left: 0;
-    border-right: 0;
-    border-radius: 0;
+    display: none;
   }
 
-  .table {
-    min-width: 680px;
+  /* Show the card stack */
+  .cardStack {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .card {
+    padding: clamp(0.9rem, 3vw, 1.2rem);
+    border: 1px solid var(--border-faint);
+    border-radius: var(--radius-md);
+    background: rgba(3, 5, 8, 0.68);
+    backdrop-filter: blur(12px);
+  }
+
+  .cardHighlighted {
+    border-color: rgba(0, 245, 160, 0.15);
+    background: rgba(0, 245, 160, 0.03);
+  }
+
+  .cardCap {
+    font-family: var(--font-sans);
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    margin-bottom: 0.6rem;
+  }
+
+  .cardLethon {
+    display: flex;
+    align-items: baseline;
+    gap: 0.6rem;
+    margin-bottom: 0.65rem;
+    padding-bottom: 0.65rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .cardLethonLabel {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    flex-shrink: 0;
+  }
+
+  .cardLethonVal {
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    color: var(--color-accent);
+    text-shadow: 0 0 12px rgba(0, 245, 160, 0.14);
+  }
+
+  .cardLethonAmber {
+    color: var(--color-amber);
+    text-shadow: none;
+  }
+
+  .cardOthers {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+  }
+
+  .cardOther {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  .cardOtherLabel {
+    font-size: 0.62rem;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .cardTip {
+    margin-top: 0.55rem;
+    padding-top: 0.55rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    color: rgba(240, 244, 248, 0.42);
+    line-height: 1.45;
   }
 }

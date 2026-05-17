@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import styles from './MetadataSection.module.css';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const ITEMS = [
   {
@@ -43,57 +44,69 @@ const ITEMS = [
 export default function MetadataSection() {
   const sectionRef = useRef(null);
   const rowRefs = useRef([]);
-  const tlRef = useRef(null);
 
-  useEffect(() => {
+  useGSAP(() => {
     const mm = gsap.matchMedia();
 
     mm.add(
       {
         isDesktop: '(min-width: 761px)',
+        isMobile: '(max-width: 760px)',
         reduceMotion: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
         const { isDesktop, reduceMotion } = context.conditions;
+
+        if (!isDesktop) {
+          /* Mobile: staggered entrance per row */
+          rowRefs.current.forEach((row, i) => {
+            if (!row) return;
+            gsap.from(row, {
+              scrollTrigger: {
+                trigger: row,
+                start: 'top 88%',
+                toggleActions: 'play none none none',
+              },
+              y: 30,
+              autoAlpha: 0,
+              duration: 0.65,
+              delay: i * 0.05,
+              ease: 'power3.out',
+            });
+          });
+          return;
+        }
+
+        /* Desktop: scrub-driven clip-path reveal */
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: isDesktop ? 'top 52%' : 'top 78%',
+            start: 'top 52%',
             end: 'bottom 26%',
-            pin: false,
-            pinSpacing: true,
             scrub: reduceMotion ? false : 0.75,
-            anticipatePin: 1,
             invalidateOnRefresh: true,
           },
         });
-        tlRef.current = tl;
 
         rowRefs.current.forEach((row, i) => {
-      if (!row) return;
-      const right = row.querySelector(`.${styles.rightSide}`);
-      const left = row.querySelector(`.${styles.leftSide}`);
-      const desc = row.querySelector(`.${styles.rowDesc}`);
+          if (!row) return;
+          const right = row.querySelector(`.${styles.rightSide}`);
+          const left = row.querySelector(`.${styles.leftSide}`);
+          const desc = row.querySelector(`.${styles.rowDesc}`);
 
-      gsap.set(right, { clipPath: 'inset(0 100% 0 0)' });
-      gsap.set(desc, { autoAlpha: 0, filter: 'blur(5px)' });
+          gsap.set(right, { clipPath: 'inset(0 100% 0 0)' });
+          gsap.set(desc, { autoAlpha: 0, filter: 'blur(5px)' });
 
-      tl
-        .to(left, { opacity: 0.2, duration: 0.5, ease: 'power2.inOut' }, i * 1.4)
-        .to(right, { clipPath: 'inset(0 0% 0 0)', duration: 1.4, ease: 'power3.out' }, i * 1.4)
-        .to(desc, { autoAlpha: 1, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' }, i * 1.4 + 0.45);
+          tl
+            .to(left, { opacity: 0.2, duration: 0.5, ease: 'power2.inOut' }, i * 1.4)
+            .to(right, { clipPath: 'inset(0 0% 0 0)', duration: 1.4, ease: 'power3.out' }, i * 1.4)
+            .to(desc, { autoAlpha: 1, filter: 'blur(0px)', duration: 0.9, ease: 'power2.out' }, i * 1.4 + 0.45);
         });
 
         tl.to({}, { duration: 1.6 });
-
-        return () => tl.kill();
       }
     );
-
-    return () => {
-      mm.revert();
-    };
-  }, []);
+  }, { scope: sectionRef });
 
   return (
     <section ref={sectionRef} className={styles.section} data-scroll-section>

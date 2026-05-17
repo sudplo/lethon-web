@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import styles from './ArchitectureSection.module.css';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const LAYERS = [
   {
@@ -43,28 +44,63 @@ export default function ArchitectureSection() {
   const cardRefs = useRef([]);
   const barRefs = useRef([]);
   const lockRefs = useRef([]);
-  const triggerRef = useRef(null);
-  const tlRef = useRef(null);
   const [activeIdx, setActiveIdx] = useState(0);
 
-  useEffect(() => {
+  useGSAP(() => {
     const mm = gsap.matchMedia();
 
     mm.add(
       {
         isDesktop: '(min-width: 901px)',
+        isMobile: '(max-width: 900px)',
         reduceMotion: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
         const { isDesktop, reduceMotion } = context.conditions;
+
+        /* On mobile, show all cards statically — no pin */
+        if (!isDesktop) {
+          cardRefs.current.forEach((card) => {
+            if (!card) return;
+            gsap.set(card, { y: 0, autoAlpha: 1, scale: 1, filter: 'blur(0px)' });
+          });
+          barRefs.current.forEach((bar) => {
+            if (!bar) return;
+            gsap.set(bar, { scaleY: 1 });
+          });
+          lockRefs.current.forEach((lock) => {
+            if (!lock) return;
+            gsap.set(lock, { autoAlpha: 1 });
+          });
+
+          /* Simple staggered entrance on mobile */
+          cardRefs.current.forEach((card, i) => {
+            if (!card) return;
+            gsap.from(card, {
+              scrollTrigger: {
+                trigger: card,
+                start: 'top 85%',
+                toggleActions: 'play none none none',
+              },
+              y: 40,
+              autoAlpha: 0,
+              duration: 0.7,
+              delay: i * 0.08,
+              ease: 'power3.out',
+            });
+          });
+          return;
+        }
+
+        /* Desktop: pinned scrolltelling */
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: isDesktop ? 'top top' : 'top 76%',
-            end: isDesktop ? '+=380%' : 'bottom 22%',
-            pin: isDesktop && !reduceMotion,
+            start: 'top top',
+            end: '+=380%',
+            pin: !reduceMotion,
             pinSpacing: true,
-            scrub: reduceMotion ? false : isDesktop ? 1.8 : 0.65,
+            scrub: reduceMotion ? false : 1.8,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
@@ -74,56 +110,47 @@ export default function ArchitectureSection() {
           },
         });
 
-        tlRef.current = tl;
-        triggerRef.current = tl.scrollTrigger;
-
         if (!reduceMotion) {
-      cardRefs.current.forEach((card, i) => {
-        if (!card) return;
-        const bar = barRefs.current[i];
-        const lock = lockRefs.current[i];
+          cardRefs.current.forEach((card, i) => {
+            if (!card) return;
+            const bar = barRefs.current[i];
+            const lock = lockRefs.current[i];
 
-        gsap.set(card, { y: 160, autoAlpha: 0, scale: 0.94, filter: 'blur(10px)' });
-        gsap.set(bar, { scaleY: 0, transformOrigin: 'top' });
-        gsap.set(lock, { autoAlpha: 0 });
+            gsap.set(card, { y: 160, autoAlpha: 0, scale: 0.94, filter: 'blur(10px)' });
+            gsap.set(bar, { scaleY: 0, transformOrigin: 'top' });
+            gsap.set(lock, { autoAlpha: 0 });
 
-        const t0 = i * 0.9;
+            const t0 = i * 0.9;
 
-        tl.to(card, { y: 0, autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: 0.5, ease: 'power3.out' }, t0)
-          .to(bar, { scaleY: 1, duration: 0.4, ease: 'power2.out' }, t0 + 0.15)
-          .to(lock, { autoAlpha: 1, duration: 0.35, ease: 'power2.out' }, t0 + 0.4);
+            tl.to(card, { y: 0, autoAlpha: 1, scale: 1, filter: 'blur(0px)', duration: 0.5, ease: 'power3.out' }, t0)
+              .to(bar, { scaleY: 1, duration: 0.4, ease: 'power2.out' }, t0 + 0.15)
+              .to(lock, { autoAlpha: 1, duration: 0.35, ease: 'power2.out' }, t0 + 0.4);
 
-        /* Push previous cards up + dim */
-        for (let j = 0; j < i; j++) {
-          tl.to(cardRefs.current[j], {
-            opacity: 0.16,
-            y: -40 * (i - j),
-            scale: 0.94,
-            filter: 'blur(4px)',
-            duration: 0.5,
-            ease: 'power2.inOut',
-          }, t0);
+            /* Push previous cards up + dim */
+            for (let j = 0; j < i; j++) {
+              tl.to(cardRefs.current[j], {
+                opacity: 0.16,
+                y: -40 * (i - j),
+                scale: 0.94,
+                filter: 'blur(4px)',
+                duration: 0.5,
+                ease: 'power2.inOut',
+              }, t0);
+            }
+          });
+
+          /* Hold at end and fade out content for clean transition */
+          tl.to({}, { duration: 0.7 })
+            .to(sectionRef.current.querySelector(`.${styles.pinWrapper}`), {
+              autoAlpha: 0,
+              y: -50,
+              duration: 0.8,
+              ease: 'power2.in'
+            });
         }
-      });
-
-      /* Hold at end and fade out content */
-      tl.to({}, { duration: 0.7 })
-        .to([sectionRef.current.querySelector(`.${styles.leftCol}`), cardRefs.current], {
-          autoAlpha: 0,
-          y: isDesktop ? -50 : -18,
-          duration: 0.8,
-          ease: 'power2.in'
-        });
-        }
-
-        return () => tl.kill();
       }
     );
-
-    return () => {
-      mm.revert();
-    };
-  }, []);
+  }, { scope: sectionRef });
 
   return (
     <section ref={sectionRef} className={styles.section} id="architecture" data-scroll-section>

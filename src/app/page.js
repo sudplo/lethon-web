@@ -49,11 +49,28 @@ gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
   useEffect(() => {
-    // Refresh all ScrollTriggers after initial mount to fix spacer heights
-    const timer = setTimeout(() => {
+    /* Wait for fonts + images to settle before calculating pin spacers */
+    const refresh = () => {
       ScrollTrigger.refresh();
-    }, 500);
-    return () => clearTimeout(timer);
+    };
+
+    /* Use document.fonts.ready for precise timing instead of arbitrary timeout */
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(() => {
+        /* Small delay after fonts to let layout settle */
+        requestAnimationFrame(() => {
+          requestAnimationFrame(refresh);
+        });
+      });
+    } else {
+      /* Fallback for older browsers */
+      const timer = setTimeout(refresh, 600);
+      return () => clearTimeout(timer);
+    }
+
+    /* Also refresh on window load (images etc.) */
+    window.addEventListener('load', refresh);
+    return () => window.removeEventListener('load', refresh);
   }, []);
 
   return (

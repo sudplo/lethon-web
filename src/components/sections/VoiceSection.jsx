@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import styles from './VoiceSection.module.css';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const STAGES = [
   { label: 'Plaintext', desc: 'Original voice. Recognizable.' },
@@ -44,10 +45,9 @@ export default function VoiceSection() {
   const closingRef = useRef(null);
   const stageRef = useRef({ val: 0 });
   const [stage, setStage] = useState(0);
-
   const stageValueRef = useRef(0);
 
-  useEffect(() => {
+  useGSAP(() => {
     gsap.set(closingRef.current, { autoAlpha: 0, filter: 'blur(8px)', y: 16 });
 
     const mm = gsap.matchMedia();
@@ -55,44 +55,62 @@ export default function VoiceSection() {
     mm.add(
       {
         isDesktop: '(min-width: 761px)',
+        isMobile: '(max-width: 760px)',
         reduceMotion: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
         const { isDesktop, reduceMotion } = context.conditions;
+
+        if (!isDesktop) {
+          /* Mobile: simple reveal on scroll */
+          gsap.to(closingRef.current, {
+            scrollTrigger: {
+              trigger: closingRef.current,
+              start: 'top 88%',
+              toggleActions: 'play none none none',
+            },
+            autoAlpha: 1,
+            filter: 'blur(0px)',
+            y: 0,
+            duration: 0.8,
+            ease: 'power3.out',
+          });
+          return;
+        }
+
+        /* Desktop: scrub-driven */
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: isDesktop ? 'top 52%' : 'top 78%',
+            start: 'top 52%',
             end: 'bottom 24%',
-            pin: false,
             scrub: reduceMotion ? false : 0.75,
-            anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
-          const raw = self.progress * 5;
-          const rounded = Math.min(5, Math.round(raw));
+              const raw = self.progress * 5;
+              const rounded = Math.min(5, Math.round(raw));
 
-          /* Smooth counter using GSAP for the number display */
-          gsap.to(stageRef.current, {
-            val: raw,
-            duration: 0.15,
-            ease: 'power2.out',
-            onUpdate: () => {
-              if (numRef.current) numRef.current.textContent = Math.round(stageRef.current.val);
-            },
-          });
+              /* Smooth counter using GSAP for the number display */
+              gsap.to(stageRef.current, {
+                val: raw,
+                duration: 0.15,
+                ease: 'power2.out',
+                onUpdate: () => {
+                  if (numRef.current) numRef.current.textContent = Math.round(stageRef.current.val);
+                },
+              });
 
-          /* Update React state only when stage changes to avoid unnecessary re-renders */
-          if (rounded !== stageValueRef.current) {
-            stageValueRef.current = rounded;
-            setStage(rounded);
+              /* Update React state only when stage changes to avoid unnecessary re-renders */
+              if (rounded !== stageValueRef.current) {
+                stageValueRef.current = rounded;
+                setStage(rounded);
 
-            gsap.fromTo(
-              [labelRef.current, descRef.current],
-              { autoAlpha: 0, y: 6, filter: 'blur(4px)' },
-              { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.3, ease: 'power3.out', overwrite: true }
-            );
-          }
+                gsap.fromTo(
+                  [labelRef.current, descRef.current],
+                  { autoAlpha: 0, y: 6, filter: 'blur(4px)' },
+                  { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.3, ease: 'power3.out', overwrite: true }
+                );
+              }
             },
           },
         });
@@ -104,15 +122,9 @@ export default function VoiceSection() {
           duration: 0.9,
           ease: 'power3.out',
         }, 0.85);
-
-        return () => tl.kill();
       }
     );
-
-    return () => {
-      mm.revert();
-    };
-  }, []);
+  }, { scope: sectionRef });
 
   return (
     <section ref={sectionRef} className={styles.section} id="voice" data-scroll-section>

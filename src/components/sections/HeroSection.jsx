@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import styles from './HeroSection.module.css';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 /* Build spans for typewriter from a string */
 function buildTypewriter(container, text) {
@@ -30,7 +31,7 @@ export default function HeroSection() {
   const overlayRef = useRef(null);
   const scrollHintRef = useRef(null);
 
-  useEffect(() => {
+  useGSAP(() => {
     const nav = document.querySelector('header');
     const canvas = document.getElementById('canvas-container');
     const mm = gsap.matchMedia();
@@ -51,7 +52,7 @@ export default function HeroSection() {
     /* Fade out overlay */
     master.to(overlayRef.current, { autoAlpha: 0, duration: 1.2, ease: 'power2.inOut' }, 0);
 
-    /* Typewriter — 0.058s per char gives ~1.3s for 22 chars */
+    /* Typewriter — 0.045s per char gives ~1s for 22 chars */
     master.to(chars, {
       opacity: 1,
       duration: 0.001,
@@ -59,7 +60,7 @@ export default function HeroSection() {
       ease: 'none',
     }, 0.55);
 
-    /* Pause — let the statement breathe without holding the page hostage */
+    /* Pause — let the statement breathe */
     master.to({}, { duration: 0.72 });
 
     /* Fade line1, reveal line2 with blur-clear */
@@ -93,7 +94,7 @@ export default function HeroSection() {
       },
       (context) => {
         const { isDesktop } = context.conditions;
-        const heroTrigger = ScrollTrigger.create({
+        ScrollTrigger.create({
           trigger: sectionRef.current,
           start: 'top top',
           end: 'bottom top',
@@ -104,7 +105,7 @@ export default function HeroSection() {
           fastScrollEnd: true,
           onUpdate: (self) => {
             const p = self.progress;
-            const contentEl = sectionRef.current.querySelector(`.${styles.content}`);
+            const contentEl = sectionRef.current?.querySelector(`.${styles.content}`);
             if (contentEl) {
               gsap.set(contentEl, {
                 y: isDesktop ? p * -24 : p * -12,
@@ -113,16 +114,9 @@ export default function HeroSection() {
             }
           },
         });
-
-        return () => heroTrigger.kill();
       }
     );
-
-    return () => {
-      master.kill();
-      mm.revert();
-    };
-  }, []);
+  }, { scope: sectionRef });
 
   return (
     <section ref={sectionRef} className={styles.hero} id="hero" data-scroll-section>

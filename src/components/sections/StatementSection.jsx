@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import styles from './StatementSection.module.css';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 function buildWords(container, words) {
   container.innerHTML = '';
@@ -29,64 +30,59 @@ export default function StatementSection() {
   const line1Ref = useRef(null);
   const line2Ref = useRef(null);
   const subRef = useRef(null);
-  const tlRef = useRef(null);
 
-  useEffect(() => {
+  useGSAP(() => {
     const w1 = buildWords(line1Ref.current, ['The', 'network', 'carries']);
     const w2 = buildWords(line2Ref.current, ['what', 'it', 'doesn\'t', 'understand.']);
     gsap.set(subRef.current, { autoAlpha: 0, y: 18 });
-
-    if (window.matchMedia('(max-width: 760px)').matches) {
-      gsap.set([...w1, ...w2], { autoAlpha: 1, y: 0, filter: 'blur(0px)' });
-      gsap.set(subRef.current, { autoAlpha: 1, y: 0 });
-      return undefined;
-    }
 
     const mm = gsap.matchMedia();
 
     mm.add(
       {
         isDesktop: '(min-width: 761px)',
+        isMobile: '(max-width: 760px)',
         reduceMotion: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
         const { isDesktop, reduceMotion } = context.conditions;
+
+        if (!isDesktop) {
+          /* Mobile: show everything immediately */
+          gsap.set([...w1, ...w2], { autoAlpha: 1, y: 0, filter: 'blur(0px)' });
+          gsap.set(subRef.current, { autoAlpha: 1, y: 0 });
+          return;
+        }
+
+        /* Desktop: scrub-driven reveal */
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: isDesktop ? 'top 55%' : 'top 78%',
-            end: isDesktop ? 'bottom 35%' : 'bottom 30%',
-            pin: false,
+            start: 'top 55%',
+            end: 'bottom 35%',
             scrub: reduceMotion ? false : 0.7,
             toggleActions: 'play none none reverse',
             invalidateOnRefresh: true,
             fastScrollEnd: true,
           },
         });
-        tlRef.current = tl;
 
         tl
-      /* Line 1 falls in */
-      .to(w1, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.6, stagger: 0.16, ease: 'power3.out' }, 0)
-      .to({}, { duration: 0.35 })
+          /* Line 1 falls in */
+          .to(w1, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.6, stagger: 0.16, ease: 'power3.out' }, 0)
+          .to({}, { duration: 0.35 })
 
-      /* Line 2 completes the thought */
-      .to(w2, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.55, stagger: 0.13, ease: 'power3.out' })
-      .to({}, { duration: 0.35 })
+          /* Line 2 completes the thought */
+          .to(w2, { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.55, stagger: 0.13, ease: 'power3.out' })
+          .to({}, { duration: 0.35 })
 
-      /* Dim both, surface subline */
-      .to([...w1, ...w2], { autoAlpha: 0.18, filter: 'blur(5px)', y: -10, duration: 0.65, ease: 'power2.inOut' })
-      .to(subRef.current, { autoAlpha: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '-=0.4')
+          /* Dim both, surface subline */
+          .to([...w1, ...w2], { autoAlpha: 0.18, filter: 'blur(5px)', y: -10, duration: 0.65, ease: 'power2.inOut' })
+          .to(subRef.current, { autoAlpha: 1, y: 0, duration: 0.75, ease: 'power3.out' }, '-=0.4')
           .to({}, { duration: 0.9 });
-
-        return () => tl.kill();
       }
     );
-
-    return () => {
-      mm.revert();
-    };
-  }, []);
+  }, { scope: sectionRef });
 
   return (
     <section ref={sectionRef} className={styles.section} data-scroll-section>

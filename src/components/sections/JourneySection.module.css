@@ -8,7 +8,7 @@
 .inner {
   min-height: auto;
   display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(360px, 1.2fr);
+  grid-template-columns: minmax(0, 0.8fr) minmax(280px, 1.2fr);
   gap: clamp(2rem, 6vw, 5rem);
   align-items: center;
 }
@@ -102,20 +102,47 @@
 @media (max-width: 820px) {
   .section {
     min-height: auto;
+    padding-block: clamp(3rem, 8vh, 5rem);
   }
 
   .inner {
     min-height: auto;
     grid-template-columns: 1fr;
     padding-block: 2rem;
+    gap: clamp(1.5rem, 4vw, 2.5rem);
   }
 
   .track {
     min-height: auto;
     gap: 1.35rem;
+    padding-left: 1.8rem;
   }
 
   .dot {
     display: none;
+  }
+
+  .stop {
+    opacity: 1;
+  }
+
+  .stopTitle {
+    font-size: clamp(0.82rem, 3.8vw, 1rem);
+  }
+
+  .stopDesc {
+    font-size: clamp(0.74rem, 3.2vw, 0.88rem);
+  }
+}
+
+@media (max-width: 480px) {
+  .track {
+    padding-left: 1.5rem;
+    gap: 1.2rem;
+  }
+
+  .stop {
+    grid-template-columns: 0.55rem minmax(0, 1fr);
+    gap: 0.75rem;
   }
 }

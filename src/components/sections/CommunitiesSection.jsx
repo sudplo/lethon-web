@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import styles from './CommunitiesSection.module.css';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 export default function CommunitiesSection() {
   const sectionRef = useRef(null);
@@ -17,68 +18,63 @@ export default function CommunitiesSection() {
   const lLinesRef = useRef([]);
   const lPermsRef = useRef([]);
   const lCheckRef = useRef(null);
-  const tlRef = useRef(null);
 
-  useEffect(() => {
+  useGSAP(() => {
     const mm = gsap.matchMedia();
 
     mm.add(
       {
         isDesktop: '(min-width: 861px)',
+        isMobile: '(max-width: 860px)',
         reduceMotion: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
         const { isDesktop, reduceMotion } = context.conditions;
+
+        if (!isDesktop || reduceMotion) {
+          /* Mobile / reduced-motion: show everything static */
+          return;
+        }
+
+        /* Desktop: scrub-driven diagram build */
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: isDesktop ? 'top 52%' : 'top 78%',
+            start: 'top 52%',
             end: 'bottom 24%',
-            pin: false,
-            pinSpacing: true,
-            scrub: reduceMotion ? false : 0.75,
-            anticipatePin: 1,
+            scrub: 0.75,
             invalidateOnRefresh: true,
           },
         });
-        tlRef.current = tl;
 
-        if (!reduceMotion) {
-      gsap.set(serverRef.current, { scale: 0, autoAlpha: 0 });
-      gsap.set(sigLinesRef.current, { scaleY: 0, transformOrigin: 'top' });
-      gsap.set(sigPermsRef.current, { autoAlpha: 0, x: -10, filter: 'blur(5px)' });
-      gsap.set(sigXRef.current, { autoAlpha: 0, scale: 0 });
-      gsap.set(lNodesRef.current, { scale: 0, autoAlpha: 0 });
-      gsap.set(lLinesRef.current, { scaleX: 0, scaleY: 0 });
-      gsap.set(lPermsRef.current, { autoAlpha: 0, x: 10, filter: 'blur(5px)' });
-      gsap.set(lCheckRef.current, { autoAlpha: 0, scale: 0 });
+        gsap.set(serverRef.current, { scale: 0, autoAlpha: 0 });
+        gsap.set(sigLinesRef.current, { scaleY: 0, transformOrigin: 'top' });
+        gsap.set(sigPermsRef.current, { autoAlpha: 0, x: -10, filter: 'blur(5px)' });
+        gsap.set(sigXRef.current, { autoAlpha: 0, scale: 0 });
+        gsap.set(lNodesRef.current, { scale: 0, autoAlpha: 0 });
+        gsap.set(lLinesRef.current, { scaleX: 0, scaleY: 0 });
+        gsap.set(lPermsRef.current, { autoAlpha: 0, x: 10, filter: 'blur(5px)' });
+        gsap.set(lCheckRef.current, { autoAlpha: 0, scale: 0 });
 
-      tl
-        .to(serverRef.current, { scale: 1, autoAlpha: 1, duration: 0.85, ease: 'back.out(1.4)' })
-        .to(sigLinesRef.current, { scaleY: 1, stagger: 0.16, duration: 0.8, ease: 'power3.out' })
-        .to(sigPermsRef.current, { autoAlpha: 1, x: 0, filter: 'blur(0px)', stagger: 0.24, duration: 0.75, ease: 'power2.out' })
-        .to(sigXRef.current, { autoAlpha: 1, scale: 1, duration: 0.8, ease: 'back.out(2)' })
-        .to(lNodesRef.current, { scale: 1, autoAlpha: 1, stagger: 0.18, duration: 0.85, ease: 'back.out(1.4)' }, '+=0.3')
-        .to(lLinesRef.current, { scaleX: 1, scaleY: 1, stagger: 0.18, duration: 0.85, ease: 'power3.out' })
-        .to(lPermsRef.current, { autoAlpha: 1, x: 0, filter: 'blur(0px)', stagger: 0.24, duration: 0.75, ease: 'power2.out' })
-        .to(lCheckRef.current, { autoAlpha: 1, scale: 1, duration: 0.8, ease: 'back.out(2)' })
-        /* Pulse server red at end to show "single point of failure" */
-        .to(serverRef.current, {
-          boxShadow: '0 0 28px rgba(239,68,68,0.75)',
-          borderColor: 'rgba(239,68,68,1)',
-          duration: 0.4, ease: 'power2.out',
-        }, '-=0.4')
-        .to({}, { duration: 0.6 });
-        }
-
-        return () => tl.kill();
+        tl
+          .to(serverRef.current, { scale: 1, autoAlpha: 1, duration: 0.85, ease: 'back.out(1.4)' })
+          .to(sigLinesRef.current, { scaleY: 1, stagger: 0.16, duration: 0.8, ease: 'power3.out' })
+          .to(sigPermsRef.current, { autoAlpha: 1, x: 0, filter: 'blur(0px)', stagger: 0.24, duration: 0.75, ease: 'power2.out' })
+          .to(sigXRef.current, { autoAlpha: 1, scale: 1, duration: 0.8, ease: 'back.out(2)' })
+          .to(lNodesRef.current, { scale: 1, autoAlpha: 1, stagger: 0.18, duration: 0.85, ease: 'back.out(1.4)' }, '+=0.3')
+          .to(lLinesRef.current, { scaleX: 1, scaleY: 1, stagger: 0.18, duration: 0.85, ease: 'power3.out' })
+          .to(lPermsRef.current, { autoAlpha: 1, x: 0, filter: 'blur(0px)', stagger: 0.24, duration: 0.75, ease: 'power2.out' })
+          .to(lCheckRef.current, { autoAlpha: 1, scale: 1, duration: 0.8, ease: 'back.out(2)' })
+          /* Pulse server red at end to show "single point of failure" */
+          .to(serverRef.current, {
+            boxShadow: '0 0 28px rgba(239,68,68,0.75)',
+            borderColor: 'rgba(239,68,68,1)',
+            duration: 0.4, ease: 'power2.out',
+          }, '-=0.4')
+          .to({}, { duration: 0.6 });
       }
     );
-
-    return () => {
-      mm.revert();
-    };
-  }, []);
+  }, { scope: sectionRef });
 
   return (
     <section ref={sectionRef} className={styles.section} id="communities" data-scroll-section>

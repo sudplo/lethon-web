@@ -211,10 +211,11 @@ main {
   backface-visibility: hidden;
 }
 
-/* GPU-hint for animated sections */
+/* GPU-hint for animated sections —
+   IMPORTANT: removed `contain: layout style` which was breaking GSAP
+   ScrollTrigger pinning (spacer height calculation). */
 [data-scroll-section] {
   will-change: transform;
-  contain: layout style;
 }
 
 [data-scroll-section].is-section-active {

@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import styles from './CompareSection.module.css';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const ROWS = [
   { cap: 'E2E encryption', lethon: '✓ Bramble+MLS', briar: '✓', signal: '✓', wa: '~', },
@@ -25,44 +26,62 @@ export default function CompareSection() {
   const rowRefs = useRef([]);
   const lethonRefs = useRef([]);
   const scanlineRef = useRef(null);
-  const tlRef = useRef(null);
+  const cardRefs = useRef([]);
 
-  useEffect(() => {
-    /* Initial states */
-    rowRefs.current.forEach(r => r && gsap.set(r, { autoAlpha: 0, y: 18, filter: 'blur(4px)' }));
-    lethonRefs.current.forEach(r => r && gsap.set(r, { autoAlpha: 0, x: -8, filter: 'blur(4px)' }));
-    gsap.set(scanlineRef.current, { top: 0, autoAlpha: 0 });
-
+  useGSAP(() => {
     const mm = gsap.matchMedia();
 
     mm.add(
       {
         isDesktop: '(min-width: 761px)',
+        isMobile: '(max-width: 760px)',
         reduceMotion: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
         const { isDesktop, reduceMotion } = context.conditions;
+
+        if (!isDesktop) {
+          /* Mobile: stagger-reveal each card */
+          cardRefs.current.forEach((card, i) => {
+            if (!card) return;
+            gsap.from(card, {
+              scrollTrigger: {
+                trigger: card,
+                start: 'top 90%',
+                toggleActions: 'play none none none',
+              },
+              y: 30,
+              autoAlpha: 0,
+              duration: 0.6,
+              delay: i * 0.04,
+              ease: 'power3.out',
+            });
+          });
+          return;
+        }
+
+        /* Desktop: scrub-driven table reveal */
+        rowRefs.current.forEach(r => r && gsap.set(r, { autoAlpha: 0, y: 18, filter: 'blur(4px)' }));
+        lethonRefs.current.forEach(r => r && gsap.set(r, { autoAlpha: 0, x: -8, filter: 'blur(4px)' }));
+        gsap.set(scanlineRef.current, { top: 0, autoAlpha: 0 });
+
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: isDesktop ? 'top 52%' : 'top 78%',
+            start: 'top 52%',
             end: 'bottom 22%',
-            pin: false,
-            pinSpacing: true,
             scrub: reduceMotion ? false : 0.75,
-            anticipatePin: 1,
             invalidateOnRefresh: true,
           },
         });
-        tlRef.current = tl;
 
         ROWS.forEach((_, i) => {
-      tl.to(rowRefs.current[i], {
-        autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.9, ease: 'expo.out',
-      }, i * 0.48);
-      tl.to(lethonRefs.current[i], {
-        autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out',
-      }, i * 0.44 + 0.12);
+          tl.to(rowRefs.current[i], {
+            autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.9, ease: 'expo.out',
+          }, i * 0.48);
+          tl.to(lethonRefs.current[i], {
+            autoAlpha: 1, x: 0, filter: 'blur(0px)', duration: 0.9, ease: 'power3.out',
+          }, i * 0.44 + 0.12);
         });
 
         const endTime = ROWS.length * 0.48;
@@ -71,15 +90,9 @@ export default function CompareSection() {
           .to(scanlineRef.current, { top: '100%', duration: 2.6, ease: 'power2.inOut' }, endTime + 0.3)
           .to(scanlineRef.current, { autoAlpha: 0, duration: 0.35 }, endTime + 2.95)
           .to({}, { duration: 1.2 });
-
-        return () => tl.kill();
       }
     );
-
-    return () => {
-      mm.revert();
-    };
-  }, []);
+  }, { scope: sectionRef });
 
   return (
     <section ref={sectionRef} className={styles.section} id="compare" data-scroll-section>
@@ -88,6 +101,7 @@ export default function CompareSection() {
           <h2>The complete picture.<br />Where architecture meets reality.</h2>
         </div>
 
+        {/* Desktop: full table */}
         <div className={styles.tableWrap} data-gsap-scan>
           <div className={styles.scanline} ref={scanlineRef} aria-hidden="true" />
 
@@ -125,6 +139,40 @@ export default function CompareSection() {
               ))}
             </tbody>
           </table>
+        </div>
+
+        {/* Mobile: card stack */}
+        <div className={styles.cardStack}>
+          {ROWS.map((row, i) => (
+            <div
+              key={i}
+              ref={el => cardRefs.current[i] = el}
+              className={`${styles.card} ${row.hl ? styles.cardHighlighted : ''}`}
+            >
+              <div className={styles.cardCap}>{row.cap}</div>
+              <div className={styles.cardLethon}>
+                <span className={styles.cardLethonLabel}>Lethon</span>
+                <span className={`${styles.cardLethonVal} ${row.audit ? styles.cardLethonAmber : ''}`}>
+                  {row.lethon}
+                </span>
+              </div>
+              <div className={styles.cardOthers}>
+                <div className={styles.cardOther}>
+                  <span className={styles.cardOtherLabel}>Briar</span>
+                  <span>{row.briar}</span>
+                </div>
+                <div className={styles.cardOther}>
+                  <span className={styles.cardOtherLabel}>Signal</span>
+                  <span>{row.signal}</span>
+                </div>
+                <div className={styles.cardOther}>
+                  <span className={styles.cardOtherLabel}>WA</span>
+                  <span>{row.wa}</span>
+                </div>
+              </div>
+              {row.tip && <div className={styles.cardTip}>{row.tip}</div>}
+            </div>
+          ))}
         </div>
       </div>
     </section>

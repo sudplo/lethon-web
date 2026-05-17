@@ -34,6 +34,13 @@ export default function SmoothScroll({ children }) {
     gsap.ticker.add(ticker);
     gsap.ticker.lagSmoothing(0);   /* prevent stutter after tab switch */
 
+    /* Normalize touch-scroll so iOS momentum doesn't fight ScrollTrigger */
+    ScrollTrigger.normalizeScroll({
+      allowNestedScroll: true,
+      lockAxis: false,
+      type: 'touch',
+    });
+
     return () => {
       gsap.ticker.remove(ticker);
       lenis.destroy();

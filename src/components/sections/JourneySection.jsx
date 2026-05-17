@@ -1,11 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useGSAP } from '@gsap/react';
 import styles from './JourneySection.module.css';
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger, useGSAP);
 
 const NODES = [
   { title: '01 · You type', desc: 'Plaintext. Still human.' },
@@ -22,37 +23,53 @@ export default function JourneySection() {
   const dotRef = useRef(null);
   const stopRefs = useRef([]);
   const labelRefs = useRef([]);
-  const tlRef = useRef(null);
   const [activeIdx, setActiveIdx] = useState(-1);
   const activeIdxRef = useRef(-1);
 
-  useEffect(() => {
-    /* Set initial states */
-    labelRefs.current.forEach(el => el && gsap.set(el, { autoAlpha: 0, x: -16, filter: 'blur(6px)' }));
-
-    if (window.matchMedia('(max-width: 820px)').matches) {
-      labelRefs.current.forEach(el => el && gsap.set(el, { autoAlpha: 1, x: 0, filter: 'blur(0px)' }));
-      return undefined;
-    }
-
+  useGSAP(() => {
     const mm = gsap.matchMedia();
 
     mm.add(
       {
         isDesktop: '(min-width: 821px)',
+        isMobile: '(max-width: 820px)',
         reduceMotion: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
         const { isDesktop, reduceMotion } = context.conditions;
+
+        if (!isDesktop) {
+          /* Mobile: show all labels visible statically, nice stagger entrance */
+          labelRefs.current.forEach(el => el && gsap.set(el, { autoAlpha: 1, x: 0, filter: 'blur(0px)' }));
+
+          /* Stagger reveal each stop on scroll */
+          stopRefs.current.forEach((stop, i) => {
+            if (!stop) return;
+            gsap.from(stop, {
+              scrollTrigger: {
+                trigger: stop,
+                start: 'top 88%',
+                toggleActions: 'play none none none',
+              },
+              y: 24,
+              autoAlpha: 0,
+              duration: 0.6,
+              delay: i * 0.04,
+              ease: 'power3.out',
+            });
+          });
+          return;
+        }
+
+        /* Desktop: scrub-driven timeline with animated dot */
+        labelRefs.current.forEach(el => el && gsap.set(el, { autoAlpha: 0, x: -16, filter: 'blur(6px)' }));
+
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: isDesktop ? 'top 48%' : 'top 78%',
+            start: 'top 48%',
             end: 'bottom 30%',
-            pin: false,
-            pinSpacing: true,
             scrub: reduceMotion ? false : 0.8,
-            anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
               const raw = self.progress * (NODES.length - 1);
@@ -64,53 +81,47 @@ export default function JourneySection() {
             },
           },
         });
-        tlRef.current = tl;
 
         const nodeStep = 1 / (NODES.length - 1);
 
         if (!reduceMotion) {
-      tl.to(dotRef.current, { top: 'calc(100% - 0.8rem)', duration: 1, ease: 'none' }, 0);
-      NODES.forEach((_, i) => {
-        const t = i * nodeStep;
+          tl.to(dotRef.current, { top: 'calc(100% - 0.8rem)', duration: 1, ease: 'none' }, 0);
 
-        /* Light up stop dot */
-        tl.to(stopRefs.current[i]?.querySelector(`.${styles.stopDot}`), {
-          backgroundColor: 'var(--color-accent)',
-          borderColor: 'var(--color-accent)',
-          boxShadow: '0 0 12px rgba(0,245,160,0.65)',
-          duration: 0.05,
-          ease: 'power2.out',
-        }, t);
+          NODES.forEach((_, i) => {
+            const t = i * nodeStep;
 
-        /* Reveal label */
-        tl.to(labelRefs.current[i], {
-          autoAlpha: 1,
-          x: 0,
-          filter: 'blur(0px)',
-          duration: 0.12,
-          ease: 'power3.out',
-        }, t);
+            /* Light up stop dot */
+            tl.to(stopRefs.current[i]?.querySelector(`.${styles.stopDot}`), {
+              backgroundColor: 'var(--color-accent)',
+              borderColor: 'var(--color-accent)',
+              boxShadow: '0 0 12px rgba(0,245,160,0.65)',
+              duration: 0.05,
+              ease: 'power2.out',
+            }, t);
 
-        /* Dim previous */
-        if (i > 0) {
-          tl.to(labelRefs.current[i - 1], {
-            autoAlpha: 0.2,
-            filter: 'blur(3px)',
-            duration: 0.1,
-            ease: 'power2.inOut',
-          }, t + 0.05);
+            /* Reveal label */
+            tl.to(labelRefs.current[i], {
+              autoAlpha: 1,
+              x: 0,
+              filter: 'blur(0px)',
+              duration: 0.12,
+              ease: 'power3.out',
+            }, t);
+
+            /* Dim previous */
+            if (i > 0) {
+              tl.to(labelRefs.current[i - 1], {
+                autoAlpha: 0.2,
+                filter: 'blur(3px)',
+                duration: 0.1,
+                ease: 'power2.inOut',
+              }, t + 0.05);
+            }
+          });
         }
-      });
-        }
-
-        return () => tl.kill();
       }
     );
-
-    return () => {
-      mm.revert();
-    };
-  }, []);
+  }, { scope: sectionRef });
 
   return (
     <section ref={sectionRef} className={styles.section} id="journey" data-scroll-section>
