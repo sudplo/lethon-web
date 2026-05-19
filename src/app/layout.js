@@ -60,7 +60,11 @@ export default function RootLayout({ children }) {
         <PageChrome />
         <Navigation />
         <GlobalCanvas />
-        <SmoothScroll>{children}</SmoothScroll>
+        <div id="smooth-wrapper">
+          <div id="smooth-content">
+            <SmoothScroll>{children}</SmoothScroll>
+          </div>
+        </div>
       </body>
     </html>
   );
