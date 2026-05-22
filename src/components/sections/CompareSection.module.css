@@ -47,13 +47,21 @@
   color: var(--text-muted);
 }
 
+.tbody tr {
+  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s ease;
+}
+
+.tbody tr:hover {
+  background: rgba(255, 255, 255, 0.02) !important;
+}
+
 .tbody td {
   padding: 0.95rem 1rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.045);
   font-family: var(--font-mono);
   font-size: 0.82rem;
   line-height: 1.45;
-  vertical-align: top;
+  vertical-align: middle;
 }
 
 .tbody tr:last-child td {
@@ -61,7 +69,7 @@
 }
 
 .highlighted {
-  background: rgba(0, 245, 160, 0.035);
+  background: rgba(0, 245, 160, 0.015);
 }
 
 .capCell {
@@ -69,6 +77,12 @@
   color: var(--text-primary);
   font-family: var(--font-sans);
   font-size: 0.92rem;
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+
+.tbody tr:hover .capCell {
+  color: #ffffff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
 }
 
 .colLethon,
@@ -79,7 +93,11 @@
 .lethonCell {
   position: relative;
   width: 30%;
-  text-shadow: 0 0 18px rgba(0, 245, 160, 0.12);
+  transition: background-color 0.25s ease;
+}
+
+.tbody tr:hover .lethonCell {
+  background: rgba(0, 245, 160, 0.04);
 }
 
 .lethonCellAmber {
@@ -101,14 +119,89 @@
 
 .scanline {
   position: absolute;
-  left: 34%;
+  left: 0;
   top: 0;
-  width: 1px;
-  height: 48px;
+  width: 100%;
+  height: 2px;
   z-index: 5;
-  background: linear-gradient(to bottom, transparent, var(--color-accent), transparent);
-  box-shadow: 0 0 10px var(--color-accent);
+  background: linear-gradient(to right, transparent, var(--color-accent), transparent);
+  box-shadow: 0 0 12px var(--color-accent);
   pointer-events: none;
+}
+
+/* ============================================================
+   Custom Badges
+   ============================================================ */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 500;
+  border: 1px solid transparent;
+  line-height: 1.1;
+  transition: all 0.25s ease;
+}
+
+.badgeLed {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.badgeIcon {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+}
+
+.badgeText {
+  white-space: nowrap;
+}
+
+.badgeCheck {
+  background: rgba(16, 185, 129, 0.05);
+  border-color: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.badgeCheck .badgeLed {
+  background: #10b981;
+  box-shadow: 0 0 6px #10b981;
+}
+
+.badgeCross {
+  background: rgba(239, 68, 68, 0.04);
+  border-color: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+}
+
+.badgeCross .badgeLed {
+  background: #ef4444;
+  box-shadow: 0 0 6px #ef4444;
+}
+
+.badgePartial {
+  background: rgba(245, 158, 11, 0.04);
+  border-color: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+}
+
+.badgePartial .badgeLed {
+  background: #f59e0b;
+  box-shadow: 0 0 6px #f59e0b;
+}
+
+.badgeRaw {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  color: var(--text-muted);
 }
 
 /* ============================================================
@@ -119,9 +212,10 @@
   display: none;
 }
 
-@media (max-width: 760px) {
+@media (max-width: 900px) {
   .section {
     min-height: auto;
+    padding-block: 4rem;
   }
 
   /* Hide the table on mobile */
@@ -132,15 +226,16 @@
   /* Show the card stack */
   .cardStack {
     display: grid;
-    gap: 0.75rem;
+    gap: 1rem;
   }
 
   .card {
-    padding: clamp(0.9rem, 3vw, 1.2rem);
+    padding: 1.25rem;
     border: 1px solid var(--border-faint);
     border-radius: var(--radius-md);
     background: rgba(3, 5, 8, 0.68);
     backdrop-filter: blur(12px);
+    transition: transform 0.2s ease, border-color 0.2s ease;
   }
 
   .cardHighlighted {
@@ -150,19 +245,24 @@
 
   .cardCap {
     font-family: var(--font-sans);
-    font-size: 0.92rem;
+    font-size: 0.95rem;
     font-weight: 500;
     color: var(--text-primary);
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.8rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 0.5rem;
   }
 
   .cardLethon {
     display: flex;
-    align-items: baseline;
+    justify-content: space-between;
+    align-items: center;
     gap: 0.6rem;
-    margin-bottom: 0.65rem;
-    padding-bottom: 0.65rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 0.8rem;
+    padding: 0.6rem 0.8rem;
+    background: rgba(0, 245, 160, 0.03);
+    border: 1px solid rgba(0, 245, 160, 0.08);
+    border-radius: 8px;
   }
 
   .cardLethonLabel {
@@ -170,49 +270,111 @@
     font-size: 0.68rem;
     text-transform: uppercase;
     color: var(--text-muted);
-    flex-shrink: 0;
+    letter-spacing: 0.05em;
   }
 
   .cardLethonVal {
-    font-family: var(--font-mono);
-    font-size: 0.84rem;
-    color: var(--color-accent);
-    text-shadow: 0 0 12px rgba(0, 245, 160, 0.14);
+    display: inline-flex;
   }
 
-  .cardLethonAmber {
+  .cardLethonVal.cardLethonAmber .badge {
     color: var(--color-amber);
-    text-shadow: none;
+    border-color: rgba(245, 158, 11, 0.2);
+    background: rgba(245, 158, 11, 0.05);
   }
 
   .cardOthers {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 0.5rem;
+    gap: 0.6rem;
+    margin-top: 0.5rem;
   }
 
   .cardOther {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
+    gap: 0.4rem;
     font-family: var(--font-mono);
     font-size: 0.78rem;
     color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.015);
+    padding: 0.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 6px;
+    align-items: flex-start;
   }
 
   .cardOtherLabel {
-    font-size: 0.62rem;
+    font-size: 0.58rem;
     text-transform: uppercase;
     color: var(--text-faint);
+    letter-spacing: 0.05em;
   }
 
   .cardTip {
-    margin-top: 0.55rem;
+    margin-top: 0.75rem;
     padding-top: 0.55rem;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
     font-family: var(--font-mono);
     font-size: 0.72rem;
     color: rgba(240, 244, 248, 0.42);
     line-height: 1.45;
+  }
+}
+
+/* ============================================================
+   Short Viewport (Laptop screens) Adjustments
+   ============================================================ */
+@media (max-height: 800px) and (min-width: 901px) {
+  .section {
+    padding-block: clamp(2rem, 5vh, 4rem);
+    min-height: auto;
+  }
+  
+  .header {
+    margin-bottom: 1.5rem;
+  }
+
+  .thead th {
+    padding: 0.75rem 0.85rem;
+    font-size: 0.68rem;
+  }
+
+  .tbody td {
+    padding: 0.6rem 0.85rem;
+    font-size: 0.76rem;
+  }
+
+  .capCell {
+    font-size: 0.84rem;
+  }
+
+  .badge {
+    padding: 0.18rem 0.45rem;
+    font-size: 0.68rem;
+  }
+
+  .tip {
+    font-size: 0.68rem;
+    margin-top: 0.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .cardOthers {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .cardOther {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    width: 100%;
+  }
+  
+  .cardOtherLabel {
+    margin-bottom: 0;
   }
 }

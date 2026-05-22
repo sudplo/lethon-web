@@ -60,6 +60,8 @@ export default function RootLayout({ children }) {
         <PageChrome />
         <Navigation />
         <GlobalCanvas />
+        <div className="vignette-overlay" />
+        <div className="grain-overlay" />
         <div id="smooth-wrapper">
           <div id="smooth-content">
             <SmoothScroll>{children}</SmoothScroll>

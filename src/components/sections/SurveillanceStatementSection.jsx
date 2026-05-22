@@ -48,12 +48,28 @@ export default function SurveillanceStatementSection() {
         const { isDesktop } = context.conditions;
 
         if (!isDesktop) {
-          gsap.set(q('.js-word'), { opacity: 1, filter: 'blur(0px)', y: 0 });
+          // Mobile: simple stagger reveal for all words when they scroll into view
+          gsap.fromTo(q('.js-word'),
+            { opacity: 0.15, filter: 'blur(4px)', y: 10 },
+            {
+              opacity: 1,
+              filter: 'blur(0px)',
+              y: 0,
+              stagger: 0.03,
+              duration: 0.9,
+              ease: 'power2.out',
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: 'top 80%',
+                toggleActions: 'play none none none',
+              }
+            }
+          );
           return;
         }
 
-        // Desktop: High-impact sequence
-        gsap.set(q('.js-word'), { opacity: 0.1, filter: 'blur(12px)', y: 20 });
+        // Desktop: High-impact sequence but softened
+        gsap.set(q('.js-word'), { opacity: 0.15, filter: 'blur(5px)', y: 10 });
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -75,9 +91,9 @@ export default function SurveillanceStatementSection() {
             opacity: 1,
             filter: 'blur(0px)',
             y: 0,
-            stagger: 0.04,
+            stagger: 0.03,
             duration: 0.8,
-            ease: 'power3.out'
+            ease: 'power2.out'
           }, label);
 
           // 2. Persistence
@@ -86,12 +102,12 @@ export default function SurveillanceStatementSection() {
           // 3. Exit if not last
           if (idx < lineWords.length - 1) {
             tl.to(words, {
-              opacity: 0.05,
-              filter: 'blur(15px)',
-              y: -25,
+              opacity: 0.25,
+              filter: 'blur(3.5px)',
+              y: -10,
               stagger: 0.02,
-              duration: 0.6,
-              ease: 'power2.in'
+              duration: 0.7,
+              ease: 'power2.inOut'
             }, `${label}+=1.6`);
           }
         });

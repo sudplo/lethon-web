@@ -222,7 +222,7 @@
   box-shadow: 0 0 5px var(--color-accent);
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px), (max-height: 800px) {
   .section {
     padding-block: 4rem;
   }
@@ -245,9 +245,6 @@
 
   .contentCard {
     position: static;
-    opacity: 1 !important;
-    transform: none !important;
-    filter: none !important;
     max-width: 100%;
   }
 

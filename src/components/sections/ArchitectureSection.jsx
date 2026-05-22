@@ -45,6 +45,12 @@ export default function ArchitectureSection() {
   const cardRefs = useRef([]);
   const barRefs = useRef([]);
   const lockRefs = useRef([]);
+  
+  // Mobile-specific refs for inline cards
+  const cardMobileRefs = useRef([]);
+  const barMobileRefs = useRef([]);
+  const lockMobileRefs = useRef([]);
+
   const headlineRef = useRef(null);
   const [activeIdx, setActiveIdx] = useState(0);
 
@@ -54,17 +60,17 @@ export default function ArchitectureSection() {
 
     mm.add(
       {
-        isDesktop: '(min-width: 901px)',
-        isMobile: '(max-width: 900px)',
+        isDesktopTall: '(min-width: 901px) and (min-height: 801px)',
+        isMobileOrShort: '(max-width: 900px), (max-height: 800px)',
         reduceMotion: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
-        const { isDesktop, reduceMotion } = context.conditions;
+        const { isDesktopTall, isMobileOrShort, reduceMotion } = context.conditions;
 
         if (reduceMotion) return;
 
         // ── 1. PREPARATION ──
-        if (isDesktop) {
+        if (isDesktopTall) {
           gsap.set(cardRefs.current, { 
             y: 400, z: 0, rotationX: 10, autoAlpha: 0, scale: 0.9, filter: 'blur(15px)', transformPerspective: 1200
           });
@@ -75,6 +81,11 @@ export default function ArchitectureSection() {
           gsap.set(q(`.${styles.desc}`), { autoAlpha: 0 });
           gsap.set(q(`.${styles.descTitle}`), { autoAlpha: 0, x: -20 });
           gsap.set(q(`.${styles.descLine}`), { autoAlpha: 0, x: -10 });
+        } else if (isMobileOrShort) {
+          gsap.set(q(`.${styles.desc}`), { autoAlpha: 0, y: 30, filter: 'blur(8px)' });
+          gsap.set(cardMobileRefs.current, { autoAlpha: 0, y: 30, scale: 0.95, filter: 'blur(8px)' });
+          gsap.set(barMobileRefs.current, { scaleY: 0, transformOrigin: 'top' });
+          gsap.set(lockMobileRefs.current, { autoAlpha: 0, x: -20 });
         }
 
         // ── 2. HEADLINE NARRATIVE ──
@@ -92,25 +103,59 @@ export default function ArchitectureSection() {
           }
         });
 
-        if (!isDesktop) {
-          // Mobile: Cards just animate up as you scroll to them.
-          // CSS handles the text visibility directly.
-          cardRefs.current.forEach((card, i) => {
-            if (!card) return;
-            gsap.fromTo(card, 
-              { y: 60, autoAlpha: 0 },
-              {
-                scrollTrigger: {
-                  trigger: card,
-                  start: 'top 90%',
-                  toggleActions: 'play none none none',
-                },
-                y: 0,
-                autoAlpha: 1,
-                duration: 0.9,
-                ease: 'power3.out',
+        if (isMobileOrShort) {
+          // Animate descriptions and their corresponding inline cards on scroll
+          const descs = q(`.${styles.desc}`);
+          descs.forEach((desc, i) => {
+            if (!desc) return;
+            
+            const mobileCard = cardMobileRefs.current[i];
+            const mobileBar = barMobileRefs.current[i];
+            const mobileLock = lockMobileRefs.current[i];
+
+            const tl = gsap.timeline({
+              scrollTrigger: {
+                trigger: desc,
+                start: 'top 85%',
+                toggleActions: 'play none none none',
               }
-            );
+            });
+
+            tl.to(desc, {
+              autoAlpha: 1,
+              y: 0,
+              filter: 'blur(0px)',
+              duration: 0.8,
+              ease: 'power3.out'
+            });
+
+            if (mobileCard) {
+              tl.to(mobileCard, {
+                autoAlpha: 1,
+                y: 0,
+                scale: 1,
+                filter: 'blur(0px)',
+                duration: 0.8,
+                ease: 'power3.out'
+              }, '-=0.6');
+            }
+
+            if (mobileBar) {
+              tl.to(mobileBar, {
+                scaleY: 1,
+                duration: 0.5,
+                ease: 'power2.out'
+              }, '-=0.4');
+            }
+
+            if (mobileLock) {
+              tl.to(mobileLock, {
+                autoAlpha: 1,
+                x: 0,
+                duration: 0.4,
+                ease: 'back.out(1.5)'
+              }, '-=0.2');
+            }
           });
           return;
         }
@@ -257,6 +302,26 @@ export default function ArchitectureSection() {
                   {layer.body.split('\n').map((line, j) => (
                     <p key={j} className={styles.descLine}>{line || '\u00A0'}</p>
                   ))}
+                </div>
+                
+                {/* Mobile-only inline card */}
+                <div className={styles.mobileCardContainer}>
+                  <div className={styles.card} ref={el => cardMobileRefs.current[i] = el}>
+                    <div
+                      className={styles.cardBar}
+                      ref={el => barMobileRefs.current[i] = el}
+                      style={{ backgroundColor: layer.color }}
+                    />
+                    <div className={styles.cardBody}>
+                      <h4 className={styles.cardTitle} style={{ color: layer.color }}>{layer.title}</h4>
+                      <div className={styles.cardTags}>
+                        {layer.tags.map((tag, j) => <span key={j} className="tag">{tag}</span>)}
+                      </div>
+                      <pre className={styles.cardLock} ref={el => lockMobileRefs.current[i] = el}>
+                        {layer.lock}
+                      </pre>
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}

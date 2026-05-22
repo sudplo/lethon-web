@@ -44,16 +44,20 @@ export default function MetadataSection() {
 
     mm.add(
       {
-        isDesktop: '(min-width: 901px)',
+        isDesktopTall: '(min-width: 901px) and (min-height: 801px)',
+        isDesktopShort: '(min-width: 901px) and (max-height: 800px)',
         isMobile: '(max-width: 900px)',
       },
       (context) => {
-        const { isDesktop } = context.conditions;
+        const { isDesktopTall, isDesktopShort, isMobile } = context.conditions;
 
-        if (!isDesktop) {
+        if (isMobile) {
           // Mobile animation: Simple fade up without pinning
           rowRefs.current.forEach((row) => {
             if (!row) return;
+            const rightBlock = row.querySelector(`.${styles.dataRight}`);
+            if (rightBlock) gsap.set(rightBlock, { clipPath: 'inset(0 0 0 0)' });
+
             gsap.from(row, {
               scrollTrigger: {
                 trigger: row,
@@ -69,59 +73,139 @@ export default function MetadataSection() {
           return;
         }
 
-        // Desktop: High-tech Dashboard Pinning Experience
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top top',
-            end: `+=${ITEMS.length * 120}%`,
-            scrub: 1,
-            pin: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
-          },
-        });
+        if (isDesktopTall) {
+          // Desktop Tall: High-tech Dashboard Pinning Experience
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top top',
+              end: `+=${ITEMS.length * 120}%`,
+              scrub: 1,
+              pin: true,
+              anticipatePin: 1,
+              invalidateOnRefresh: true,
+            },
+          });
 
-        // Initialize states
-        rowRefs.current.forEach((row, i) => {
-          if (!row) return;
-          const leftBlock = row.querySelector(`.${styles.dataLeft}`);
-          const rightBlock = row.querySelector(`.${styles.dataRight}`);
-          const scanner = row.querySelector(`.${styles.scanner}`);
-          
-          gsap.set(row, { autoAlpha: i === 0 ? 1 : 0.2, scale: i === 0 ? 1 : 0.96 });
-          gsap.set(rightBlock, { clipPath: 'inset(0 100% 0 0)' });
-          gsap.set(scanner, { left: '0%', autoAlpha: 0 });
-        });
+          // Initialize states
+          rowRefs.current.forEach((row, i) => {
+            if (!row) return;
+            const leftBlock = row.querySelector(`.${styles.dataLeft}`);
+            const rightBlock = row.querySelector(`.${styles.dataRight}`);
+            const scanner = row.querySelector(`.${styles.scanner}`);
+            const title = row.querySelector(`.${styles.rowTitle}`);
+            const desc = row.querySelector(`.${styles.rowDesc}`);
+            
+            gsap.set(row, { autoAlpha: i === 0 ? 1 : 0.35, scale: i === 0 ? 1.01 : 0.98 });
+            gsap.set(title, { color: i === 0 ? '#ffffff' : 'rgba(240, 244, 248, 0.65)' });
+            gsap.set(desc, { opacity: i === 0 ? 0.85 : 0.55 });
+            gsap.set(rightBlock, { clipPath: 'inset(0 100% 0 0)' });
+            gsap.set(scanner, { left: '0%', autoAlpha: 0 });
+          });
 
-        // Sequential Redaction Animation
-        rowRefs.current.forEach((row, i) => {
-          if (!row) return;
-          const leftBlock = row.querySelector(`.${styles.dataLeft}`);
-          const rightBlock = row.querySelector(`.${styles.dataRight}`);
-          const scanner = row.querySelector(`.${styles.scanner}`);
-          
-          const label = `row-${i}`;
-          tl.addLabel(label);
+          // Sequential Redaction Animation
+          rowRefs.current.forEach((row, i) => {
+            if (!row) return;
+            const leftBlock = row.querySelector(`.${styles.dataLeft}`);
+            const rightBlock = row.querySelector(`.${styles.dataRight}`);
+            const scanner = row.querySelector(`.${styles.scanner}`);
+            const title = row.querySelector(`.${styles.rowTitle}`);
+            const desc = row.querySelector(`.${styles.rowDesc}`);
+            
+            const label = `row-${i}`;
+            tl.addLabel(label);
 
-          // 1. Focus current row
-          tl.to(row, { autoAlpha: 1, scale: 1, duration: 0.8, ease: 'power2.out' }, label);
+            // 1. Focus current row with high-tech glass highlights
+            tl.to(row, { 
+              autoAlpha: 1, 
+              scale: 1.01, 
+              backgroundColor: 'rgba(255, 255, 255, 0.02)',
+              boxShadow: 'inset 0 0 20px rgba(0, 245, 160, 0.02)',
+              duration: 0.8, 
+              ease: 'power2.out' 
+            }, label)
+            .to(title, { color: '#ffffff', duration: 0.8, ease: 'power2.out' }, label)
+            .to(desc, { opacity: 0.85, duration: 0.8, ease: 'power2.out' }, label);
 
-          // 2. Scanner sweeping effect
-          tl.to(scanner, { autoAlpha: 1, duration: 0.3 }, `${label}+=0.3`)
-            .to(scanner, { left: '100%', duration: 1.8, ease: 'power1.inOut' }, `${label}+=0.3`)
-            .to(rightBlock, { clipPath: 'inset(0 0% 0 0)', duration: 1.8, ease: 'power1.inOut' }, `${label}+=0.3`)
-            .to(leftBlock, { filter: 'blur(8px)', opacity: 0.2, duration: 1.2, ease: 'power2.in' }, `${label}+=0.8`)
-            .to(scanner, { autoAlpha: 0, duration: 0.3 }, `${label}+=2.1`);
+            // 2. Scanner sweeping and redaction
+            tl.to(scanner, { autoAlpha: 1, duration: 0.3 }, `${label}+=0.3`)
+              .to(scanner, { left: '100%', duration: 1.8, ease: 'power1.inOut' }, `${label}+=0.3`)
+              .to(rightBlock, { clipPath: 'inset(0 0% 0 0)', duration: 1.8, ease: 'power1.inOut' }, `${label}+=0.3`)
+              .to(leftBlock, { 
+                filter: 'blur(5px)', 
+                opacity: 0.25, 
+                backgroundColor: 'rgba(255, 255, 255, 0.005)',
+                borderColor: 'rgba(255, 255, 255, 0.02)',
+                color: 'rgba(255, 255, 255, 0.2)',
+                duration: 1.4, 
+                ease: 'power2.inOut' 
+              }, `${label}+=0.6`)
+              .to(scanner, { autoAlpha: 0, duration: 0.3 }, `${label}+=2.1`);
 
-          // 3. Persistence
-          tl.to({}, { duration: 1 }, `${label}+=2.4`);
+            // 3. Persistence
+            tl.to({}, { duration: 1 }, `${label}+=2.4`);
 
-          // 4. Dim row if not last
-          if (i < ITEMS.length - 1) {
-            tl.to(row, { autoAlpha: 0.2, scale: 0.96, duration: 0.8, ease: 'power2.inOut' }, `${label}+=3.4`);
-          }
-        });
+            // 4. Dim row if not last
+            if (i < ITEMS.length - 1) {
+              tl.to(row, { 
+                autoAlpha: 0.35, 
+                scale: 0.98, 
+                backgroundColor: 'rgba(0,0,0,0)',
+                boxShadow: 'inset 0 0 0px rgba(0, 0, 0, 0)',
+                duration: 0.8, 
+                ease: 'power2.inOut' 
+              }, `${label}+=3.4`)
+              .to(title, { color: 'rgba(240, 244, 248, 0.65)', duration: 0.8, ease: 'power2.inOut' }, `${label}+=3.4`)
+              .to(desc, { opacity: 0.55, duration: 0.8, ease: 'power2.inOut' }, `${label}+=3.4`);
+            }
+          });
+        } else if (isDesktopShort) {
+          // Desktop Short: Flow layout with scroll-triggered redactions playing once
+          rowRefs.current.forEach((row, i) => {
+            if (!row) return;
+            const leftBlock = row.querySelector(`.${styles.dataLeft}`);
+            const rightBlock = row.querySelector(`.${styles.dataRight}`);
+            const scanner = row.querySelector(`.${styles.scanner}`);
+            const title = row.querySelector(`.${styles.rowTitle}`);
+            
+            gsap.set(row, { autoAlpha: 0, scale: 0.98 });
+            gsap.set(title, { color: 'rgba(240, 244, 248, 0.65)' });
+            gsap.set(rightBlock, { clipPath: 'inset(0 100% 0 0)' });
+            gsap.set(scanner, { left: '0%', autoAlpha: 0 });
+
+            const tlRow = gsap.timeline({
+              scrollTrigger: {
+                trigger: row,
+                start: 'top 85%',
+                toggleActions: 'play none none none',
+              }
+            });
+
+            tlRow
+              .to(row, { 
+                autoAlpha: 1, 
+                scale: 1.01, 
+                backgroundColor: 'rgba(255, 255, 255, 0.02)',
+                boxShadow: 'inset 0 0 20px rgba(0, 245, 160, 0.02)',
+                duration: 0.6, 
+                ease: 'power2.out' 
+              })
+              .to(title, { color: '#ffffff', duration: 0.6 }, '<')
+              .to(scanner, { autoAlpha: 1, duration: 0.2 }, '-=0.1')
+              .to(scanner, { left: '100%', duration: 1.4, ease: 'power2.inOut' }, '-=0.1')
+              .to(rightBlock, { clipPath: 'inset(0 0% 0 0)', duration: 1.4, ease: 'power2.inOut' }, '<')
+              .to(leftBlock, { 
+                filter: 'blur(5px)', 
+                opacity: 0.25, 
+                backgroundColor: 'rgba(255, 255, 255, 0.005)',
+                borderColor: 'rgba(255, 255, 255, 0.02)',
+                color: 'rgba(255, 255, 255, 0.2)',
+                duration: 1.1, 
+                ease: 'power2.inOut' 
+              }, '-=0.9')
+              .to(scanner, { autoAlpha: 0, duration: 0.2 });
+          });
+        }
       }
     );
   }, { scope: sectionRef });
@@ -154,6 +238,7 @@ export default function MetadataSection() {
                 
                 <div className={styles.dataBlock} aria-label="Standard metadata">
                   <div className={styles.dataLeft}>
+                    <div className={styles.mobileLabel}>Standard Reality</div>
                     <pre>{item.left}</pre>
                   </div>
                 </div>
@@ -161,6 +246,7 @@ export default function MetadataSection() {
                 <div className={styles.dataBlock} aria-label="Lethon metadata">
                   <div className={styles.scanner} />
                   <div className={styles.dataRight}>
+                    <div className={styles.mobileLabel}>Lethon Reality</div>
                     <pre>{item.right}</pre>
                   </div>
                 </div>

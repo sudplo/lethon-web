@@ -18,6 +18,12 @@ export default function CustomCursor() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
+    const hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (!hasFinePointer) {
+      document.body.style.cursor = 'auto';
+      return;
+    }
+
     // Hide native cursor completely
     document.body.style.cursor = 'none';
     

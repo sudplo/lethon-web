@@ -34,24 +34,28 @@ export default function JourneySection() {
 
     mm.add(
       {
-        isDesktop: '(min-width: 901px)',
-        isMobile: '(max-width: 900px)',
+        isDesktopTall: '(min-width: 901px) and (min-height: 801px)',
+        isMobileOrShort: '(max-width: 900px), (max-height: 800px)',
       },
       (context) => {
-        const { isDesktop } = context.conditions;
+        const { isDesktopTall, isMobileOrShort } = context.conditions;
 
-        if (!isDesktop) {
-          // Mobile: Sequential reveal on scroll
-          stopRefs.current.forEach((stop, i) => {
-            if (!stop) return;
-            gsap.from(stop, {
+        if (isMobileOrShort) {
+          // Mobile/Short height: Sequential reveal of cards on scroll in a flowing vertical list
+          gsap.set(contentRefs.current, { autoAlpha: 0, y: 30, x: 0, scale: 0.96, filter: 'blur(8px)' });
+
+          contentRefs.current.forEach((card) => {
+            if (!card) return;
+            gsap.to(card, {
               scrollTrigger: {
-                trigger: stop,
-                start: 'top 90%',
+                trigger: card,
+                start: 'top 88%',
                 toggleActions: 'play none none none',
               },
-              autoAlpha: 0,
-              y: 30,
+              autoAlpha: 1,
+              y: 0,
+              scale: 1,
+              filter: 'blur(0px)',
               duration: 0.8,
               ease: 'power3.out',
             });
@@ -59,7 +63,7 @@ export default function JourneySection() {
           return;
         }
 
-        // Desktop: Pinning and scroll-driven journey
+        // Desktop Tall: Pinning and scroll-driven journey
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
@@ -81,7 +85,7 @@ export default function JourneySection() {
         });
 
         // Initialize cards
-        gsap.set(contentRefs.current, { autoAlpha: 0, x: 40, scale: 0.9, filter: 'blur(10px)' });
+        gsap.set(contentRefs.current, { autoAlpha: 0, x: 40, y: 0, scale: 0.9, filter: 'blur(10px)' });
 
         // Animate the main path line and dot across the whole timeline
         tl.to(progressLineRef.current, { height: '100%', ease: 'none', duration: NODES.length * 4 }, 0);
@@ -178,7 +182,7 @@ export default function JourneySection() {
                   key={i}
                   ref={el => contentRefs.current[i] = el}
                   className={styles.contentCard}
-                  style={{ opacity: 0, transform: 'translateX(40px) scale(0.9)', filter: 'blur(10px)' }}
+                  style={{ opacity: 0 }}
                 >
                   <div className={styles.cardHeader}>
                     <span className={styles.nodeIndex}>0{i + 1}</span>

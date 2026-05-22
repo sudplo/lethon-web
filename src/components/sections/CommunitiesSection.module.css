@@ -70,134 +70,360 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: clamp(1.5rem, 3vw, 3rem);
-  background: rgba(15, 20, 25, 0.4);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  background: rgba(3, 5, 8, 0.72);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-faint);
   border-radius: 24px;
-}
-
-.server,
-.clientNode,
-.node {
-  min-width: 8rem;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  text-align: center;
-  font-weight: 500;
-}
-
-.server {
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  background: rgba(239, 68, 68, 0.05);
-  color: rgba(255, 255, 255, 0.8);
   position: relative;
   overflow: hidden;
 }
 
-.serverIcon {
+.standardSystem,
+.lethonSystem {
+  width: 280px;
+  height: 140px;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lethonSystem {
+  display: block;
+}
+
+.server {
+  width: 180px;
+  padding: 0.75rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  background: rgba(239, 68, 68, 0.05);
+  color: #ff8a8a;
+  font-family: var(--font-mono);
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.05);
+  transition: all 0.3s ease;
   z-index: 2;
 }
 
+.serverHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  border-bottom: 1px solid rgba(239, 68, 68, 0.25);
+  padding-bottom: 0.3rem;
+  margin-bottom: 0.3rem;
+}
+
+.serverStatusLed {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ef4444;
+  box-shadow: 0 0 8px #ef4444;
+  animation: pulseRed 1s infinite alternate;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+@keyframes pulseRed {
+  0% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+.serverName {
+  font-size: 0.62rem;
+  color: #ffb8b8;
+  letter-spacing: 0.05em;
+}
+
+.serverBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  text-align: left;
+}
+
+.dbIcon {
+  font-size: 0.7rem;
+  color: #ef4444;
+  font-weight: 600;
+}
+
+.serverTelemetry {
+  font-size: 0.62rem;
+  color: rgba(255, 138, 138, 0.7);
+}
+
 .clientNode {
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  width: 160px;
+  padding: 0.6rem 0.8rem;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.02);
+  font-family: var(--font-mono);
+  text-align: center;
+  z-index: 2;
+}
+
+.nodeHeader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+.nodeRole {
+  font-size: 0.6rem;
+  color: var(--text-muted);
+}
+
+.nodeTitle {
+  font-size: 0.76rem;
   color: var(--text-primary);
+}
+
+.svgLineWrap {
+  width: 100%;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  z-index: 1;
+}
+
+.connectorSvg {
+  width: 100px;
+  height: 100%;
+}
+
+.meshSvgWrap {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.meshSvg {
+  width: 100%;
+  height: 100%;
+}
+
+.animatedPath {
+  stroke-dasharray: 6 15;
+  animation: dashFlow 2s linear infinite;
+}
+
+@keyframes dashFlow {
+  to {
+    stroke-dashoffset: -21;
+  }
+}
+
+.node {
+  position: absolute;
+  width: 70px;
+  height: 38px;
+  padding: 0.35rem 0.5rem;
+  border-radius: 8px;
+  font-family: var(--font-mono);
+  border: 1px solid rgba(0, 245, 160, 0.2);
+  background: rgba(0, 245, 160, 0.03);
+  color: var(--color-accent);
+  box-shadow: 0 0 10px rgba(0, 245, 160, 0.03);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.nodeOwner {
+  left: 10px;
+  top: 10px;
+}
+
+.nodeAdmin {
+  right: 10px;
+  top: 10px;
+}
+
+.nodeMember {
+  left: 105px;
+  top: 90px;
+}
+
+.nodeLedGreen {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 6px var(--color-accent);
+  display: inline-block;
+}
+
+.nodeKey {
+  font-size: 0.52rem;
+  color: rgba(0, 245, 160, 0.7);
+  letter-spacing: 0.02em;
 }
 
 .lineV {
   width: 1px;
-  height: 3rem;
-  margin: 0.5rem 0;
-  background: rgba(255, 255, 255, 0.1);
+  height: 2.2rem;
+  margin: 0.4rem 0;
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .lineVAccent {
   background: var(--color-accent);
-  box-shadow: 0 0 15px rgba(0, 245, 160, 0.4);
+  box-shadow: 0 0 10px var(--color-accent);
+}
+
+.decoratorLine {
+  display: none;
 }
 
 .perms {
   width: 100%;
   display: grid;
-  gap: 0.75rem;
-  margin-top: 1rem;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+  z-index: 2;
 }
 
 .permSignal,
 .permLethon {
-  padding: 1rem;
-  border-radius: 12px;
+  padding: 0.65rem 0.85rem;
+  border-radius: 10px;
   font-family: var(--font-mono);
-  font-size: 0.8rem;
-  line-height: 1.5;
+  font-size: 0.74rem;
+  line-height: 1.4;
   text-align: left;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  gap: 0.25rem;
+  transition: border-color 0.3s ease, background-color 0.3s ease;
+}
+
+.terminalHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  opacity: 0.5;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  padding-bottom: 0.2rem;
+}
+
+.terminalDot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.terminalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.logLabel {
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+.logLabelError {
+  color: #ff6b6b;
+  font-size: 0.68rem;
+}
+
+.logLabelSuccess {
+  color: var(--color-accent);
+  font-size: 0.68rem;
 }
 
 .permLabel {
-  font-size: 0.65rem;
-  opacity: 0.6;
+  font-size: 0.6rem;
+  opacity: 0.5;
   text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.permVal {
+  color: var(--text-primary);
 }
 
 .permSignal {
-  background: rgba(245, 158, 11, 0.03);
-  border: 1px solid rgba(245, 158, 11, 0.1);
-  color: #ffb84d;
+  background: rgba(239, 68, 68, 0.015);
+  border: 1px solid rgba(239, 68, 68, 0.08);
+  color: #ffb8b8;
+}
+
+.permSignal:hover {
+  border-color: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.03);
 }
 
 .permLethon {
+  background: rgba(0, 245, 160, 0.015);
+  border: 1px solid rgba(0, 245, 160, 0.08);
+  color: var(--color-accent);
+}
+
+.permLethon:hover {
+  border-color: rgba(0, 245, 160, 0.2);
   background: rgba(0, 245, 160, 0.03);
-  border: 1px solid rgba(0, 245, 160, 0.1);
-  color: var(--color-accent);
-}
-
-.mesh {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-.node {
-  border: 1px solid rgba(0, 245, 160, 0.3);
-  background: rgba(0, 245, 160, 0.05);
-  color: var(--color-accent);
-}
-
-.lineH {
-  width: 2rem;
-  height: 1px;
-  background: rgba(0, 245, 160, 0.3);
 }
 
 .result {
   margin-top: auto;
-  padding-top: 2rem;
+  padding-top: 1.5rem;
   width: 100%;
-  text-align: center;
+  display: flex;
+  justify-content: center;
 }
 
-.resultFail {
+.resultBadgeFail,
+.resultBadgeSuccess {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 1rem;
+  border-radius: 9999px;
   font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: #ff6b6b;
-  font-weight: 500;
-}
-
-.resultSuccess {
-  font-family: var(--font-mono);
-  font-size: 0.85rem;
-  color: var(--color-accent);
+  font-size: 0.72rem;
   font-weight: 600;
-  text-shadow: 0 0 15px rgba(0, 245, 160, 0.3);
+  letter-spacing: 0.04em;
+  border: 1px solid transparent;
+}
+
+.resultBadgeFail {
+  background: rgba(239, 68, 68, 0.06);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #ff6b6b;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.05);
+}
+
+.resultBadgeSuccess {
+  background: rgba(0, 245, 160, 0.06);
+  border-color: rgba(0, 245, 160, 0.2);
+  color: var(--color-accent);
+  box-shadow: 0 0 20px rgba(0, 245, 160, 0.1);
+  text-shadow: 0 0 8px rgba(0, 245, 160, 0.3);
+}
+
+.resultIcon {
+  flex-shrink: 0;
 }
 
 @media (max-width: 900px) {
@@ -213,15 +439,70 @@
 
   .diagram {
     min-height: auto;
-    padding: 2rem 1.5rem;
+    padding: 1.5rem;
   }
 
-  .mesh {
-    flex-direction: column;
+  .standardSystem,
+  .lethonSystem {
+    margin-inline: auto;
+  }
+}
+
+/* ============================================================
+   Short Viewport (Laptop screens) Adjustments
+   ============================================================ */
+@media (max-height: 800px) and (min-width: 901px) {
+  .section {
+    padding-block: clamp(2rem, 5vh, 4rem);
+    min-height: auto;
   }
 
-  .lineH {
-    width: 1px;
-    height: 1.5rem;
+  .header {
+    margin-bottom: 1.5rem;
+  }
+
+  .grid {
+    gap: 1.5rem;
+  }
+
+  .diagram {
+    min-height: auto;
+    padding: 1.25rem;
+  }
+
+  .standardSystem,
+  .lethonSystem {
+    transform: scale(0.9);
+    margin-block: -0.5rem;
+  }
+
+  .perms {
+    gap: 0.45rem;
+    margin-top: 0.4rem;
+  }
+
+  .permSignal,
+  .permLethon {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.7rem;
+  }
+
+  .result {
+    padding-top: 1rem;
+  }
+
+  .resultBadgeFail,
+  .resultBadgeSuccess {
+    padding: 0.35rem 0.8rem;
+    font-size: 0.68rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .standardSystem,
+  .lethonSystem {
+    transform: scale(0.85);
+    transform-origin: center top;
+    margin-bottom: -20px;
   }
 }

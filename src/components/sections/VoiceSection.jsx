@@ -44,8 +44,45 @@ export default function VoiceSection() {
   const descRef = useRef(null);
   const closingRef = useRef(null);
   const stageRef = useRef({ val: 0 });
+  const timelineRef = useRef(null);
   const [stage, setStage] = useState(0);
   const stageValueRef = useRef(0);
+
+  const triggerVisualTransition = (i) => {
+    if (numRef.current) numRef.current.textContent = i;
+
+    // Refined text transition
+    gsap.fromTo(
+      [labelRef.current, descRef.current],
+      { autoAlpha: 0, y: 5, filter: 'blur(8px)' },
+      { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'power3.out', overwrite: 'auto' }
+    );
+    
+    // Waveform reactive animation
+    const q = gsap.utils.selector(sectionRef);
+    gsap.fromTo(q(`.${styles.barProcessed}`), 
+      { scaleY: 1.3, opacity: 1, filter: 'brightness(1.5)' },
+      { scaleY: 1, opacity: 1, filter: 'brightness(1)', duration: 0.6, stagger: { amount: 0.2, from: 'center' }, ease: 'expo.out' }
+    );
+
+    // Card intensity glow
+    gsap.to(cardRef.current, {
+      boxShadow: `0 0 ${20 + i * 10}px rgba(0, 245, 160, ${0.05 + i * 0.03})`,
+      duration: 0.4
+    });
+  };
+
+  const handleMarkerClick = (i) => {
+    const isDesktop = window.matchMedia('(min-width: 901px)').matches;
+    if (isDesktop && timelineRef.current && timelineRef.current.scrollTrigger) {
+      const st = timelineRef.current.scrollTrigger;
+      const targetScroll = st.start + (st.end - st.start) * (i / 5);
+      window.scrollTo({ top: targetScroll, behavior: 'smooth' });
+    } else {
+      setStage(i);
+      triggerVisualTransition(i);
+    }
+  };
 
   useGSAP(() => {
     const q = gsap.utils.selector(sectionRef);
@@ -57,88 +94,111 @@ export default function VoiceSection() {
 
     mm.add(
       {
-        isDesktop: '(min-width: 901px)',
+        isDesktopTall: '(min-width: 901px) and (min-height: 801px)',
+        isDesktopShort: '(min-width: 901px) and (max-height: 800px)',
         isMobile: '(max-width: 900px)',
       },
       (context) => {
-        const { isDesktop } = context.conditions;
+        const { isDesktopTall, isDesktopShort, isMobile } = context.conditions;
 
-        if (!isDesktop) {
+        if (isMobile) {
           gsap.set([cardRef.current, closingRef.current], { autoAlpha: 1, y: 0, scale: 1, filter: 'blur(0px)' });
           return;
         }
 
-        // Entrance animation
-        const entranceTl = gsap.timeline({
-          scrollTrigger: {
-            trigger: cardRef.current,
-            start: 'top 85%',
-          }
-        });
-
-        entranceTl.to(cardRef.current, {
-          autoAlpha: 1,
-          y: 0,
-          scale: 1,
-          duration: 1.4,
-          ease: 'expo.out',
-        });
-
-        // Main scrub timeline
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: 'top top',
-            end: '+=100%',
-            scrub: 1,
-            pin: true,
-            anticipatePin: 1,
-          },
-        });
-
-        tl.to(stageRef.current, {
-          val: 5,
-          duration: 10,
-          ease: 'none',
-          onUpdate: () => {
-            const raw = stageRef.current.val;
-            const rounded = Math.min(5, Math.round(raw));
-
-            if (numRef.current) numRef.current.textContent = rounded;
-
-            if (rounded !== stageValueRef.current) {
-              stageValueRef.current = rounded;
-              setStage(rounded);
-
-              // Refined text transition
-              gsap.fromTo(
-                [labelRef.current, descRef.current],
-                { autoAlpha: 0, y: 5, filter: 'blur(8px)' },
-                { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 0.5, ease: 'power3.out', overwrite: 'auto' }
-              );
-              
-              // Waveform reactive animation
-              gsap.fromTo(q(`.${styles.barProcessed}`), 
-                { scaleY: 1.3, opacity: 1, filter: 'brightness(1.5)' },
-                { scaleY: 1, opacity: 1, filter: 'brightness(1)', duration: 0.6, stagger: { amount: 0.2, from: 'center' }, ease: 'expo.out' }
-              );
-
-              // Card intensity glow
-              gsap.to(cardRef.current, {
-                boxShadow: `0 0 ${20 + rounded * 10}px rgba(0, 245, 160, ${0.05 + rounded * 0.03})`,
-                duration: 0.4
-              });
+        if (isDesktopTall) {
+          // Entrance animation
+          const entranceTl = gsap.timeline({
+            scrollTrigger: {
+              trigger: cardRef.current,
+              start: 'top 85%',
             }
-          },
-        });
+          });
 
-        tl.to(closingRef.current, {
-          autoAlpha: 1,
-          y: 0,
-          filter: 'blur(0px)',
-          duration: 2,
-          ease: 'power4.out',
-        }, '+=1');
+          entranceTl.to(cardRef.current, {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            duration: 1.4,
+            ease: 'expo.out',
+          });
+
+          // Main scrub timeline
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top top',
+              end: '+=100%',
+              scrub: 1,
+              pin: true,
+              anticipatePin: 1,
+            },
+          });
+          timelineRef.current = tl;
+
+          tl.to(stageRef.current, {
+            val: 5,
+            duration: 10,
+            ease: 'none',
+            onUpdate: () => {
+              const raw = stageRef.current.val;
+              const rounded = Math.min(5, Math.round(raw));
+
+              if (rounded !== stageValueRef.current) {
+                stageValueRef.current = rounded;
+                setStage(rounded);
+                triggerVisualTransition(rounded);
+              }
+            },
+          });
+
+          tl.to(closingRef.current, {
+            autoAlpha: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            duration: 2,
+            ease: 'power4.out',
+          }, '+=1');
+        } else if (isDesktopShort) {
+          // Desktop Short (e.g. laptop): One-shot entrance, then auto-plays the stages 0-5 as a demo
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: cardRef.current,
+              start: 'top 80%',
+              toggleActions: 'play none none none',
+            }
+          });
+
+          tl.to(cardRef.current, {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.8,
+            ease: 'power3.out',
+          })
+          .to(stageRef.current, {
+            val: 5,
+            duration: 4.5,
+            ease: 'power1.inOut',
+            onUpdate: () => {
+              const raw = stageRef.current.val;
+              const rounded = Math.min(5, Math.round(raw));
+
+              if (rounded !== stageValueRef.current) {
+                stageValueRef.current = rounded;
+                setStage(rounded);
+                triggerVisualTransition(rounded);
+              }
+            },
+          })
+          .to(closingRef.current, {
+            autoAlpha: 1,
+            y: 0,
+            filter: 'blur(0px)',
+            duration: 0.8,
+            ease: 'power3.out',
+          }, '-=0.4');
+        }
       }
     );
   }, { scope: sectionRef });
@@ -181,14 +241,24 @@ export default function VoiceSection() {
                   }}
                 />
                 {STAGES.map((s, i) => (
-                  <div key={i} className={`${styles.marker} ${stage >= i ? styles.markerActive : ''}`}>
+                  <div
+                    key={i}
+                    className={`${styles.marker} ${stage >= i ? styles.markerActive : ''}`}
+                    onClick={() => handleMarkerClick(i)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     <div className={styles.markerDot} />
                   </div>
                 ))}
               </div>
               <div className={styles.trackLabels}>
                 {STAGES.map((s, i) => (
-                  <span key={i} className={`${styles.markerLabel} ${stage === i ? styles.markerLabelActive : ''}`}>
+                  <span
+                    key={i}
+                    className={`${styles.markerLabel} ${stage === i ? styles.markerLabelActive : ''}`}
+                    onClick={() => handleMarkerClick(i)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     {s.label}
                   </span>
                 ))}

@@ -55,19 +55,25 @@ export default function BackgroundGrid() {
     return { positions, uvs };
   }, [spacing]);
 
+  const hasFinePointer = useMemo(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  }, []);
+
   useFrame((state) => {
-    // Update mouse position mapped to our plane scale
-    // Pointer is normalized (-1 to 1)
-    mouse.current.x = state.pointer.x * (size.width / 2);
-    mouse.current.y = state.pointer.y * (size.height / 2);
+    if (hasFinePointer) {
+      // Update mouse position mapped to our viewport scale (frustum space at z=0)
+      mouse.current.x = state.pointer.x * (viewport.width / 2);
+      mouse.current.y = state.pointer.y * (viewport.height / 2);
+    } else {
+      // Keep offscreen on touch devices
+      mouse.current.set(-10000, -10000);
+    }
 
     if (materialRef.current) {
       materialRef.current.uniforms.uMouse.value.copy(mouse.current);
       materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
-      
-      // Update global opacity based on scroll velocity/state (placeholder for now)
-      // The spec says: "Malla de puntos microscópicos respiran (pulse 4s ciclo)" initially,
-      // and "Zona de scroll activa: se encienden levemente (opacity 0.15 -> 0.35)".
+      materialRef.current.uniforms.uMaxDist.value = viewport.height * 0.15;
     }
   });
 
@@ -76,14 +82,18 @@ export default function BackgroundGrid() {
     uniforms: {
       uTime: { value: 0 },
       uMouse: { value: new THREE.Vector2(-1000, -1000) },
-      uColor: { value: new THREE.Color('#ffffff') },
-      uBaseOpacity: { value: 0.15 },
+      uMaxDist: { value: 60.0 },
+      uColor: { value: new THREE.Color('#00f5a0') },
+      uBaseOpacity: { value: 0.12 },
     },
     vertexShader: `
       uniform float uTime;
       uniform vec2 uMouse;
+      uniform float uMaxDist;
       
       varying vec2 vUv;
+      varying float vScanGlow;
+      varying float vMouseActive;
       
       void main() {
         vUv = uv;
@@ -91,23 +101,40 @@ export default function BackgroundGrid() {
         
         // Repulsion logic
         float dist = distance(pos.xy, uMouse);
-        float maxDist = 150.0;
-        if(dist < maxDist) {
-          float force = (maxDist - dist) / maxDist;
-          // Push away from mouse gently
+        if(dist < uMaxDist) {
+          float force = (uMaxDist - dist) / uMaxDist;
           vec2 dir = normalize(pos.xy - uMouse);
-          pos.xy += dir * force * 15.0; // max displacement 15 units
+          pos.xy += dir * force * (uMaxDist * 0.1); 
         }
         
-        // Pulse breathing effect (pulse 4s ciclo)
+        // Pulse breathing effect (4s cycle)
         pos.z += sin(pos.x * 0.01 + uTime * 1.5) * 5.0;
+        
+        // Scanline sweep wave (slow radar ping travelling down)
+        float scanSpeed = 180.0;
+        float scanPeriod = 3600.0;
+        float yScan = mod(uTime * scanSpeed, scanPeriod) - 1800.0;
+        
+        float distToScan = abs(pos.y - yScan);
+        float scanGlow = 0.0;
+        if(distToScan < 250.0) {
+          scanGlow = (250.0 - distToScan) / 250.0;
+          scanGlow = pow(scanGlow, 3.0);
+        }
+        vScanGlow = scanGlow;
+        
+        // Mouse activity
+        float mouseActive = 0.0;
+        if(dist < uMaxDist) {
+          mouseActive = (uMaxDist - dist) / uMaxDist;
+        }
+        vMouseActive = mouseActive;
         
         vec4 mvPosition = modelViewMatrix * vec4(pos, 1.0);
         gl_Position = projectionMatrix * mvPosition;
         
-        // Size of the points (diminutos, imperceptibles)
-        gl_PointSize = 1.5;
-        // Perspective attenuation
+        // Dynamically scale point sizes
+        gl_PointSize = 1.3 + (scanGlow * 1.5) + (mouseActive * 1.5);
         gl_PointSize *= (500.0 / -mvPosition.z);
       }
     `,
@@ -115,17 +142,26 @@ export default function BackgroundGrid() {
       uniform vec3 uColor;
       uniform float uBaseOpacity;
       uniform float uTime;
+      
       varying vec2 vUv;
+      varying float vScanGlow;
+      varying float vMouseActive;
       
       void main() {
-        // Circular point
         float dist = distance(gl_PointCoord, vec2(0.5));
         if(dist > 0.5) discard;
         
-        // Pulse alpha slightly based on time
-        float alpha = uBaseOpacity + sin(uTime * (6.28 / 4.0)) * 0.05; 
+        // Slate blue-grey base, signature green active
+        vec3 baseColor = vec3(0.12, 0.15, 0.19);
+        vec3 activeColor = vec3(0.0, 0.96, 0.63);
         
-        gl_FragColor = vec4(uColor, alpha);
+        float blendFactor = max(vMouseActive, vScanGlow * 0.7);
+        vec3 finalColor = mix(baseColor, activeColor, blendFactor);
+        
+        float pulse = sin(uTime * 1.2) * 0.02;
+        float alpha = uBaseOpacity + pulse + (vScanGlow * 0.16) + (vMouseActive * 0.4);
+        
+        gl_FragColor = vec4(finalColor, alpha);
       }
     `,
     transparent: true,

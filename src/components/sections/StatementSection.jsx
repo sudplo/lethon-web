@@ -35,8 +35,8 @@ export default function StatementSection() {
     const w2 = buildWords(line2Ref.current, ['what', 'it', 'doesn\'t', 'understand.']);
     const allWords = [...w1, ...w2];
     
-    gsap.set(allWords, { opacity: 0.1, filter: 'blur(12px)', scale: 0.9 });
-    gsap.set(subRef.current, { autoAlpha: 0, y: 20 });
+    gsap.set(allWords, { opacity: 0.15, filter: 'blur(5px)', scale: 0.98 });
+    gsap.set(subRef.current, { autoAlpha: 0, y: 15 });
 
     const mm = gsap.matchMedia();
 
@@ -49,8 +49,36 @@ export default function StatementSection() {
         const { isDesktop } = context.conditions;
 
         if (!isDesktop) {
-          gsap.set(allWords, { opacity: 1, filter: 'blur(0px)', scale: 1 });
-          gsap.set(subRef.current, { autoAlpha: 1, y: 0 });
+          gsap.fromTo(allWords, 
+            { opacity: 0.15, filter: 'blur(4px)', scale: 0.98 },
+            {
+              opacity: 1,
+              filter: 'blur(0px)',
+              scale: 1,
+              stagger: 0.06,
+              duration: 1.0,
+              ease: 'power2.out',
+              scrollTrigger: {
+                trigger: sectionRef.current,
+                start: 'top 80%',
+                toggleActions: 'play none none none',
+              }
+            }
+          );
+          gsap.fromTo(subRef.current,
+            { autoAlpha: 0, y: 10 },
+            {
+              autoAlpha: 1,
+              y: 0,
+              duration: 0.8,
+              ease: 'power2.out',
+              scrollTrigger: {
+                trigger: subRef.current,
+                start: 'top 85%',
+                toggleActions: 'play none none none',
+              }
+            }
+          );
           return;
         }
 
@@ -65,29 +93,31 @@ export default function StatementSection() {
           },
         });
 
-        // Dynamic focus effect
+        // Dynamic soft focus effect
         allWords.forEach((word, i) => {
           tl.to(word, {
             opacity: 1,
             filter: 'blur(0px)',
             scale: 1,
             color: '#fff',
-            duration: 0.5,
-          }, i * 0.2)
+            duration: 0.6,
+            ease: 'power2.out'
+          }, i * 0.18)
           .to(word, {
-            opacity: 0.15,
-            filter: 'blur(8px)',
-            scale: 0.95,
-            duration: 0.5,
-          }, (i * 0.2) + 0.5);
+            opacity: 0.35,
+            filter: 'blur(3.5px)',
+            scale: 0.98,
+            duration: 0.6,
+            ease: 'power2.inOut'
+          }, (i * 0.18) + 0.6);
         });
 
         tl.to(subRef.current, {
           autoAlpha: 1,
           y: 0,
-          duration: 1,
+          duration: 0.8,
           ease: 'power3.out'
-        }, '>-=0.5');
+        }, '>-=0.3');
       }
     );
   }, { scope: sectionRef });

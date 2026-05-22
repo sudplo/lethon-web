@@ -189,7 +189,11 @@
   padding-left: 1rem;
 }
 
-@media (max-width: 900px) {
+.mobileCardContainer {
+  display: none;
+}
+
+@media (max-width: 900px), (max-height: 800px) {
   .section {
     min-height: auto;
   }
@@ -212,28 +216,26 @@
   .desc {
     position: relative;
     display: block;
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: none !important;
-    margin-bottom: 3rem;
+    margin-bottom: 3.5rem;
     pointer-events: auto;
+    visibility: visible;
   }
 
   .descActive {
     display: block;
   }
 
+  .mobileCardContainer {
+    display: block;
+    margin-top: 1.5rem;
+    width: 100%;
+  }
+
   .rightCol {
-    height: auto;
-    display: grid;
-    gap: 1.5rem;
-    perspective: none;
+    display: none;
   }
 
   .card {
     position: relative;
-    transform: none !important;
-    opacity: 1 !important;
-    filter: none !important;
   }
 }

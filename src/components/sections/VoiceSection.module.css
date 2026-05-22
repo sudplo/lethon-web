@@ -146,6 +146,13 @@
   position: absolute;
   top: 50%;
   transform: translate(-50%, -50%);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
 }
 
 .marker:nth-child(2) { left: 0%; }
@@ -161,6 +168,7 @@
   background: rgba(255, 255, 255, 0.2);
   border-radius: 50%;
   transition: all 0.4s ease;
+  pointer-events: none; /* Let the parent .marker handle events */
 }
 
 .markerActive .markerDot {
@@ -182,6 +190,9 @@
   letter-spacing: 0.05em;
   opacity: 0.4;
   transition: all 0.4s ease;
+  cursor: pointer;
+  padding: 8px 4px; /* More clickable area */
+  margin-top: -8px;
 }
 
 .markerLabelActive {
@@ -336,5 +347,11 @@
 
   .markerLabel {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .waveform {
+    gap: 1.5px;
   }
 }

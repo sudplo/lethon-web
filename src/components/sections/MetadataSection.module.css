@@ -128,6 +128,10 @@
   height: 100%;
 }
 
+.mobileLabel {
+  display: none;
+}
+
 .dataLeft {
   color: rgba(255, 255, 255, 0.7);
   background: rgba(255, 255, 255, 0.02);
@@ -154,12 +158,23 @@
 /* Scanner Effect */
 .scanner {
   position: absolute;
-  top: -10%;
-  bottom: -10%;
-  width: 2px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
   background: var(--color-accent);
-  box-shadow: 0 0 20px 2px var(--color-accent);
+  box-shadow: 0 0 15px #00f5a0, 0 0 30px rgba(0, 245, 160, 0.5);
   z-index: 10;
+  pointer-events: none;
+}
+
+.scanner::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 3px; /* Trails behind as it sweeps left to right */
+  width: 60px;
+  background: linear-gradient(to left, rgba(0, 245, 160, 0.16), transparent);
   pointer-events: none;
 }
 
@@ -190,5 +205,21 @@
 
   .scanner {
     display: none;
+  }
+
+  .mobileLabel {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: 0.75rem;
+    opacity: 0.8;
+  }
+
+  .dataRight .mobileLabel {
+    color: var(--color-accent);
   }
 }

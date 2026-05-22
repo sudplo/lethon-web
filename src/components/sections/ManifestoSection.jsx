@@ -50,28 +50,48 @@ export default function ManifestoSection() {
 
     mm.add(
       {
-        isDesktop: '(min-width: 901px)',
-        isMobile: '(max-width: 900px)',
+        isDesktopTall: '(min-width: 901px) and (min-height: 801px)',
+        isMobileOrShort: '(max-width: 900px), (max-height: 800px)',
         reduceMotion: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
-        const { isDesktop, reduceMotion } = context.conditions;
+        const { isDesktopTall, isMobileOrShort, reduceMotion } = context.conditions;
 
-        if (!isDesktop) {
-          allSpans.forEach(spans => {
-            gsap.set(spans, { autoAlpha: 1, y: 0, rotateX: 0, filter: 'blur(0px)' });
-          });
-          gsap.to([dividerRef.current, ctasRef.current], {
-            autoAlpha: 1,
-            scaleX: 1,
-            y: 0,
-            duration: 1,
-            stagger: 0.2,
+        if (reduceMotion) return;
+
+        if (isMobileOrShort) {
+          // Cinematic one-shot entrance timeline for mobile/short viewports
+          const tl = gsap.timeline({
             scrollTrigger: {
-              trigger: ctasRef.current,
-              start: 'top 90%',
+              trigger: sectionRef.current,
+              start: 'top 75%',
+              toggleActions: 'play none none none',
             }
           });
+
+          PHRASES.forEach((phrase, idx) => {
+            const spans = allSpans[idx];
+            tl.to(spans, {
+              autoAlpha: 1,
+              y: 0,
+              rotateX: 0,
+              filter: 'blur(0px)',
+              duration: 1,
+              stagger: 0.08,
+              ease: 'expo.out',
+            }, `phrase-${idx}`);
+
+            if (phrase.glow) {
+              tl.to(phraseRefs.current[idx], {
+                textShadow: '0 0 35px rgba(0, 245, 160, 0.4)',
+                duration: 0.8,
+              }, `phrase-${idx}+=0.5`);
+            }
+          });
+
+          tl.to(dividerRef.current, { scaleX: 1, duration: 0.8, ease: 'power2.out' }, '+=0.2')
+            .to(ctasRef.current, { autoAlpha: 1, y: 0, duration: 0.8, ease: 'back.out(1.5)' }, '-=0.4');
+
           return;
         }
 

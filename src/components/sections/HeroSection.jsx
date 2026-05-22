@@ -100,7 +100,10 @@ export default function HeroSection() {
       });
     });
 
-    window.addEventListener('mousemove', onMouseMove);
+    const hasFinePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    if (hasFinePointer) {
+      window.addEventListener('mousemove', onMouseMove);
+    }
 
     // ── 4. SCROLL PERSPECTIVE ──
     mm.add({
@@ -130,7 +133,11 @@ export default function HeroSection() {
       });
     });
 
-    return () => window.removeEventListener('mousemove', onMouseMove);
+    return () => {
+      if (hasFinePointer) {
+        window.removeEventListener('mousemove', onMouseMove);
+      }
+    };
   }, { scope: sectionRef });
 
   return (
