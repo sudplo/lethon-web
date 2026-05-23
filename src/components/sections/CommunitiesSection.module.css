@@ -2,12 +2,16 @@
   min-height: 100vh;
   display: flex;
   align-items: center;
-  padding-block: clamp(6rem, 15vh, 10rem);
-  background: radial-gradient(circle at 10% 90%, rgba(0, 245, 160, 0.02) 0%, transparent 50%);
+  padding-block: clamp(6rem, 12vh, 10rem);
+  background: radial-gradient(circle at 80% 20%, rgba(0, 245, 160, 0.02) 0%, transparent 60%),
+              radial-gradient(circle at 20% 80%, rgba(239, 68, 68, 0.015) 0%, transparent 60%);
+  position: relative;
+  overflow: hidden;
 }
 
 .header {
-  margin-bottom: clamp(3rem, 6vw, 5rem);
+  margin-bottom: clamp(3rem, 5vw, 5rem);
+  text-align: left;
 }
 
 .tag {
@@ -15,127 +19,186 @@
   font-size: 0.75rem;
   letter-spacing: 0.2em;
   color: var(--color-accent);
-  margin-bottom: 1.5rem;
-  opacity: 0.8;
-  display: flex;
+  margin-bottom: 1.25rem;
+  display: inline-flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.6rem;
+  font-weight: 500;
 }
 
-.tag::before {
-  content: '';
-  width: 12px;
-  height: 1px;
+.tagDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
   background: currentColor;
+  box-shadow: 0 0 8px currentColor;
 }
 
 .headline {
   margin: 0 0 1.5rem;
   font-family: var(--font-sans);
-  font-size: clamp(2.5rem, 5vw, 4.2rem);
-  font-weight: 600;
-  line-height: 1.1;
-  letter-spacing: -0.01em;
+  font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.word {
+  display: inline-block;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
 }
 
 .sub {
   display: grid;
-  gap: 0.4rem;
+  gap: 0.5rem;
   font-family: var(--font-mono);
-  font-size: clamp(0.9rem, 1.1vw, 1.05rem);
+  font-size: clamp(0.85rem, 1vw, 1rem);
   line-height: 1.6;
   color: var(--text-muted);
-  max-width: 600px;
+  max-width: 650px;
+}
+
+.sub p {
+  opacity: 0.85;
 }
 
 .grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: clamp(1.5rem, 4vw, 3rem);
+  gap: clamp(1.5rem, 3.5vw, 3rem);
+  width: 100%;
+}
+
+.col {
+  display: flex;
+  flex-direction: column;
 }
 
 .colHeader {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.75rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
   font-family: var(--font-mono);
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: 0.12em;
   color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.statusDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.statusDotRed {
+  background: #ff4a4a;
+  box-shadow: 0 0 8px rgba(255, 74, 74, 0.7);
+}
+
+.statusDotGreen {
+  background: var(--color-accent);
+  box-shadow: 0 0 8px var(--color-accent);
 }
 
 .diagram {
-  min-height: 28rem;
+  flex: 1;
+  min-height: 31rem;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: clamp(1.5rem, 3vw, 2.5rem);
-  background: rgba(3, 5, 8, 0.72);
-  backdrop-filter: blur(20px);
+  padding: clamp(1.25rem, 2.5vw, 2.25rem);
+  background: rgba(3, 5, 8, 0.65);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   border: 1px solid var(--border-faint);
-  border-radius: 24px;
+  border-radius: 20px;
   position: relative;
   overflow: hidden;
+  transition: border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
-.standardSystem,
-.lethonSystem {
-  width: 280px;
-  height: 140px;
-  position: relative;
+.diagramRed:hover {
+  border-color: rgba(239, 68, 68, 0.18);
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.03);
+}
+
+.diagramGreen:hover {
+  border-color: rgba(0, 245, 160, 0.18);
+  box-shadow: 0 10px 30px rgba(0, 245, 160, 0.03);
+}
+
+.scanline {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.08), transparent);
+  opacity: 0.6;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* --- Visual Areas --- */
+.visualArea {
+  height: 180px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: space-between;
+  margin-bottom: 1.5rem;
+  position: relative;
+  z-index: 2;
 }
 
-.lethonSystem {
-  display: block;
+.visualAreaMesh {
+  height: 180px;
+  position: relative;
+  margin-bottom: 1.5rem;
+  z-index: 2;
 }
 
-.server {
-  width: 180px;
+/* Centralized elements */
+.serverCard {
+  width: 200px;
   padding: 0.75rem 1rem;
   border-radius: 12px;
-  border: 1px solid rgba(239, 68, 68, 0.3);
-  background: rgba(239, 68, 68, 0.05);
-  color: #ff8a8a;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.03);
+  color: #ffb3b3;
   font-family: var(--font-mono);
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.05);
+  box-shadow: 0 0 20px rgba(239, 68, 68, 0.03);
+  z-index: 5;
   transition: all 0.3s ease;
-  z-index: 2;
 }
 
 .serverHeader {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  border-bottom: 1px solid rgba(239, 68, 68, 0.25);
-  padding-bottom: 0.3rem;
-  margin-bottom: 0.3rem;
+  border-bottom: 1px solid rgba(239, 68, 68, 0.15);
+  padding-bottom: 0.35rem;
+  margin-bottom: 0.35rem;
 }
 
-.serverStatusLed {
+.serverLed {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #ef4444;
-  box-shadow: 0 0 8px #ef4444;
-  animation: pulseRed 1s infinite alternate;
-  display: inline-block;
-  flex-shrink: 0;
+  background: #ff3333;
+  box-shadow: 0 0 8px #ff3333;
 }
 
-@keyframes pulseRed {
-  0% { opacity: 0.4; }
-  100% { opacity: 1; }
-}
-
-.serverName {
-  font-size: 0.62rem;
-  color: #ffb8b8;
+.monoTitle {
+  font-size: 0.65rem;
   letter-spacing: 0.05em;
+  opacity: 0.85;
 }
 
 .serverBody {
@@ -145,188 +208,161 @@
   text-align: left;
 }
 
-.dbIcon {
-  font-size: 0.7rem;
-  color: #ef4444;
-  font-weight: 600;
+.telemetryText {
+  font-size: 0.68rem;
+  font-weight: 500;
 }
 
-.serverTelemetry {
-  font-size: 0.62rem;
-  color: rgba(255, 138, 138, 0.7);
+.telemetrySub {
+  font-size: 0.6rem;
+  color: rgba(255, 179, 179, 0.6);
 }
 
-.clientNode {
+.connector {
+  width: 2px;
+  flex: 1;
+  background: rgba(255, 255, 255, 0.04);
+  position: relative;
+  z-index: 1;
+}
+
+.connectorLineRed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ff4a4a;
+  box-shadow: 0 0 8px #ff4a4a;
+  transform-origin: top;
+}
+
+.clientCard {
   width: 160px;
   padding: 0.6rem 0.8rem;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-faint);
+  background: rgba(255, 255, 255, 0.015);
   font-family: var(--font-mono);
   text-align: center;
-  z-index: 2;
+  z-index: 5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
-.nodeHeader {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.4rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+.clientHeader {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04);
   padding-bottom: 0.25rem;
   margin-bottom: 0.25rem;
 }
 
-.nodeRole {
-  font-size: 0.6rem;
+.clientBody {
+  font-size: 0.65rem;
   color: var(--text-muted);
 }
 
-.nodeTitle {
-  font-size: 0.76rem;
-  color: var(--text-primary);
-}
-
-.svgLineWrap {
-  width: 100%;
-  height: 25px;
-  display: flex;
-  justify-content: center;
-  z-index: 1;
-}
-
-.connectorSvg {
-  width: 100px;
-  height: 100%;
-}
-
-.meshSvgWrap {
+/* Mesh SVG styling */
+.meshSvg {
   position: absolute;
-  left: 0;
-  top: 0;
+  inset: 0;
   width: 100%;
   height: 100%;
   pointer-events: none;
   z-index: 1;
 }
 
-.meshSvg {
-  width: 100%;
-  height: 100%;
+.meshPath {
+  will-change: stroke-dashoffset;
 }
 
-.animatedPath {
-  stroke-dasharray: 6 15;
-  animation: dashFlow 2s linear infinite;
-}
-
-@keyframes dashFlow {
-  to {
-    stroke-dashoffset: -21;
-  }
-}
-
-.node {
+/* Mesh Node Styling */
+.p2pNode {
   position: absolute;
-  width: 70px;
-  height: 38px;
-  padding: 0.35rem 0.5rem;
+  width: 76px;
+  height: 44px;
+  padding: 0.4rem 0.5rem;
   border-radius: 8px;
   font-family: var(--font-mono);
   border: 1px solid rgba(0, 245, 160, 0.2);
-  background: rgba(0, 245, 160, 0.03);
-  color: var(--color-accent);
-  box-shadow: 0 0 10px rgba(0, 245, 160, 0.03);
-  z-index: 2;
+  background: rgba(3, 5, 8, 0.85);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5), 0 0 10px rgba(0, 245, 160, 0.02);
+  z-index: 5;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  text-align: center;
 }
 
-.nodeOwner {
-  left: 10px;
-  top: 10px;
+/* Fluid responsive node placements, calculated relative to SVG coordinate space 300x160 */
+.p2pNode1 {
+  left: 16.666%; /* 50 / 300 */
+  top: 25%;       /* 40 / 160 */
+  transform: translate(-50%, -50%);
 }
 
-.nodeAdmin {
-  right: 10px;
-  top: 10px;
+.p2pNode2 {
+  left: 83.333%; /* 250 / 300 */
+  top: 25%;       /* 40 / 160 */
+  transform: translate(-50%, -50%);
 }
 
-.nodeMember {
-  left: 105px;
-  top: 90px;
+.p2pNode3 {
+  left: 50%;     /* 150 / 300 */
+  top: 75%;       /* 120 / 160 */
+  transform: translate(-50%, -50%);
 }
 
-.nodeLedGreen {
+.p2pLed {
   width: 4px;
   height: 4px;
   border-radius: 50%;
   background: var(--color-accent);
   box-shadow: 0 0 6px var(--color-accent);
-  display: inline-block;
+  margin-bottom: 2px;
 }
 
-.nodeKey {
-  font-size: 0.52rem;
-  color: rgba(0, 245, 160, 0.7);
-  letter-spacing: 0.02em;
+.monoSmall {
+  font-size: 0.55rem;
+  color: var(--text-primary);
+  line-height: 1.1;
 }
 
-.lineV {
-  width: 1px;
-  height: 2.2rem;
-  margin: 0.4rem 0;
-  background: rgba(255, 255, 255, 0.08);
+.nodeRoleTag {
+  font-size: 0.48rem;
+  color: var(--color-accent);
+  opacity: 0.8;
+  margin-top: 1px;
 }
 
-.lineVAccent {
-  background: var(--color-accent);
-  box-shadow: 0 0 10px var(--color-accent);
-}
-
-.decoratorLine {
-  display: none;
-}
-
-.perms {
+/* Terminal Area styling */
+.terminal {
   width: 100%;
-  display: grid;
-  gap: 0.6rem;
-  margin-top: 0.8rem;
-  z-index: 2;
-}
-
-.permSignal,
-.permLethon {
-  padding: 0.65rem 0.85rem;
-  border-radius: 10px;
+  background: rgba(2, 3, 5, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
   font-family: var(--font-mono);
-  font-size: 0.74rem;
-  line-height: 1.4;
-  text-align: left;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  transition: border-color 0.3s ease, background-color 0.3s ease;
+  box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.8);
+  margin-top: auto;
 }
 
 .terminalHeader {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.45rem;
   font-size: 0.58rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  opacity: 0.5;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  opacity: 0.6;
   border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  padding-bottom: 0.2rem;
+  padding-bottom: 0.35rem;
+  margin-bottom: 0.5rem;
 }
 
 .terminalDot {
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
   background: currentColor;
 }
@@ -334,101 +370,87 @@
 .terminalBody {
   display: flex;
   flex-direction: column;
-  gap: 0.1rem;
+  gap: 0.3rem;
+}
+
+.logRow {
+  display: flex;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  will-change: opacity, transform;
 }
 
 .logLabel {
+  color: var(--text-muted);
   font-weight: 500;
   opacity: 0.7;
 }
 
-.logLabelError {
-  color: #ff6b6b;
-  font-size: 0.68rem;
-}
-
-.logLabelSuccess {
-  color: var(--color-accent);
-  font-size: 0.68rem;
-}
-
-.permLabel {
-  font-size: 0.6rem;
-  opacity: 0.5;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-}
-
-.permVal {
+.logVal {
   color: var(--text-primary);
 }
 
-.permSignal {
-  background: rgba(239, 68, 68, 0.015);
-  border: 1px solid rgba(239, 68, 68, 0.08);
-  color: #ffb8b8;
+.logValFail {
+  color: #ff5252;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(255, 82, 82, 0.3);
 }
 
-.permSignal:hover {
-  border-color: rgba(239, 68, 68, 0.2);
-  background: rgba(239, 68, 68, 0.03);
-}
-
-.permLethon {
-  background: rgba(0, 245, 160, 0.015);
-  border: 1px solid rgba(0, 245, 160, 0.08);
+.logValSuccess {
   color: var(--color-accent);
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(0, 245, 160, 0.3);
 }
 
-.permLethon:hover {
-  border-color: rgba(0, 245, 160, 0.2);
-  background: rgba(0, 245, 160, 0.03);
-}
-
-.result {
-  margin-top: auto;
-  padding-top: 1.5rem;
+/* Badge Wrap and Badge styling */
+.badgeWrap {
+  margin-top: 1.25rem;
   width: 100%;
   display: flex;
   justify-content: center;
+  z-index: 2;
 }
 
-.resultBadgeFail,
-.resultBadgeSuccess {
+.badgeFail,
+.badgeSuccess {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.45rem 1rem;
-  border-radius: 9999px;
+  border-radius: 20px;
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.04em;
   border: 1px solid transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.resultBadgeFail {
-  background: rgba(239, 68, 68, 0.06);
-  border-color: rgba(239, 68, 68, 0.2);
-  color: #ff6b6b;
-  box-shadow: 0 0 15px rgba(239, 68, 68, 0.05);
+.badgeFail {
+  background: rgba(239, 68, 68, 0.05);
+  border-color: rgba(239, 68, 68, 0.15);
+  color: #ff5252;
 }
 
-.resultBadgeSuccess {
-  background: rgba(0, 245, 160, 0.06);
-  border-color: rgba(0, 245, 160, 0.2);
+.badgeSuccess {
+  background: rgba(0, 245, 160, 0.05);
+  border-color: rgba(0, 245, 160, 0.15);
   color: var(--color-accent);
-  box-shadow: 0 0 20px rgba(0, 245, 160, 0.1);
-  text-shadow: 0 0 8px rgba(0, 245, 160, 0.3);
 }
 
-.resultIcon {
+.badgeIcon {
   flex-shrink: 0;
 }
 
+/* ============================================================
+   RESPONSIVENESS & MEDIA QUERIES
+   ============================================================ */
 @media (max-width: 900px) {
   .section {
-    padding-block: 4rem;
+    padding-block: clamp(4rem, 8vh, 6rem);
     min-height: auto;
   }
 
@@ -438,71 +460,86 @@
   }
 
   .diagram {
-    min-height: auto;
-    padding: 1.5rem;
-  }
-
-  .standardSystem,
-  .lethonSystem {
-    margin-inline: auto;
+    min-height: 29rem;
+    padding: 1.25rem;
   }
 }
 
-/* ============================================================
-   Short Viewport (Laptop screens) Adjustments
-   ============================================================ */
 @media (max-height: 800px) and (min-width: 901px) {
   .section {
-    padding-block: clamp(2rem, 5vh, 4rem);
+    padding-block: clamp(3rem, 6vh, 4rem);
     min-height: auto;
   }
 
   .header {
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
   }
 
-  .grid {
-    gap: 1.5rem;
+  .diagram {
+    min-height: 27rem;
+    padding: 1rem;
+  }
+
+  .visualArea,
+  .visualAreaMesh {
+    height: 150px;
+    margin-bottom: 1rem;
+  }
+
+  .p2pNode {
+    width: 68px;
+    height: 38px;
+    padding: 0.25rem 0.35rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding-block: 3.5rem;
   }
 
   .diagram {
     min-height: auto;
-    padding: 1.25rem;
+    padding: 1rem;
   }
 
-  .standardSystem,
-  .lethonSystem {
-    transform: scale(0.9);
-    margin-block: -0.5rem;
+  .visualArea,
+  .visualAreaMesh {
+    height: 140px;
+    margin-bottom: 0.75rem;
   }
 
-  .perms {
-    gap: 0.45rem;
-    margin-top: 0.4rem;
+  .p2pNode {
+    width: 60px;
+    height: 34px;
+    padding: 0.15rem 0.25rem;
   }
 
-  .permSignal,
-  .permLethon {
+  .monoSmall {
+    font-size: 0.5rem;
+  }
+
+  .nodeRoleTag {
+    font-size: 0.42rem;
+  }
+
+  .serverCard {
+    width: 160px;
     padding: 0.5rem 0.75rem;
-    font-size: 0.7rem;
   }
 
-  .result {
-    padding-top: 1rem;
+  .clientCard {
+    width: 130px;
+    padding: 0.4rem 0.6rem;
   }
 
-  .resultBadgeFail,
-  .resultBadgeSuccess {
-    padding: 0.35rem 0.8rem;
-    font-size: 0.68rem;
+  .terminal {
+    padding: 0.65rem 0.8rem;
   }
-}
 
-@media (max-width: 380px) {
-  .standardSystem,
-  .lethonSystem {
-    transform: scale(0.85);
-    transform-origin: center top;
-    margin-bottom: -20px;
+  .badgeFail,
+  .badgeSuccess {
+    padding: 0.35rem 0.75rem;
+    font-size: 0.6rem;
   }
 }

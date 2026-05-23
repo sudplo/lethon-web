@@ -12,130 +12,238 @@ export default function CommunitiesSection() {
   const sectionRef = useRef(null);
   const headlineRef = useRef(null);
   
-  // Refs for animation targets
-  const serverRef = useRef(null);
-  const sigLinesRef = useRef([]);
-  const sigPermsRef = useRef([]);
-  const sigXRef = useRef(null);
-  
-  const lNodesRef = useRef([]);
-  const lLinesRef = useRef([]);
-  const lPermsRef = useRef([]);
-  const lCheckRef = useRef(null);
+  // Centralized column refs
+  const centralServerRef = useRef(null);
+  const centralClientRef = useRef(null);
+  const centralLineRef = useRef(null);
+  const centralLogsRef = useRef([]);
+  const centralBadgeRef = useRef(null);
+
+  // Lethon column refs
+  const lethonMeshRef = useRef(null);
+  const lethonNodesRef = useRef([]);
+  const lethonLinesRef = useRef([]);
+  const lethonLogsRef = useRef([]);
+  const lethonBadgeRef = useRef(null);
 
   useGSAP(() => {
     const q = gsap.utils.selector(sectionRef);
     const mm = gsap.matchMedia();
 
-    // ── 1. INITIAL STATES ──
-    const headlineWords = headlineRef.current.querySelectorAll('span');
+    // ── 1. INITIAL ANIMATION STATES ──
+    const headlineWords = headlineRef.current.querySelectorAll(`.${styles.word}`);
     gsap.set(headlineWords, { autoAlpha: 0, y: 30, rotateX: -30 });
     
-    gsap.set(serverRef.current, { scale: 0.8, autoAlpha: 0, filter: 'blur(15px)' });
-    gsap.set(sigLinesRef.current, { scaleY: 0, transformOrigin: 'top' });
-    gsap.set(sigPermsRef.current, { autoAlpha: 0, x: -15, filter: 'blur(10px)' });
-    gsap.set(sigXRef.current, { autoAlpha: 0, y: 15, scale: 0.9 });
+    // Centralized Initial State
+    gsap.set(centralServerRef.current, { scale: 0.85, autoAlpha: 0, filter: 'blur(10px)' });
+    gsap.set(centralClientRef.current, { scale: 0.85, autoAlpha: 0, filter: 'blur(10px)' });
+    gsap.set(centralLineRef.current, { scaleY: 0, transformOrigin: 'top' });
+    gsap.set(centralLogsRef.current, { autoAlpha: 0, y: 10 });
+    gsap.set(centralBadgeRef.current, { scale: 0.8, autoAlpha: 0 });
     
-    gsap.set(lNodesRef.current, { scale: 0.5, autoAlpha: 0, filter: 'blur(15px)' });
-    gsap.set(lLinesRef.current, { scaleX: 0, scaleY: 0, transformOrigin: 'center' });
-    gsap.set(lPermsRef.current, { autoAlpha: 0, x: 15, filter: 'blur(10px)' });
-    gsap.set(lCheckRef.current, { autoAlpha: 0, y: 15, scale: 0.9 });
+    // Lethon Initial State
+    gsap.set(lethonNodesRef.current, { scale: 0.85, autoAlpha: 0, filter: 'blur(10px)' });
+    gsap.set(lethonLinesRef.current, { opacity: 0 });
+    gsap.set(lethonLogsRef.current, { autoAlpha: 0, y: 10 });
+    gsap.set(lethonBadgeRef.current, { scale: 0.8, autoAlpha: 0 });
 
+    // ── 2. GLOBAL INFINITE LOOPS ──
+    // Run these immediately so they are active as soon as sections compile/fade in
+    gsap.fromTo(q(`.${styles.scanline}`), 
+      { top: '0%' }, 
+      { top: '100%', duration: 4, repeat: -1, ease: 'none' }
+    );
+
+    // Dashes flow loop
+    gsap.fromTo(lethonLinesRef.current, 
+      { strokeDashoffset: 24 }, 
+      { strokeDashoffset: 0, duration: 1.2, repeat: -1, ease: 'none' }
+    );
+
+    // Server alarm pulse
+    gsap.to(centralServerRef.current, {
+      borderColor: 'rgba(239, 68, 68, 0.45)',
+      boxShadow: '0 0 20px rgba(239, 68, 68, 0.2)',
+      duration: 1.2,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut'
+    });
+
+    // P2P node heartbeats
+    gsap.to(lethonNodesRef.current, {
+      borderColor: 'rgba(0, 245, 160, 0.45)',
+      boxShadow: '0 0 15px rgba(0, 245, 160, 0.15)',
+      stagger: {
+        each: 0.2,
+        repeat: -1,
+        yoyo: true
+      },
+      duration: 1.0,
+      ease: 'sine.inOut'
+    });
+
+    // ── 3. LAYOUT SPECIFIC RESPONSIVE ANIMATIONS ──
     mm.add(
       {
-        isDesktop: '(min-width: 901px)',
+        isDesktopTall: '(min-width: 901px) and (min-height: 801px)',
+        isDesktopShort: '(min-width: 901px) and (max-height: 800px)',
         isMobile: '(max-width: 900px)',
+        reduceMotion: '(prefers-reduced-motion: reduce)',
       },
       (context) => {
-        const { isDesktop } = context.conditions;
+        const { isDesktopTall, isDesktopShort, isMobile, reduceMotion } = context.conditions;
 
-        // ── 2. HEADLINE ENTRANCE ──
-        gsap.to(headlineWords, {
-          autoAlpha: 1,
-          y: 0,
-          rotateX: 0,
-          stagger: 0.05,
-          duration: 1.2,
-          ease: 'expo.out',
-          scrollTrigger: {
-            trigger: headlineRef.current,
-            start: 'top 85%',
-          }
-        });
+        if (reduceMotion) {
+          // Instant values for reduced motion
+          gsap.set(headlineWords, { autoAlpha: 1, y: 0, rotateX: 0 });
+          gsap.set([centralServerRef.current, centralClientRef.current], { scale: 1, autoAlpha: 1, filter: 'blur(0px)' });
+          gsap.set(centralLineRef.current, { scaleY: 1 });
+          gsap.set(centralLogsRef.current, { autoAlpha: 1, y: 0 });
+          gsap.set(centralBadgeRef.current, { scale: 1, autoAlpha: 1 });
 
-        // ── 3. DIAGRAM ANIMATIONS ──
-        
-        // --- Standard Side ---
-        const tlStandard = gsap.timeline({
-          scrollTrigger: {
-            trigger: q(`.${styles.col}`)[0],
-            start: 'top 75%',
-            toggleActions: 'play none none none',
-          }
-        });
+          gsap.set(lethonNodesRef.current, { scale: 1, autoAlpha: 1, filter: 'blur(0px)' });
+          gsap.set(lethonLinesRef.current, { opacity: 0.8 });
+          gsap.set(lethonLogsRef.current, { autoAlpha: 1, y: 0 });
+          gsap.set(lethonBadgeRef.current, { scale: 1, autoAlpha: 1 });
+          return;
+        }
 
-        tlStandard
-          .to(serverRef.current, { 
-            scale: 1, autoAlpha: 1, filter: 'blur(0px)', duration: 1, ease: 'expo.out' 
-          })
-          .to(sigLinesRef.current, { 
-            scaleY: 1, stagger: 0.1, duration: 0.8, ease: 'power3.out' 
-          }, '-=0.4')
-          .to(sigPermsRef.current, { 
-            autoAlpha: 1, x: 0, filter: 'blur(0px)', stagger: 0.12, duration: 0.8, ease: 'back.out(1.2)' 
-          }, '-=0.6')
-          .to(sigXRef.current, { 
-            autoAlpha: 1, y: 0, scale: 1, duration: 0.8, ease: 'elastic.out(1, 0.5)' 
-          }, '-=0.2')
-          .to(serverRef.current, {
-            boxShadow: '0 0 40px rgba(239, 68, 68, 0.4)',
-            borderColor: 'rgba(239, 68, 68, 0.6)',
-            backgroundColor: 'rgba(239, 68, 68, 0.12)',
-            duration: 1.5,
-            repeat: -1,
-            yoyo: true,
-            ease: 'sine.inOut'
-          }, '-=0.2');
-
-        // --- Lethon Side ---
-        const tlLethon = gsap.timeline({
-          scrollTrigger: {
-            trigger: q(`.${styles.col}`)[1],
-            start: 'top 75%',
-            toggleActions: 'play none none none',
-          }
-        });
-
-        tlLethon
-          .to(lNodesRef.current, { 
-            scale: 1, autoAlpha: 1, filter: 'blur(0px)', stagger: 0.1, duration: 1, ease: 'expo.out' 
-          })
-          .to(lLinesRef.current, { 
-            scaleX: 1, scaleY: 1, stagger: 0.1, duration: 0.6, ease: 'power2.inOut' 
-          }, '-=0.8')
-          .to(lPermsRef.current, { 
-            autoAlpha: 1, x: 0, filter: 'blur(0px)', stagger: 0.12, duration: 0.8, ease: 'back.out(1.2)' 
-          }, '-=0.6')
-          .to(lCheckRef.current, { 
-            autoAlpha: 1, y: 0, scale: 1, duration: 0.8, ease: 'elastic.out(1, 0.5)' 
-          }, '-=0.2')
-          .to(lNodesRef.current, {
-            borderColor: 'rgba(0, 245, 160, 0.6)',
-            boxShadow: '0 0 25px rgba(0, 245, 160, 0.25)',
-            backgroundColor: 'rgba(0, 245, 160, 0.08)',
-            duration: 0.5,
-            stagger: 0.1,
-            ease: 'sine.inOut'
-          }, '-=0.4');
-
-        if (isDesktop) {
-          // Add subtle scan effect animation
-          gsap.to(q(`.${styles.scanline}`), {
-            y: '100%',
-            duration: 4,
-            repeat: -1,
-            ease: 'none',
+        // --- A. MOBILE VIEWPORTS ---
+        if (isMobile) {
+          gsap.to(headlineWords, {
+            autoAlpha: 1,
+            y: 0,
+            rotateX: 0,
+            stagger: 0.04,
+            duration: 1.0,
+            ease: 'expo.out',
+            scrollTrigger: {
+              trigger: headlineRef.current,
+              start: 'top 85%',
+            }
           });
+
+          // Single trigger timelines for mobile scroll flow
+          const tlCentral = gsap.timeline({
+            scrollTrigger: {
+              trigger: centralClientRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            }
+          });
+          tlCentral
+            .to(centralClientRef.current, { scale: 1, autoAlpha: 1, filter: 'blur(0px)', duration: 0.6, ease: 'back.out(1.2)' })
+            .to(centralLineRef.current, { scaleY: 1, duration: 0.6, ease: 'power2.inOut' }, '-=0.25')
+            .to(centralServerRef.current, { scale: 1, autoAlpha: 1, filter: 'blur(0px)', duration: 0.6, ease: 'back.out(1.2)' }, '-=0.3')
+            .to(centralLogsRef.current, { autoAlpha: 1, y: 0, stagger: 0.12, duration: 0.45, ease: 'power2.out' }, '-=0.15')
+            .to(centralBadgeRef.current, { scale: 1, autoAlpha: 1, duration: 0.7, ease: 'elastic.out(1, 0.6)' }, '-=0.1');
+
+          const tlLethon = gsap.timeline({
+            scrollTrigger: {
+              trigger: lethonMeshRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            }
+          });
+          tlLethon
+            .to(lethonNodesRef.current, { scale: 1, autoAlpha: 1, filter: 'blur(0px)', stagger: 0.1, duration: 0.6, ease: 'back.out(1.3)' })
+            .to(lethonLinesRef.current, { opacity: 0.8, duration: 0.45 }, '-=0.4')
+            .to(lethonLogsRef.current, { autoAlpha: 1, y: 0, stagger: 0.12, duration: 0.45, ease: 'power2.out' }, '-=0.2')
+            .to(lethonBadgeRef.current, { scale: 1, autoAlpha: 1, duration: 0.7, ease: 'elastic.out(1, 0.6)' }, '-=0.1');
+
+          return;
+        }
+
+        // --- B. COMPACT DESKTOP (LAPTOPS) ---
+        if (isDesktopShort) {
+          const tlShort = gsap.timeline({
+            scrollTrigger: {
+              trigger: headlineRef.current,
+              start: 'top 85%',
+              toggleActions: 'play none none none',
+            }
+          });
+
+          tlShort
+            .to(headlineWords, {
+              autoAlpha: 1,
+              y: 0,
+              rotateX: 0,
+              stagger: 0.04,
+              duration: 1.0,
+              ease: 'expo.out'
+            })
+            // Assemble Centralized Diagram
+            .to(centralClientRef.current, { scale: 1, autoAlpha: 1, filter: 'blur(0px)', duration: 0.5, ease: 'back.out(1.2)' }, '-=0.4')
+            .to(centralLineRef.current, { scaleY: 1, duration: 0.5, ease: 'power2.inOut' }, '-=0.25')
+            .to(centralServerRef.current, { scale: 1, autoAlpha: 1, filter: 'blur(0px)', duration: 0.5, ease: 'back.out(1.2)' }, '-=0.35')
+            .to(centralLogsRef.current, { autoAlpha: 1, y: 0, stagger: 0.1, duration: 0.4, ease: 'power2.out' }, '-=0.15')
+            .to(centralBadgeRef.current, { scale: 1, autoAlpha: 1, duration: 0.6, ease: 'elastic.out(1, 0.6)' }, '-=0.1')
+            // Assemble Lethon Diagram
+            .to(lethonNodesRef.current, { scale: 1, autoAlpha: 1, filter: 'blur(0px)', stagger: 0.08, duration: 0.6, ease: 'back.out(1.3)' }, '-=0.2')
+            .to(lethonLinesRef.current, { opacity: 0.8, duration: 0.35 }, '-=0.35')
+            .to(lethonLogsRef.current, { autoAlpha: 1, y: 0, stagger: 0.1, duration: 0.4, ease: 'power2.out' }, '-=0.15')
+            .to(lethonBadgeRef.current, { scale: 1, autoAlpha: 1, duration: 0.6, ease: 'elastic.out(1, 0.6)' }, '-=0.1');
+
+          return;
+        }
+
+        // --- C. TALL DESKTOP (PINNED REVEAL) ---
+        if (isDesktopTall) {
+          const tlTall = gsap.timeline({
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top top',
+              end: '+=180%',
+              pin: true,
+              scrub: 1,
+              anticipatePin: 1,
+            }
+          });
+
+          tlTall
+            // Step 1: Scrub title text reveal
+            .to(headlineWords, {
+              autoAlpha: 1,
+              y: 0,
+              rotateX: 0,
+              stagger: 0.04,
+              duration: 1.0,
+              ease: 'power2.out'
+            })
+            // Step 2: Build Centralized Standard diagram
+            .to(centralClientRef.current, { 
+              scale: 1, autoAlpha: 1, filter: 'blur(0px)', duration: 0.8, ease: 'back.out(1.2)' 
+            }, '+=0.1')
+            .to(centralLineRef.current, { 
+              scaleY: 1, duration: 0.8, ease: 'power2.inOut' 
+            }, '-=0.4')
+            .to(centralServerRef.current, { 
+              scale: 1, autoAlpha: 1, filter: 'blur(0px)', duration: 0.8, ease: 'back.out(1.2)' 
+            }, '-=0.5')
+            .to(centralLogsRef.current, { 
+              autoAlpha: 1, y: 0, stagger: 0.15, duration: 0.7, ease: 'power2.out' 
+            }, '-=0.2')
+            .to(centralBadgeRef.current, { 
+              scale: 1, autoAlpha: 1, duration: 0.9, ease: 'back.out(1.4)' 
+            }, '-=0.2')
+            // Step 3: Build Lethon Cryptographic Mesh diagram
+            .to(lethonNodesRef.current, { 
+              scale: 1, autoAlpha: 1, filter: 'blur(0px)', stagger: 0.15, duration: 1.0, ease: 'back.out(1.3)' 
+            }, '+=0.3')
+            .to(lethonLinesRef.current, { 
+              opacity: 0.8, duration: 0.6 
+            }, '-=0.6')
+            .to(lethonLogsRef.current, { 
+              autoAlpha: 1, y: 0, stagger: 0.15, duration: 0.7, ease: 'power2.out' 
+            }, '-=0.35')
+            .to(lethonBadgeRef.current, { 
+              scale: 1, autoAlpha: 1, duration: 0.9, ease: 'back.out(1.4)' 
+            }, '-=0.2');
+
+          // Persistence delay at the end
+          tlTall.to({}, { duration: 0.5 });
         }
       }
     );
@@ -144,8 +252,13 @@ export default function CommunitiesSection() {
   return (
     <section ref={sectionRef} className={styles.section} id="communities" data-scroll-section>
       <div className="container">
+        
+        {/* Header Section */}
         <header className={styles.header}>
-          <div className={styles.tag}>DECENTRALIZED COMMUNITIES</div>
+          <div className={styles.tag}>
+            <span className={styles.tagDot} />
+            DECENTRALIZED COMMUNITIES
+          </div>
           <h2 className={styles.headline} ref={headlineRef}>
             {'Groups without a gatekeeper.'.split(' ').map((word, i) => (
               <span key={i} className={styles.word}>{word}&nbsp;</span>
@@ -159,59 +272,73 @@ export default function CommunitiesSection() {
           </div>
         </header>
 
+        {/* The Comparison Grid */}
         <div className={styles.grid}>
-          {/* Standard Column */}
+          
+          {/* Column 1: Centralized Architecture */}
           <div className={styles.col}>
             <div className={styles.colHeader}>
-              <span className={styles.colStatus} />
+              <span className={`${styles.statusDot} ${styles.statusDotRed}`} />
               Centralized Standard
             </div>
-            <div className={styles.diagram}>
+            
+            <div className={`${styles.diagram} ${styles.diagramRed}`}>
               <div className={styles.scanline} aria-hidden="true" />
-              <div className={styles.visualStack}>
-                {/* Central Server */}
-                <div className={styles.server} ref={serverRef}>
+              
+              {/* Visual Architecture Area */}
+              <div className={styles.visualArea}>
+                {/* Central Server Card */}
+                <div className={styles.serverCard} ref={centralServerRef}>
                   <div className={styles.serverHeader}>
-                    <span className={styles.serverStatusLed} />
-                    <span className={styles.mono}>CENTRAL_GATEKEEPER_v4</span>
+                    <span className={styles.serverLed} />
+                    <span className={styles.monoTitle}>CENTRAL_GATEKEEPER_v4</span>
                   </div>
                   <div className={styles.serverBody}>
-                    <div className={styles.telemetry}>[AUTH_DATABASE]</div>
-                    <div className={styles.telemetryMuted}>ENFORCING_RULES...</div>
+                    <span className={styles.telemetryText}>[AUTH_DATABASE: ACTIVE]</span>
+                    <span className={styles.telemetrySub}>ENFORCING_RULES...</span>
                   </div>
                 </div>
 
-                <div className={styles.connector} ref={el => sigLinesRef.current[0] = el}>
+                {/* Connection Line */}
+                <div className={styles.connector} ref={centralLineRef}>
                   <div className={styles.connectorLineRed} />
                 </div>
 
-                {/* Client Node */}
-                <div className={styles.clientNode}>
-                  <div className={styles.nodeHeader}>
-                    <span className={styles.monoSmall}>[CLIENT_ID: 8821]</span>
+                {/* Client Node Card */}
+                <div className={styles.clientCard} ref={centralClientRef}>
+                  <div className={styles.clientHeader}>
+                    <span className={styles.monoTitle}>[CLIENT_ID: 8821]</span>
                   </div>
-                  <div className={styles.nodeRole}>Group Member</div>
+                  <div className={styles.clientBody}>Group Member</div>
                 </div>
               </div>
 
+              {/* Terminal Logs Area */}
               <div className={styles.terminal}>
-                <div className={styles.logRow} ref={el => sigPermsRef.current[0] = el}>
-                  <span className={styles.logLabel}>REQUEST:</span>
-                  <span className={styles.logVal}>&quot;Post Message&quot;</span>
+                <div className={styles.terminalHeader}>
+                  <span className={styles.terminalDot} />
+                  <span>console_stream</span>
                 </div>
-                <div className={styles.logRow} ref={el => sigPermsRef.current[1] = el}>
-                  <span className={styles.logLabel}>QUERY:</span>
-                  <span className={styles.logVal}>Server Auth Check</span>
-                </div>
-                <div className={styles.logRow} ref={el => sigPermsRef.current[2] = el}>
-                  <span className={styles.logLabel}>RESULT:</span>
-                  <span className={styles.logValError}>PENDING SERVER APPROVAL</span>
+                <div className={styles.terminalBody}>
+                  <div className={styles.logRow} ref={el => centralLogsRef.current[0] = el}>
+                    <span className={styles.logLabel}>REQUEST:</span>
+                    <span className={styles.logVal}>&quot;Post Message&quot;</span>
+                  </div>
+                  <div className={styles.logRow} ref={el => centralLogsRef.current[1] = el}>
+                    <span className={styles.logLabel}>QUERY:</span>
+                    <span className={styles.logVal}>Server Auth Check</span>
+                  </div>
+                  <div className={styles.logRow} ref={el => centralLogsRef.current[2] = el}>
+                    <span className={styles.logLabel}>RESULT:</span>
+                    <span className={styles.logValFail}>PENDING SERVER APPROVAL</span>
+                  </div>
                 </div>
               </div>
 
-              <div className={styles.badgeWrap} ref={sigXRef}>
+              {/* Status Badge */}
+              <div className={styles.badgeWrap} ref={centralBadgeRef}>
                 <div className={styles.badgeFail}>
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" className={styles.badgeIcon}>
                     <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 10.1L10.1 11.5 8 9.4l-2.1 2.1-1.4-1.4 2.1-2.1-2.1-2.1 1.4-1.4 2.1 2.1 2.1-2.1 1.4 1.4-2.1 2.1 2.1 2.1z"/>
                   </svg>
                   <span>SINGLE POINT OF FAILURE</span>
@@ -220,66 +347,107 @@ export default function CommunitiesSection() {
             </div>
           </div>
 
-          {/* Lethon Column */}
+          {/* Column 2: Lethon Decentralized Architecture */}
           <div className={styles.col}>
             <div className={styles.colHeader}>
-              <span className={`${styles.colStatus} ${styles.colStatusActive}`} />
-              Lethon Architecture
+              <span className={`${styles.statusDot} ${styles.statusDotGreen}`} />
+              Lethon Cryptographic Mesh
             </div>
-            <div className={styles.diagram}>
+            
+            <div className={`${styles.diagram} ${styles.diagramGreen}`}>
               <div className={styles.scanline} aria-hidden="true" />
-              <div className={styles.visualStackMesh}>
-                {/* Mesh Nodes */}
-                <div className={styles.meshWrap}>
-                  <svg className={styles.meshSvg} viewBox="0 0 240 120">
-                    <path 
-                      ref={el => lLinesRef.current[0] = el}
-                      d="M 40 30 L 200 30 L 120 90 Z" 
-                      fill="none" 
-                      stroke="var(--color-accent)" 
-                      strokeWidth="1" 
-                      strokeDasharray="4 4"
-                      opacity="0.3"
-                    />
-                  </svg>
+              
+              {/* Visual Architecture Area (P2P Mesh Network) */}
+              <div className={styles.visualAreaMesh} ref={lethonMeshRef}>
+                
+                {/* SVG connection lines between P2P nodes */}
+                <svg className={styles.meshSvg} viewBox="0 0 300 160">
+                  <defs>
+                    <linearGradient id="meshGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="var(--color-accent)" stopOpacity="0.85" />
+                      <stop offset="100%" stopColor="var(--color-accent)" stopOpacity="0.15" />
+                    </linearGradient>
+                  </defs>
                   
-                  <div className={`${styles.p2pNode} ${styles.p1}`} ref={el => lNodesRef.current[0] = el}>
-                    <div className={styles.p2pLed} />
-                    <span className={styles.monoSmall}>NODE_01</span>
-                  </div>
-                  <div className={`${styles.p2pNode} ${styles.p2}`} ref={el => lNodesRef.current[1] = el}>
-                    <div className={styles.p2pLed} />
-                    <span className={styles.monoSmall}>NODE_02</span>
-                  </div>
-                  <div className={`${styles.p2pNode} ${styles.p3}`} ref={el => lNodesRef.current[2] = el}>
-                    <div className={styles.p2pLed} />
-                    <span className={styles.monoSmall}>NODE_03</span>
-                  </div>
+                  {/* Triangle connection paths */}
+                  <path
+                    ref={el => lethonLinesRef.current[0] = el}
+                    d="M 50 40 L 250 40"
+                    fill="none"
+                    stroke="url(#meshGradient)"
+                    strokeWidth="1.5"
+                    strokeDasharray="6 6"
+                    className={styles.meshPath}
+                  />
+                  <path
+                    ref={el => lethonLinesRef.current[1] = el}
+                    d="M 250 40 L 150 120"
+                    fill="none"
+                    stroke="url(#meshGradient)"
+                    strokeWidth="1.5"
+                    strokeDasharray="6 6"
+                    className={styles.meshPath}
+                  />
+                  <path
+                    ref={el => lethonLinesRef.current[2] = el}
+                    d="M 150 120 L 50 40"
+                    fill="none"
+                    stroke="url(#meshGradient)"
+                    strokeWidth="1.5"
+                    strokeDasharray="6 6"
+                    className={styles.meshPath}
+                  />
+                </svg>
+                
+                {/* P2P Node 1 */}
+                <div className={`${styles.p2pNode} ${styles.p2pNode1}`} ref={el => lethonNodesRef.current[0] = el}>
+                  <div className={styles.p2pLed} />
+                  <span className={styles.monoSmall}>NODE_01</span>
+                  <span className={styles.nodeRoleTag}>Owner</span>
                 </div>
-
-                <div className={styles.connector} ref={el => lLinesRef.current[1] = el}>
-                  <div className={styles.connectorLineGreen} />
+                
+                {/* P2P Node 2 */}
+                <div className={`${styles.p2pNode} ${styles.p2pNode2}`} ref={el => lethonNodesRef.current[1] = el}>
+                  <div className={styles.p2pLed} />
+                  <span className={styles.monoSmall}>NODE_02</span>
+                  <span className={styles.nodeRoleTag}>Admin</span>
                 </div>
+                
+                {/* P2P Node 3 */}
+                <div className={`${styles.p2pNode} ${styles.p2pNode3}`} ref={el => lethonNodesRef.current[2] = el}>
+                  <div className={styles.p2pLed} />
+                  <span className={styles.monoSmall}>NODE_03</span>
+                  <span className={styles.nodeRoleTag}>Member</span>
+                </div>
+                
               </div>
 
+              {/* Terminal Logs Area */}
               <div className={styles.terminal}>
-                <div className={styles.logRow} ref={el => lPermsRef.current[0] = el}>
-                  <span className={styles.logLabel}>SIG:</span>
-                  <span className={styles.logVal}>ED25519_AUTH_VALID</span>
+                <div className={styles.terminalHeader}>
+                  <span className={styles.terminalDot} />
+                  <span>consensus_stream</span>
                 </div>
-                <div className={styles.logRow} ref={el => lPermsRef.current[1] = el}>
-                  <span className={styles.logLabel}>CONSENSUS:</span>
-                  <span className={styles.logVal}>LOCAL_RULES_ENFORCED</span>
-                </div>
-                <div className={styles.logRow} ref={el => lPermsRef.current[2] = el}>
-                  <span className={styles.logLabel}>RESULT:</span>
-                  <span className={styles.logValSuccess}>MATHEMATICAL CERTAINTY</span>
+                <div className={styles.terminalBody}>
+                  <div className={styles.logRow} ref={el => lethonLogsRef.current[0] = el}>
+                    <span className={styles.logLabel}>SIG:</span>
+                    <span className={styles.logVal}>ED25519_AUTH_VALID</span>
+                  </div>
+                  <div className={styles.logRow} ref={el => lethonLogsRef.current[1] = el}>
+                    <span className={styles.logLabel}>CONSENSUS:</span>
+                    <span className={styles.logVal}>LOCAL_RULES_ENFORCED</span>
+                  </div>
+                  <div className={styles.logRow} ref={el => lethonLogsRef.current[2] = el}>
+                    <span className={styles.logLabel}>RESULT:</span>
+                    <span className={styles.logValSuccess}>MATHEMATICAL CERTAINTY</span>
+                  </div>
                 </div>
               </div>
 
-              <div className={styles.badgeWrap} ref={lCheckRef}>
+              {/* Status Badge */}
+              <div className={styles.badgeWrap} ref={lethonBadgeRef}>
                 <div className={styles.badgeSuccess}>
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                  <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor" className={styles.badgeIcon}>
                     <path d="M8 0a8 8 0 100 16A8 8 0 008 0zm3.5 6.5l-4.5 4.5-2.5-2.5 1.4-1.4 1.1 1.1 3.1-3.1 1.4 1.4z"/>
                   </svg>
                   <span>DECENTRALIZED ENFORCEMENT</span>
@@ -287,6 +455,7 @@ export default function CommunitiesSection() {
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </section>

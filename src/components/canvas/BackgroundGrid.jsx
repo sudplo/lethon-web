@@ -73,7 +73,91 @@ export default function BackgroundGrid() {
     if (materialRef.current) {
       materialRef.current.uniforms.uMouse.value.copy(mouse.current);
       materialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
-      materialRef.current.uniforms.uMaxDist.value = viewport.height * 0.15;
+
+      // Dynamic theme morphing based on active section
+      const activeSection = (typeof document !== 'undefined' && document.documentElement.dataset.activeSection) || 'hero';
+      const activeArchStep = (typeof document !== 'undefined' && document.documentElement.dataset.activeArchStep) || '0';
+
+      let targetColorStr = '#00f5a0';
+      let targetOpacity = 0.12;
+      let targetMaxDistMult = 1.0;
+
+      switch(activeSection) {
+        case 'hero':
+          targetColorStr = '#00f5a0';
+          targetOpacity = 0.12;
+          targetMaxDistMult = 1.0;
+          break;
+        case 'statement':
+          targetColorStr = '#1e293b';
+          targetOpacity = 0.04;
+          targetMaxDistMult = 0.5;
+          break;
+        case 'surveillance':
+          targetColorStr = '#f59e0b';
+          targetOpacity = 0.08;
+          targetMaxDistMult = 1.3;
+          break;
+        case 'metadata':
+          targetColorStr = '#00e5ff';
+          targetOpacity = 0.15;
+          targetMaxDistMult = 0.8;
+          break;
+        case 'architecture':
+          if (activeArchStep === '0') {
+            targetColorStr = '#f59e0b';
+          } else if (activeArchStep === '1') {
+            targetColorStr = '#7b2fff';
+          } else if (activeArchStep === '2') {
+            targetColorStr = '#1d9e75';
+          } else {
+            targetColorStr = '#52c41a';
+          }
+          targetOpacity = 0.12;
+          targetMaxDistMult = 1.0;
+          break;
+        case 'voice':
+          targetColorStr = '#00f5a0';
+          targetOpacity = 0.10;
+          targetMaxDistMult = 1.0;
+          break;
+        case 'communities':
+          targetColorStr = '#7b2fff';
+          targetOpacity = 0.08;
+          targetMaxDistMult = 1.0;
+          break;
+        case 'journey':
+          targetColorStr = '#00f5a0';
+          targetOpacity = 0.08;
+          targetMaxDistMult = 0.8;
+          break;
+        case 'compare':
+          targetColorStr = '#334155';
+          targetOpacity = 0.05;
+          targetMaxDistMult = 0.6;
+          break;
+        case 'manifesto':
+          targetColorStr = '#00f5a0';
+          targetOpacity = 0.12;
+          targetMaxDistMult = 1.0;
+          break;
+      }
+
+      const targetColor = new THREE.Color(targetColorStr);
+      materialRef.current.uniforms.uColor.value.lerp(targetColor, 0.04);
+      
+      materialRef.current.uniforms.uBaseOpacity.value = THREE.MathUtils.lerp(
+        materialRef.current.uniforms.uBaseOpacity.value,
+        targetOpacity,
+        0.04
+      );
+
+      const targetMaxDist = viewport.height * 0.15 * targetMaxDistMult;
+      materialRef.current.uniforms.uMaxDist.value = THREE.MathUtils.lerp(
+        materialRef.current.uniforms.uMaxDist.value,
+        targetMaxDist,
+        0.04
+      );
     }
   });
 

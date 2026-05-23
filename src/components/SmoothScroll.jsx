@@ -7,9 +7,14 @@ import { useGSAP } from '@gsap/react';
 
 export default function SmoothScroll({ children }) {
   useGSAP(() => {
+    // Disable native browser scroll restoration to prevent jumping
+    if (typeof window !== 'undefined') {
+      window.history.scrollRestoration = 'manual';
+    }
+
     gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
-    ScrollSmoother.create({
+    const smoother = ScrollSmoother.create({
       wrapper: '#smooth-wrapper',
       content: '#smooth-content',
       smooth: 2,               /* Cinematic deceleration (similar to Lenis 2.0) */
@@ -18,6 +23,9 @@ export default function SmoothScroll({ children }) {
       normalizeScroll: true,   /* Prevents address bar jitters and ensures consistency */
       ignoreMobileResize: true /* Optimizes performance on mobile orientation changes */
     });
+
+    // Instantly scroll to top on page load/refresh
+    smoother.scrollTo(0, true);
   }, []);
 
   return <>{children}</>;

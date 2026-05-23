@@ -9,12 +9,82 @@ const seededRandom = (seed) => {
   return x - Math.floor(x);
 };
 
+function getThemeColors(activeSection, activeArchStep) {
+  let main = '#00f5a0';
+  let core = '#b3ffd6';
+  let lineBase = '#080c10';
+
+  switch(activeSection) {
+    case 'hero':
+      main = '#00f5a0';
+      core = '#b3ffd6';
+      lineBase = '#080c10';
+      break;
+    case 'statement':
+      main = '#223344';
+      core = '#475569';
+      lineBase = '#090d13';
+      break;
+    case 'surveillance':
+      main = '#f59e0b';
+      core = '#ffe6cc';
+      lineBase = '#130e08';
+      break;
+    case 'metadata':
+      main = '#00e5ff';
+      core = '#ccf9ff';
+      lineBase = '#081116';
+      break;
+    case 'architecture':
+      if (activeArchStep === '0') {
+        main = '#f59e0b';
+      } else if (activeArchStep === '1') {
+        main = '#7b2fff';
+      } else if (activeArchStep === '2') {
+        main = '#1d9e75';
+      } else {
+        main = '#52c41a';
+      }
+      core = '#d9f7be';
+      lineBase = '#0a1308';
+      break;
+    case 'voice':
+      main = '#00f5a0';
+      core = '#b3ffd6';
+      lineBase = '#080c10';
+      break;
+    case 'communities':
+      main = '#7b2fff';
+      core = '#e6d6ff';
+      lineBase = '#0d0816';
+      break;
+    case 'journey':
+      main = '#00f5a0';
+      core = '#b3ffd6';
+      lineBase = '#080c10';
+      break;
+    case 'compare':
+      main = '#334155';
+      core = '#64748b';
+      lineBase = '#0b0f14';
+      break;
+    case 'manifesto':
+      main = '#00f5a0';
+      core = '#b3ffd6';
+      lineBase = '#080c10';
+      break;
+  }
+
+  return { main, core, lineBase };
+}
+
 export default function WakuMeshScene() {
   const pointsRef = useRef();
   const linesRef = useRef();
   const groupRef = useRef();
   const pointsMaterialRef = useRef();
   const lineMaterialRef = useRef();
+  const speedMultiplierRef = useRef(1.0);
   
   const { size, viewport } = useThree();
 
@@ -63,6 +133,8 @@ export default function WakuMeshScene() {
   const pointsShaderArgs = useMemo(() => ({
     uniforms: {
       uTime: { value: 0 },
+      uColor: { value: new THREE.Color('#00f5a0') },
+      uCoreColor: { value: new THREE.Color('#b3ffd6') },
     },
     vertexShader: `
       uniform float uTime;
@@ -83,6 +155,8 @@ export default function WakuMeshScene() {
       }
     `,
     fragmentShader: `
+      uniform vec3 uColor;
+      uniform vec3 uCoreColor;
       varying float vOpacity;
       
       void main() {
@@ -96,10 +170,7 @@ export default function WakuMeshScene() {
         float glow = smoothstep(0.5, 0.05, dist);
         float core = smoothstep(0.18, 0.0, dist);
         
-        vec3 baseColor = vec3(0.0, 0.96, 0.63); // Signature green
-        vec3 coreColor = vec3(0.7, 1.0, 0.9); // Mint/bright core
-        
-        vec3 finalColor = mix(baseColor, coreColor, core * 0.65);
+        vec3 finalColor = mix(uColor, uCoreColor, core * 0.65);
         float alpha = (glow * 0.75 + core * 0.25) * vOpacity;
         
         gl_FragColor = vec4(finalColor, alpha);
@@ -114,6 +185,8 @@ export default function WakuMeshScene() {
   const lineShaderArgs = useMemo(() => ({
     uniforms: {
       uTime: { value: 0 },
+      uBaseColor: { value: new THREE.Color('#0c1017') },
+      uActiveColor: { value: new THREE.Color('#00f5a0') },
     },
     vertexShader: `
       attribute float aOpacity;
@@ -132,6 +205,8 @@ export default function WakuMeshScene() {
     `,
     fragmentShader: `
       uniform float uTime;
+      uniform vec3 uBaseColor;
+      uniform vec3 uActiveColor;
       
       varying float vOpacity;
       varying float vLineUv;
@@ -145,10 +220,7 @@ export default function WakuMeshScene() {
         float pulse = fract(vLineUv - uTime * pulseSpeed);
         float pulseGlow = smoothstep(0.2, 0.0, abs(pulse - 0.5));
         
-        vec3 baseColor = vec3(0.12, 0.15, 0.19); // Slate grey-blue
-        vec3 activeColor = vec3(0.0, 0.96, 0.63); // Signature green
-        
-        vec3 finalColor = mix(baseColor, activeColor, pulseGlow * 0.7);
+        vec3 finalColor = mix(uBaseColor, uActiveColor, pulseGlow * 0.7);
         
         // Fade lines near the nodes at start (0.0) and end (1.0)
         float edgeFade = smoothstep(0.0, 0.15, vLineUv) * smoothstep(1.0, 0.85, vLineUv);
@@ -175,15 +247,30 @@ export default function WakuMeshScene() {
     const scrollY = window.scrollY;
     groupRef.current.position.y = scrollY * 0.24;
 
+    // Read active section & step from document
+    const activeSection = (typeof document !== 'undefined' && document.documentElement.dataset.activeSection) || 'hero';
+    const activeArchStep = (typeof document !== 'undefined' && document.documentElement.dataset.activeArchStep) || '0';
+
+    // Interpolate drift speed multiplier
+    let targetSpeed = 1.0;
+    if (activeSection === 'statement' || activeSection === 'compare') {
+      targetSpeed = 0.25;
+    } else if (activeSection === 'surveillance') {
+      targetSpeed = 2.0;
+    } else if (activeSection === 'metadata') {
+      targetSpeed = 1.5;
+    }
+    speedMultiplierRef.current = THREE.MathUtils.lerp(speedMultiplierRef.current, targetSpeed, 0.04);
+
     // Viewport-aware wrapping limits (plus padding)
     const boundaryX = viewport.width / 2 + 50;
     const boundaryY = viewport.height / 2 + 50;
 
     // Update node positions (drift)
     for(let i=0; i<nodeCount; i++) {
-      posAttr.array[i*3] += velocities[i].x;
-      posAttr.array[i*3+1] += velocities[i].y;
-      posAttr.array[i*3+2] += velocities[i].z;
+      posAttr.array[i*3] += velocities[i].x * speedMultiplierRef.current;
+      posAttr.array[i*3+1] += velocities[i].y * speedMultiplierRef.current;
+      posAttr.array[i*3+2] += velocities[i].z * speedMultiplierRef.current;
 
       // Wrap around screen boundaries
       if(posAttr.array[i*3] > boundaryX) posAttr.array[i*3] = -boundaryX;
@@ -193,12 +280,23 @@ export default function WakuMeshScene() {
     }
     posAttr.needsUpdate = true;
 
-    // Update Shader Material Time Uniforms
+    // Interpolate colors based on section themes
+    const { main, core, lineBase } = getThemeColors(activeSection, activeArchStep);
+    
+    const targetMainColor = new THREE.Color(main);
+    const targetCoreColor = new THREE.Color(core);
+    const targetLineBaseColor = new THREE.Color(lineBase);
+
+    // Update Shader Material Time & Color Uniforms
     if (pointsMaterialRef.current) {
       pointsMaterialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+      pointsMaterialRef.current.uniforms.uColor.value.lerp(targetMainColor, 0.04);
+      pointsMaterialRef.current.uniforms.uCoreColor.value.lerp(targetCoreColor, 0.04);
     }
     if (lineMaterialRef.current) {
       lineMaterialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
+      lineMaterialRef.current.uniforms.uBaseColor.value.lerp(targetLineBaseColor, 0.04);
+      lineMaterialRef.current.uniforms.uActiveColor.value.lerp(targetMainColor, 0.04);
     }
 
     // Build connections

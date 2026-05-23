@@ -4,6 +4,11 @@
    ============================================================ */
 
 :root {
+  /* ── Ambient Background Glow Variables ── */
+  --bg-glow-color: rgba(0, 245, 160, 0.03);
+  --glow-x: 80%;
+  --glow-y: 20%;
+
   /* ── Brand colours ── */
   --color-accent: #00f5a0;
   --color-amber: #f59e0b;
@@ -166,6 +171,19 @@ button {
     rgba(3, 5, 8, 0.5) 100%
   );
   mix-blend-mode: multiply;
+}
+
+.ambient-glow {
+  position: fixed;
+  inset: 0;
+  z-index: 1; /* Under main content, above vignette */
+  pointer-events: none;
+  background: radial-gradient(
+    circle at var(--glow-x, 80%) var(--glow-y, 20%),
+    var(--bg-glow-color, rgba(0, 245, 160, 0.03)) 0%,
+    transparent 60%
+  );
+  will-change: background, transform;
 }
 
 /* ── Main content layer ── */

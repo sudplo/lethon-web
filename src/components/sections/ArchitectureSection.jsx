@@ -53,6 +53,7 @@ export default function ArchitectureSection() {
 
   const headlineRef = useRef(null);
   const [activeIdx, setActiveIdx] = useState(0);
+  const activeIdxRef = useRef(0);
 
   useGSAP(() => {
     const mm = gsap.matchMedia();
@@ -173,7 +174,30 @@ export default function ArchitectureSection() {
               const progress = self.progress;
               // Precise index calculation with slight buffer
               const idx = gsap.utils.clamp(0, LAYERS.length - 1, Math.floor(progress * LAYERS.length * 0.99));
-              if (idx !== activeIdx) setActiveIdx(idx);
+              if (idx !== activeIdxRef.current) {
+                activeIdxRef.current = idx;
+                setActiveIdx(idx);
+
+                if (typeof document !== 'undefined') {
+                  document.documentElement.dataset.activeArchStep = idx.toString();
+                  
+                  const glowColors = {
+                    'var(--color-amber)': 'rgba(245, 158, 11, 0.04)',
+                    'var(--color-purple)': 'rgba(123, 47, 255, 0.04)',
+                    'var(--color-teal)': 'rgba(29, 158, 117, 0.04)',
+                    'var(--color-green)': 'rgba(82, 196, 26, 0.04)',
+                  };
+
+                  gsap.to(document.documentElement, {
+                    '--bg-glow-color': glowColors[LAYERS[idx].color] || 'rgba(0, 245, 160, 0.03)',
+                    '--glow-x': `${20 + idx * 20}%`,
+                    '--glow-y': `${40 + (idx % 2) * 20}%`,
+                    duration: 0.8,
+                    ease: 'power2.out',
+                    overwrite: 'auto'
+                  });
+                }
+              }
               
               gsap.to(sectionRef.current, {
                 '--layer-color': LAYERS[idx].color,

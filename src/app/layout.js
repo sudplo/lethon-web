@@ -61,6 +61,7 @@ export default function RootLayout({ children }) {
         <Navigation />
         <GlobalCanvas />
         <div className="vignette-overlay" />
+        <div className="ambient-glow" />
         <div className="grain-overlay" />
         <div id="smooth-wrapper">
           <div id="smooth-content">

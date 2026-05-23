@@ -2,153 +2,339 @@
   min-height: 100svh;
   display: flex;
   align-items: center;
-  padding-block: clamp(5rem, 10vh, 8rem);
+  padding-block: clamp(4rem, 8vh, 7rem);
+  position: relative;
+  overflow: hidden;
 }
 
 .header {
   margin-bottom: clamp(2rem, 5vw, 3.5rem);
 }
 
-.header h2 {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-size: clamp(2rem, 4.2vw, 3.4rem);
-  font-weight: 540;
-  line-height: 1.14;
-  letter-spacing: 0;
+.headerTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
 }
 
 /* ============================================================
-   Desktop: full table
+   HUD / System Status Tags
+   ============================================================ */
+
+.systemTag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-faint);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  letter-spacing: 0.08em;
+}
+
+.tagDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 8px var(--color-accent);
+}
+
+.statusConsole {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  padding: 0.35rem 0.85rem;
+  background: rgba(0, 245, 160, 0.02);
+  border: 1px solid rgba(0, 245, 160, 0.15);
+  border-radius: var(--radius-sm);
+  color: var(--color-accent);
+  transition: all 0.35s ease;
+}
+
+.statusConsoleSecured {
+  background: rgba(0, 245, 160, 0.06);
+  border-color: rgba(0, 245, 160, 0.3);
+  box-shadow: 0 0 15px rgba(0, 245, 160, 0.05);
+}
+
+.consolePulse {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-accent);
+  box-shadow: 0 0 8px var(--color-accent);
+  animation: pulse-glow 1.5s infinite alternate;
+}
+
+.consoleText {
+  color: rgba(255, 255, 255, 0.6);
+  letter-spacing: 0.04em;
+}
+
+.consoleVal {
+  color: #ffffff;
+  font-weight: 600;
+  text-shadow: 0 0 8px rgba(0, 245, 160, 0.4);
+}
+
+@keyframes pulse-glow {
+  0% {
+    opacity: 0.3;
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1.2);
+    box-shadow: 0 0 12px var(--color-accent);
+  }
+}
+
+.header h2 {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: clamp(2rem, 3.8vw, 3rem);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+
+/* ============================================================
+   Desktop HUD Table
    ============================================================ */
 
 .tableWrap {
   position: relative;
-  overflow-x: auto;
+  overflow: hidden;
   border: 1px solid var(--border-faint);
-  border-radius: var(--radius-md);
-  background: rgba(3, 5, 8, 0.72);
-  backdrop-filter: blur(18px);
+  border-radius: 8px;
+  background: rgba(4, 6, 10, 0.65);
+  backdrop-filter: blur(20px);
+  padding: 1.5rem;
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.4),
+    inset 0 0 30px rgba(255, 255, 255, 0.015);
 }
+
+/* Sci-fi Corner Brackets */
+.cornerMarker {
+  position: absolute;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--color-accent);
+  opacity: 0.35;
+  pointer-events: none;
+  line-height: 1;
+}
+
+.cornerTL { top: 6px; left: 8px; }
+.cornerTR { top: 6px; right: 8px; }
+.cornerBL { bottom: 6px; left: 8px; }
+.cornerBR { bottom: 6px; right: 8px; }
 
 .table {
   width: 100%;
-  min-width: 760px;
-  border-collapse: collapse;
+  min-width: 820px;
+  border-collapse: separate;
+  border-spacing: 0 0.5rem; /* gives row separation for cyber look */
 }
 
 .thead th {
-  padding: 1rem;
-  border-bottom: 1px solid var(--border-faint);
+  padding: 1.25rem 1rem;
   font-family: var(--font-mono);
   font-size: 0.72rem;
   text-align: left;
   text-transform: uppercase;
+  letter-spacing: 0.06em;
   color: var(--text-muted);
+  border-bottom: 1px solid var(--border-faint);
 }
 
+/* Highlighted Lethon Column Header */
+.colLethon {
+  width: 28%;
+}
+
+.lethonThContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  border-left: 1px solid var(--border-accent);
+  padding-left: 1.25rem;
+}
+
+.lethonTitle {
+  font-weight: 600;
+  color: var(--color-accent);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-shadow: 0 0 8px rgba(0, 245, 160, 0.25);
+}
+
+.lethonSubtitle {
+  font-size: 0.58rem;
+  color: var(--text-muted);
+  opacity: 0.7;
+}
+
+.colOther {
+  width: 16%;
+  padding-left: 1rem;
+}
+
+/* Row states */
 .tbody tr {
-  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1), transform 0.2s ease;
+  position: relative;
+  transition: all 0.25s var(--ease-out);
 }
 
 .tbody tr:hover {
   background: rgba(255, 255, 255, 0.02) !important;
 }
 
+/* Make other rows fade slightly when hovering one */
+.table:hover .tbody tr:not(:hover) {
+  opacity: 0.5;
+  filter: blur(0.5px);
+}
+
 .tbody td {
-  padding: 0.95rem 1rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.045);
+  padding: 1.1rem 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
   font-family: var(--font-mono);
   font-size: 0.82rem;
   line-height: 1.45;
   vertical-align: middle;
+  transition: all 0.2s ease;
 }
 
-.tbody tr:last-child td {
-  border-bottom: 0;
+.tbody td:first-child {
+  border-left: 1px solid rgba(255, 255, 255, 0.02);
+  border-top-left-radius: 6px;
+  border-bottom-left-radius: 6px;
 }
 
-.highlighted {
-  background: rgba(0, 245, 160, 0.015);
+.tbody td:last-child {
+  border-right: 1px solid rgba(255, 255, 255, 0.02);
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+/* Highlighted specific rows */
+.highlighted td {
+  background: rgba(0, 245, 160, 0.005);
 }
 
 .capCell {
-  width: 24%;
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: 0.92rem;
-  transition: color 0.25s ease, text-shadow 0.25s ease;
+  font-size: 0.94rem;
+  font-weight: 450;
+  transition: color 0.25s ease;
+}
+
+.capHighlight {
+  font-weight: 550;
+  color: #ffffff;
 }
 
 .tbody tr:hover .capCell {
   color: #ffffff;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.15);
 }
 
-.colLethon,
+/* Lethon Column Highlight styling */
 .lethonCell {
+  border-left: 1px solid var(--border-accent) !important;
+  border-right: 1px solid var(--border-accent) !important;
   color: var(--color-accent);
 }
 
-.lethonCell {
-  position: relative;
-  width: 30%;
-  transition: background-color 0.25s ease;
-}
-
 .tbody tr:hover .lethonCell {
-  background: rgba(0, 245, 160, 0.04);
+  background: rgba(0, 245, 160, 0.04) !important;
 }
 
 .lethonCellAmber {
-  color: var(--color-amber);
+  border-left-color: rgba(245, 158, 11, 0.25) !important;
+  border-right-color: rgba(245, 158, 11, 0.25) !important;
 }
 
-.otherCell,
-.colOther {
+.tbody tr:hover .lethonCellAmber {
+  background: rgba(245, 158, 11, 0.03) !important;
+}
+
+.cellContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding-left: 0.25rem;
+}
+
+.otherCell {
   color: var(--text-muted);
+  padding-left: 1rem;
 }
 
 .tip {
   display: block;
-  margin-top: 0.35rem;
-  color: rgba(240, 244, 248, 0.48);
-  font-size: 0.74rem;
+  color: rgba(240, 244, 248, 0.45);
+  font-size: 0.7rem;
   white-space: normal;
+  line-height: 1.3;
 }
 
+/* laser scanline overlay */
 .scanline {
   position: absolute;
   left: 0;
-  top: 0;
   width: 100%;
-  height: 2px;
-  z-index: 5;
-  background: linear-gradient(to right, transparent, var(--color-accent), transparent);
-  box-shadow: 0 0 12px var(--color-accent);
+  height: 3px;
+  z-index: 10;
+  background: linear-gradient(to right, 
+    transparent 5%, 
+    rgba(0, 245, 160, 0.8) 40%, 
+    #ffffff 50%, 
+    rgba(0, 245, 160, 0.8) 60%, 
+    transparent 95%
+  );
+  box-shadow: 
+    0 0 10px rgba(0, 245, 160, 0.6),
+    0 0 20px rgba(0, 245, 160, 0.3);
   pointer-events: none;
 }
 
 /* ============================================================
-   Custom Badges
+   Futuristic Cyber Badges
    ============================================================ */
+
 .badge {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem;
-  padding: 0.25rem 0.6rem;
+  gap: 0.45rem;
+  padding: 0.3rem 0.65rem;
   border-radius: 6px;
   font-family: var(--font-mono);
   font-size: 0.72rem;
   font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0.02em;
   border: 1px solid transparent;
-  line-height: 1.1;
-  transition: all 0.25s ease;
+  transition: all 0.25s var(--ease-out);
 }
 
 .badgeLed {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   display: inline-block;
   flex-shrink: 0;
@@ -157,8 +343,6 @@
 .badgeIcon {
   display: inline-block;
   flex-shrink: 0;
-  width: 12px;
-  height: 12px;
 }
 
 .badgeText {
@@ -166,36 +350,38 @@
 }
 
 .badgeCheck {
-  background: rgba(16, 185, 129, 0.05);
-  border-color: rgba(16, 185, 129, 0.15);
-  color: #10b981;
+  background: rgba(0, 245, 160, 0.05);
+  border-color: rgba(0, 245, 160, 0.15);
+  color: var(--color-accent);
+  box-shadow: 0 0 10px rgba(0, 245, 160, 0.03);
 }
 
 .badgeCheck .badgeLed {
-  background: #10b981;
-  box-shadow: 0 0 6px #10b981;
+  background: var(--color-accent);
+  box-shadow: 0 0 8px var(--color-accent);
+  animation: led-blink 2s infinite alternate;
 }
 
 .badgeCross {
   background: rgba(239, 68, 68, 0.04);
   border-color: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
+  color: #ff4757;
 }
 
 .badgeCross .badgeLed {
-  background: #ef4444;
-  box-shadow: 0 0 6px #ef4444;
+  background: #ff4757;
+  box-shadow: 0 0 6px #ff4757;
 }
 
 .badgePartial {
   background: rgba(245, 158, 11, 0.04);
-  border-color: rgba(245, 158, 11, 0.12);
-  color: #f59e0b;
+  border-color: rgba(245, 158, 11, 0.15);
+  color: var(--color-amber);
 }
 
 .badgePartial .badgeLed {
-  background: #f59e0b;
-  box-shadow: 0 0 6px #f59e0b;
+  background: var(--color-amber);
+  box-shadow: 0 0 6px var(--color-amber);
 }
 
 .badgeRaw {
@@ -204,11 +390,16 @@
   color: var(--text-muted);
 }
 
+@keyframes led-blink {
+  0%, 100% { opacity: 0.7; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.05); box-shadow: 0 0 10px var(--color-accent); }
+}
+
 /* ============================================================
-   Mobile: card stack — hidden on desktop
+   Mobile: Interactive Console & Cards
    ============================================================ */
 
-.cardStack {
+.mobileConsole {
   display: none;
 }
 
@@ -218,107 +409,194 @@
     padding-block: 4rem;
   }
 
-  /* Hide the table on mobile */
   .tableWrap {
     display: none;
   }
 
-  /* Show the card stack */
-  .cardStack {
-    display: grid;
-    gap: 1rem;
+  .mobileConsole {
+    display: block;
   }
 
-  .card {
+  /* Segmented Competitor Switcher */
+  .tabsHeader {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1.75rem;
+    padding: 1rem;
+    background: rgba(4, 6, 10, 0.45);
+    border: 1px solid var(--border-faint);
+    border-radius: 8px;
+    backdrop-filter: blur(10px);
+  }
+
+  .compareLabel {
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    font-weight: 500;
+  }
+
+  .tabGroup {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    background: rgba(0, 0, 0, 0.35);
+    padding: 4px;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
+  }
+
+  .tabButton {
+    padding: 0.65rem 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-radius: 4px;
+    text-align: center;
+    letter-spacing: 0.05em;
+    transition: all 0.25s var(--ease-out);
+  }
+
+  .tabActive {
+    background: var(--color-accent);
+    color: var(--bg-base);
+    box-shadow: 0 0 15px rgba(0, 245, 160, 0.25);
+    text-shadow: none;
+  }
+
+  /* Capability Cards */
+  .cardStack {
+    display: grid;
+    gap: 1.25rem;
+  }
+
+  .mobileCard {
     padding: 1.25rem;
     border: 1px solid var(--border-faint);
-    border-radius: var(--radius-md);
-    background: rgba(3, 5, 8, 0.68);
-    backdrop-filter: blur(12px);
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    border-radius: 8px;
+    background: rgba(4, 6, 10, 0.55);
+    backdrop-filter: blur(15px);
+    transition: all 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   }
 
   .cardHighlighted {
     border-color: rgba(0, 245, 160, 0.15);
-    background: rgba(0, 245, 160, 0.03);
+    background: linear-gradient(135deg, rgba(0, 245, 160, 0.02) 0%, rgba(4, 6, 10, 0.7) 100%);
+    box-shadow: 
+      0 10px 30px rgba(0, 0, 0, 0.2),
+      inset 0 0 15px rgba(0, 245, 160, 0.015);
   }
 
-  .cardCap {
-    font-family: var(--font-sans);
-    font-size: 0.95rem;
-    font-weight: 500;
-    color: var(--text-primary);
-    margin-bottom: 0.8rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    padding-bottom: 0.5rem;
-  }
-
-  .cardLethon {
+  .cardCapHeader {
     display: flex;
-    justify-content: space-between;
     align-items: center;
     gap: 0.6rem;
-    margin-bottom: 0.8rem;
-    padding: 0.6rem 0.8rem;
-    background: rgba(0, 245, 160, 0.03);
-    border: 1px solid rgba(0, 245, 160, 0.08);
-    border-radius: 8px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    padding-bottom: 0.65rem;
   }
 
-  .cardLethonLabel {
+  .cardCapIndex {
     font-family: var(--font-mono);
-    font-size: 0.68rem;
-    text-transform: uppercase;
-    color: var(--text-muted);
+    font-size: 0.75rem;
+    color: var(--color-accent);
     letter-spacing: 0.05em;
   }
 
-  .cardLethonVal {
-    display: inline-flex;
+  .cardCapTitle {
+    font-family: var(--font-sans);
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #ffffff;
   }
 
-  .cardLethonVal.cardLethonAmber .badge {
+  /* Side-by-Side Comparison Columns */
+  .cardGrid {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 0.75rem;
+  }
+
+  .cardColumnLethon,
+  .cardColumnCompetitor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+
+  .cardColumnLethon {
+    border-right: 1px solid rgba(255, 255, 255, 0.04);
+    padding-right: 0.75rem;
+  }
+
+  .cardColLabel {
+    font-family: var(--font-mono);
+    font-size: 0.58rem;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    letter-spacing: 0.06em;
+  }
+
+  .cardColumnLethon .cardColLabel {
+    color: var(--color-accent);
+    opacity: 0.8;
+  }
+
+  .cardValWrap,
+  .cardCompetitorVal {
+    display: flex;
+    align-items: center;
+    min-height: 26px;
+  }
+
+  .lethonAmberVal .badge {
     color: var(--color-amber);
     border-color: rgba(245, 158, 11, 0.2);
     background: rgba(245, 158, 11, 0.05);
   }
 
-  .cardOthers {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 0.6rem;
-    margin-top: 0.5rem;
+  .lethonAmberVal .badge .badgeLed {
+    background: var(--color-amber);
+    box-shadow: 0 0 6px var(--color-amber);
   }
 
-  .cardOther {
+  /* Technical Details / Accordions */
+  .cardAccordionTip {
     display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--text-muted);
+    gap: 0.5rem;
+    padding: 0.6rem 0.8rem;
     background: rgba(255, 255, 255, 0.015);
-    padding: 0.5rem;
     border: 1px solid rgba(255, 255, 255, 0.03);
     border-radius: 6px;
-    align-items: flex-start;
   }
 
-  .cardOtherLabel {
-    font-size: 0.58rem;
-    text-transform: uppercase;
-    color: var(--text-faint);
-    letter-spacing: 0.05em;
-  }
-
-  .cardTip {
-    margin-top: 0.75rem;
-    padding-top: 0.55rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+  .tipIcon {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
     font-family: var(--font-mono);
-    font-size: 0.72rem;
-    color: rgba(240, 244, 248, 0.42);
-    line-height: 1.45;
+    font-size: 0.58rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .tipText {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    line-height: 1.35;
   }
 }
 
@@ -335,22 +613,26 @@
     margin-bottom: 1.5rem;
   }
 
+  .tableWrap {
+    padding: 1rem 1.25rem;
+  }
+
   .thead th {
-    padding: 0.75rem 0.85rem;
+    padding: 0.85rem 0.75rem;
     font-size: 0.68rem;
   }
 
   .tbody td {
-    padding: 0.6rem 0.85rem;
+    padding: 0.75rem 0.75rem;
     font-size: 0.76rem;
   }
 
   .capCell {
-    font-size: 0.84rem;
+    font-size: 0.86rem;
   }
 
   .badge {
-    padding: 0.18rem 0.45rem;
+    padding: 0.22rem 0.5rem;
     font-size: 0.68rem;
   }
 
@@ -361,20 +643,15 @@
 }
 
 @media (max-width: 480px) {
-  .cardOthers {
+  .cardGrid {
     grid-template-columns: 1fr;
-    gap: 0.5rem;
+    gap: 0.85rem;
   }
-  
-  .cardOther {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0.75rem;
-    width: 100%;
-  }
-  
-  .cardOtherLabel {
-    margin-bottom: 0;
+
+  .cardColumnLethon {
+    border-right: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    padding-right: 0;
+    padding-bottom: 0.75rem;
   }
 }
