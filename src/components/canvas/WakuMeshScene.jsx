@@ -85,6 +85,7 @@ export default function WakuMeshScene() {
   const pointsMaterialRef = useRef();
   const lineMaterialRef = useRef();
   const speedMultiplierRef = useRef(1.0);
+  const scrollYRef = useRef(0);
   
   const { size, viewport } = useThree();
 
@@ -95,9 +96,9 @@ export default function WakuMeshScene() {
     const positions = new Float32Array(nodeCount * 3);
     const velocities = [];
     
-    // Distribute uniformly across the current viewport boundaries
-    const spreadX = viewport.width + 100;
-    const spreadY = viewport.height + 100;
+    // Use fixed reference spread bounds to stabilize nodes and connections on mount
+    const spreadX = 1600;
+    const spreadY = 1200;
     
     for(let i=0; i<nodeCount; i++) {
       positions[i*3] = (seededRandom(i + 1) - 0.5) * spreadX;
@@ -112,7 +113,7 @@ export default function WakuMeshScene() {
     }
     
     return { positions, velocities };
-  }, [nodeCount, viewport.width, viewport.height]);
+  }, [nodeCount]);
 
   // For lines (we'll generate them dynamically based on distance)
   const maxLines = nodeCount * 4;
@@ -244,14 +245,16 @@ export default function WakuMeshScene() {
     // Safeguard: Ensure the buffer size matches the current nodeCount before updating
     if (posAttr.count !== nodeCount) return;
 
-    const scrollY = window.scrollY;
-    groupRef.current.position.y = scrollY * 0.24;
+    // Smoothly lerp scroll translation to prevent jumps
+    const targetScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+    scrollYRef.current = THREE.MathUtils.lerp(scrollYRef.current, targetScrollY, 0.05);
+    groupRef.current.position.y = scrollYRef.current * 0.24;
 
     // Read active section & step from document
     const activeSection = (typeof document !== 'undefined' && document.documentElement.dataset.activeSection) || 'hero';
     const activeArchStep = (typeof document !== 'undefined' && document.documentElement.dataset.activeArchStep) || '0';
 
-    // Interpolate drift speed multiplier
+    // Interpolate drift speed multiplier (slower lerp at 0.02)
     let targetSpeed = 1.0;
     if (activeSection === 'statement' || activeSection === 'compare') {
       targetSpeed = 0.25;
@@ -260,7 +263,7 @@ export default function WakuMeshScene() {
     } else if (activeSection === 'metadata') {
       targetSpeed = 1.5;
     }
-    speedMultiplierRef.current = THREE.MathUtils.lerp(speedMultiplierRef.current, targetSpeed, 0.04);
+    speedMultiplierRef.current = THREE.MathUtils.lerp(speedMultiplierRef.current, targetSpeed, 0.02);
 
     // Viewport-aware wrapping limits (plus padding)
     const boundaryX = viewport.width / 2 + 50;
@@ -280,23 +283,23 @@ export default function WakuMeshScene() {
     }
     posAttr.needsUpdate = true;
 
-    // Interpolate colors based on section themes
+    // Interpolate colors based on section themes (slower lerp at 0.02)
     const { main, core, lineBase } = getThemeColors(activeSection, activeArchStep);
     
     const targetMainColor = new THREE.Color(main);
     const targetCoreColor = new THREE.Color(core);
     const targetLineBaseColor = new THREE.Color(lineBase);
 
-    // Update Shader Material Time & Color Uniforms
+    // Update Shader Material Time & Color Uniforms (lerped at 0.02)
     if (pointsMaterialRef.current) {
       pointsMaterialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
-      pointsMaterialRef.current.uniforms.uColor.value.lerp(targetMainColor, 0.04);
-      pointsMaterialRef.current.uniforms.uCoreColor.value.lerp(targetCoreColor, 0.04);
+      pointsMaterialRef.current.uniforms.uColor.value.lerp(targetMainColor, 0.02);
+      pointsMaterialRef.current.uniforms.uCoreColor.value.lerp(targetCoreColor, 0.02);
     }
     if (lineMaterialRef.current) {
       lineMaterialRef.current.uniforms.uTime.value = state.clock.elapsedTime;
-      lineMaterialRef.current.uniforms.uBaseColor.value.lerp(targetLineBaseColor, 0.04);
-      lineMaterialRef.current.uniforms.uActiveColor.value.lerp(targetMainColor, 0.04);
+      lineMaterialRef.current.uniforms.uBaseColor.value.lerp(targetLineBaseColor, 0.02);
+      lineMaterialRef.current.uniforms.uActiveColor.value.lerp(targetMainColor, 0.02);
     }
 
     // Build connections

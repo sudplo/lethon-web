@@ -69,8 +69,8 @@ export default function JourneySection() {
             trigger: sectionRef.current,
             start: 'top top',
             end: '+=400%', // More space for professional feel
-            scrub: 1,
             pin: true,
+            scrub: 1,
             anticipatePin: 1,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
@@ -84,15 +84,22 @@ export default function JourneySection() {
           },
         });
 
+        // 1. Entrance transition
+        tl.fromTo(containerRef.current,
+          { opacity: 0, y: 80, filter: 'blur(10px)' },
+          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 2.0, ease: 'power3.out' },
+          0
+        );
+
         // Initialize cards
         gsap.set(contentRefs.current, { autoAlpha: 0, x: 40, y: 0, scale: 0.9, filter: 'blur(10px)' });
 
-        // Animate the main path line and dot across the whole timeline
-        tl.to(progressLineRef.current, { height: '100%', ease: 'none', duration: NODES.length * 4 }, 0);
-        tl.to(dotRef.current, { top: '100%', ease: 'none', duration: NODES.length * 4 }, 0);
+        // Animate the main path line and dot across the whole timeline (shifted by 2.0s)
+        tl.to(progressLineRef.current, { height: '100%', ease: 'none', duration: NODES.length * 4 }, 2.0);
+        tl.to(dotRef.current, { top: '100%', ease: 'none', duration: NODES.length * 4 }, 2.0);
 
         NODES.forEach((_, i) => {
-          const startTime = i * 4;
+          const startTime = 2.0 + (i * 4);
           const label = `node-${i}`;
           tl.addLabel(label, startTime);
           
@@ -138,6 +145,15 @@ export default function JourneySection() {
             }, `${label}+=2.7`);
           }
         });
+
+        // 2. Exit transition
+        tl.to(containerRef.current, {
+          opacity: 0,
+          y: -80,
+          filter: 'blur(10px)',
+          duration: 2.0,
+          ease: 'power3.in'
+        }, 2.0 + (NODES.length * 4) - 0.5);
       }
     );
   }, { scope: sectionRef });

@@ -76,15 +76,23 @@ export default function SurveillanceStatementSection() {
             trigger: sectionRef.current,
             start: 'top top',
             end: '+=300%',
-            scrub: 1,
             pin: true,
+            scrub: 1,
             anticipatePin: 1,
           },
         });
 
+        // 1. Entrance transition
+        tl.fromTo(containerRef.current,
+          { opacity: 0, y: 40, filter: 'blur(10px)' },
+          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.0, ease: 'power2.out' },
+          0
+        );
+
         lineWords.forEach((words, idx) => {
+          const startTime = 1.0 + (idx * 2.4);
           const label = `line-${idx}`;
-          tl.addLabel(label);
+          tl.addLabel(label, startTime);
 
           // 1. Reveal Group
           tl.to(words, {
@@ -111,6 +119,15 @@ export default function SurveillanceStatementSection() {
             }, `${label}+=1.6`);
           }
         });
+
+        // 2. Exit transition
+        tl.to(containerRef.current, {
+          opacity: 0,
+          y: -40,
+          filter: 'blur(10px)',
+          duration: 1.2,
+          ease: 'power2.in'
+        }, 1.0 + (lineWords.length * 2.4) - 0.4);
       }
     );
   }, { scope: sectionRef });

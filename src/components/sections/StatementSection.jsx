@@ -82,16 +82,24 @@ export default function StatementSection() {
           return;
         }
 
+        const block = sectionRef.current.querySelector(`.${styles.block}`);
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
             start: 'top top',
             end: '+=150%',
-            scrub: 1,
             pin: true,
+            scrub: 1,
             anticipatePin: 1,
           },
         });
+
+        // 1. Entrance transition
+        tl.fromTo(block, 
+          { opacity: 0, y: 40, filter: 'blur(10px)' },
+          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.0, ease: 'power2.out' },
+          0
+        );
 
         // Dynamic soft focus effect
         allWords.forEach((word, i) => {
@@ -102,14 +110,14 @@ export default function StatementSection() {
             color: '#fff',
             duration: 0.6,
             ease: 'power2.out'
-          }, i * 0.18)
+          }, 1.0 + i * 0.18)
           .to(word, {
             opacity: 0.35,
             filter: 'blur(3.5px)',
             scale: 0.98,
             duration: 0.6,
             ease: 'power2.inOut'
-          }, (i * 0.18) + 0.6);
+          }, 1.0 + (i * 0.18) + 0.6);
         });
 
         tl.to(subRef.current, {
@@ -118,6 +126,15 @@ export default function StatementSection() {
           duration: 0.8,
           ease: 'power3.out'
         }, '>-=0.3');
+
+        // 2. Exit transition
+        tl.to(block, {
+          opacity: 0,
+          y: -40,
+          filter: 'blur(10px)',
+          duration: 1.0,
+          ease: 'power2.in'
+        }, '+=1.0');
       }
     );
   }, { scope: sectionRef });

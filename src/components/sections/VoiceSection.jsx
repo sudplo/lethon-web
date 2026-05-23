@@ -89,7 +89,7 @@ export default function VoiceSection() {
     const mm = gsap.matchMedia();
 
     // Initial states for refined entrance
-    gsap.set(closingRef.current, { autoAlpha: 0, y: 40, filter: 'blur(12px)' });
+    gsap.set(closingRef.current, { autoAlpha: 0, y: 150, filter: 'blur(12px)' });
     gsap.set(cardRef.current, { autoAlpha: 0, y: 60, scale: 0.98, boxShadow: '0 0 0 rgba(0,245,160,0)' });
 
     mm.add(
@@ -107,38 +107,32 @@ export default function VoiceSection() {
         }
 
         if (isDesktopTall) {
-          // Entrance animation
-          const entranceTl = gsap.timeline({
-            scrollTrigger: {
-              trigger: cardRef.current,
-              start: 'top 85%',
-            }
-          });
-
-          entranceTl.to(cardRef.current, {
-            autoAlpha: 1,
-            y: 0,
-            scale: 1,
-            duration: 1.4,
-            ease: 'expo.out',
-          });
-
-          // Main scrub timeline
+          // Main scrub timeline (increased scroll area to end: '+=200%' for a more comfortable scrolling length)
           const tl = gsap.timeline({
             scrollTrigger: {
               trigger: sectionRef.current,
               start: 'top top',
-              end: '+=100%',
-              scrub: 1,
+              end: '+=200%',
               pin: true,
+              scrub: 1,
               anticipatePin: 1,
             },
           });
           timelineRef.current = tl;
 
+          // 1. Entrance transition
+          tl.fromTo(containerRef.current,
+            { opacity: 0, y: 80, filter: 'blur(10px)' },
+            { opacity: 1, y: 0, filter: 'blur(0px)', duration: 2, ease: 'power3.out' },
+            0
+          );
+          
+          gsap.set(cardRef.current, { autoAlpha: 1, y: 0, scale: 1 });
+
+          // Voice stages (duration 8, runs from 2 to 10)
           tl.to(stageRef.current, {
             val: 5,
-            duration: 10,
+            duration: 8,
             ease: 'none',
             onUpdate: () => {
               const raw = stageRef.current.val;
@@ -150,15 +144,33 @@ export default function VoiceSection() {
                 triggerVisualTransition(rounded);
               }
             },
-          });
+          }, 2);
 
+          // Shift card and header upwards to make room for closing text (runs from 10 to 13)
+          tl.to([q('header'), cardRef.current], {
+            y: -250,
+            autoAlpha: 0.15,
+            duration: 3,
+            ease: 'power2.inOut'
+          }, 10);
+
+          // Simultaneously slide the closing text up from below into the center (runs from 10 to 13)
           tl.to(closingRef.current, {
             autoAlpha: 1,
-            y: 0,
+            y: -250, // moves text up to occupy the center space vacated by the card
             filter: 'blur(0px)',
+            duration: 3,
+            ease: 'power2.out',
+          }, 10);
+
+          // Exit transition of the entire container fading out together (starts at 15 after a persistence hold, runs to 17)
+          tl.to(containerRef.current, {
+            opacity: 0,
+            y: -330,
+            filter: 'blur(10px)',
             duration: 2,
-            ease: 'power4.out',
-          }, '+=1');
+            ease: 'power3.in'
+          }, 15);
         } else if (isDesktopShort) {
           // Desktop Short (e.g. laptop): One-shot entrance, then auto-plays the stages 0-5 as a demo
           const tl = gsap.timeline({

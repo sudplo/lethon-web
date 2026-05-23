@@ -38,6 +38,7 @@ const ITEMS = [
 export default function MetadataSection() {
   const sectionRef = useRef(null);
   const rowRefs = useRef([]);
+  const containerRef = useRef(null);
   
   useGSAP(() => {
     const mm = gsap.matchMedia();
@@ -86,6 +87,13 @@ export default function MetadataSection() {
               invalidateOnRefresh: true,
             },
           });
+
+          // 1. Entrance transition
+          tl.fromTo(containerRef.current,
+            { opacity: 0, y: 50, filter: 'blur(10px)' },
+            { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.0, ease: 'power2.out' },
+            0
+          );
 
           // Initialize states
           rowRefs.current.forEach((row, i) => {
@@ -159,6 +167,15 @@ export default function MetadataSection() {
               .to(desc, { opacity: 0.55, duration: 0.8, ease: 'power2.inOut' }, `${label}+=3.4`);
             }
           });
+
+          // 2. Exit transition
+          tl.to(containerRef.current, {
+            opacity: 0,
+            y: -50,
+            filter: 'blur(10px)',
+            duration: 1.2,
+            ease: 'power2.in'
+          }, `row-${ITEMS.length - 1}+=3.8`);
         } else if (isDesktopShort) {
           // Desktop Short: Flow layout with scroll-triggered redactions playing once
           rowRefs.current.forEach((row, i) => {
@@ -212,7 +229,7 @@ export default function MetadataSection() {
 
   return (
     <section ref={sectionRef} className={styles.section} id="metadata" data-scroll-section>
-      <div className="container">
+      <div className="container" ref={containerRef}>
         <header className={styles.header}>
           <div className={styles.tag}>METADATA OBFUSCATION</div>
           <h2 className={styles.headline}>

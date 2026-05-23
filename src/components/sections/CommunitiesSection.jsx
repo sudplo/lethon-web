@@ -11,6 +11,7 @@ gsap.registerPlugin(ScrollTrigger, useGSAP);
 export default function CommunitiesSection() {
   const sectionRef = useRef(null);
   const headlineRef = useRef(null);
+  const containerRef = useRef(null);
   
   // Centralized column refs
   const centralServerRef = useRef(null);
@@ -202,6 +203,13 @@ export default function CommunitiesSection() {
             }
           });
 
+          // 1. Entrance transition
+          tlTall.fromTo(containerRef.current,
+            { opacity: 0, y: 80, filter: 'blur(10px)' },
+            { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.5, ease: 'power3.out' },
+            0
+          );
+
           tlTall
             // Step 1: Scrub title text reveal
             .to(headlineWords, {
@@ -211,7 +219,7 @@ export default function CommunitiesSection() {
               stagger: 0.04,
               duration: 1.0,
               ease: 'power2.out'
-            })
+            }, 1.0)
             // Step 2: Build Centralized Standard diagram
             .to(centralClientRef.current, { 
               scale: 1, autoAlpha: 1, filter: 'blur(0px)', duration: 0.8, ease: 'back.out(1.2)' 
@@ -242,6 +250,15 @@ export default function CommunitiesSection() {
               scale: 1, autoAlpha: 1, duration: 0.9, ease: 'back.out(1.4)' 
             }, '-=0.2');
 
+          // 2. Exit transition
+          tlTall.to(containerRef.current, {
+            opacity: 0,
+            y: -80,
+            filter: 'blur(10px)',
+            duration: 1.5,
+            ease: 'power3.in'
+          }, '+=1.0');
+
           // Persistence delay at the end
           tlTall.to({}, { duration: 0.5 });
         }
@@ -251,7 +268,7 @@ export default function CommunitiesSection() {
 
   return (
     <section ref={sectionRef} className={styles.section} id="communities" data-scroll-section>
-      <div className="container">
+      <div className="container" ref={containerRef}>
         
         {/* Header Section */}
         <header className={styles.header}>

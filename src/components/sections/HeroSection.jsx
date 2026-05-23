@@ -4,10 +4,11 @@ import { useRef, useEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { TextPlugin } from 'gsap/TextPlugin';
+import { ScrollSmoother } from 'gsap/ScrollSmoother';
 import { useGSAP } from '@gsap/react';
 import styles from './HeroSection.module.css';
 
-gsap.registerPlugin(ScrollTrigger, TextPlugin, useGSAP);
+gsap.registerPlugin(ScrollTrigger, TextPlugin, ScrollSmoother, useGSAP);
 
 export default function HeroSection() {
   const sectionRef = useRef(null);
@@ -24,6 +25,20 @@ export default function HeroSection() {
     const nav = document.querySelector('header');
     const canvas = document.getElementById('canvas-container');
     const mm = gsap.matchMedia();
+
+    // Pause scrolling immediately to ensure the user cannot scroll during the intro
+    const lockScroll = () => {
+      const smoother = ScrollSmoother.get();
+      if (smoother) {
+        smoother.paused(true);
+      } else {
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
+      }
+    };
+
+    lockScroll();
+    const lockTimer = setTimeout(lockScroll, 50);
 
     // ── 1. INITIAL STATES ──
     gsap.set([nav, canvas], { autoAlpha: 0 });
@@ -74,7 +89,17 @@ export default function HeroSection() {
       }, '-=1')
       .to(ctasRef.current, { autoAlpha: 1, y: 0, duration: 1, ease: 'power3.out' }, '-=0.8')
       .to(scrollHintRef.current, { autoAlpha: 1, y: 0, duration: 1.2, ease: 'back.out(1.7)' }, '-=0.6')
-      .to(nav, { autoAlpha: 1, duration: 1 }, '-=1');
+      .to(nav, { autoAlpha: 1, duration: 1 }, '-=1')
+      .add(() => {
+        // Unpause scrolling when the intro ends (header revealed)
+        clearTimeout(lockTimer);
+        const smoother = ScrollSmoother.get();
+        if (smoother) {
+          smoother.paused(false);
+        }
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
+      });
 
     // ── 3. MOUSE PARALLAX & GRID ANIMATION ──
     const onMouseMove = contextSafe((e) => {
@@ -134,9 +159,17 @@ export default function HeroSection() {
     });
 
     return () => {
+      clearTimeout(lockTimer);
       if (hasFinePointer) {
         window.removeEventListener('mousemove', onMouseMove);
       }
+      // Ensure we restore scrolling if component unmounts mid-intro
+      const smoother = ScrollSmoother.get();
+      if (smoother) {
+        smoother.paused(false);
+      }
+      document.documentElement.style.overflow = '';
+      document.body.style.overflow = '';
     };
   }, { scope: sectionRef });
 

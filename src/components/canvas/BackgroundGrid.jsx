@@ -144,19 +144,19 @@ export default function BackgroundGrid() {
       }
 
       const targetColor = new THREE.Color(targetColorStr);
-      materialRef.current.uniforms.uColor.value.lerp(targetColor, 0.04);
+      materialRef.current.uniforms.uColor.value.lerp(targetColor, 0.02);
       
       materialRef.current.uniforms.uBaseOpacity.value = THREE.MathUtils.lerp(
         materialRef.current.uniforms.uBaseOpacity.value,
         targetOpacity,
-        0.04
+        0.02
       );
 
       const targetMaxDist = viewport.height * 0.15 * targetMaxDistMult;
       materialRef.current.uniforms.uMaxDist.value = THREE.MathUtils.lerp(
         materialRef.current.uniforms.uMaxDist.value,
         targetMaxDist,
-        0.04
+        0.02
       );
     }
   });

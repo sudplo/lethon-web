@@ -208,6 +208,13 @@ export default function ArchitectureSection() {
           },
         });
 
+        // 1. Entrance transition
+        mainTimeline.fromTo(containerRef.current,
+          { autoAlpha: 0, y: 80, filter: 'blur(15px)' },
+          { autoAlpha: 1, y: 0, filter: 'blur(0px)', duration: 1.5, ease: 'power3.out' },
+          0
+        );
+
         LAYERS.forEach((_, i) => {
           const card = cardRefs.current[i];
           const bar = barRefs.current[i];

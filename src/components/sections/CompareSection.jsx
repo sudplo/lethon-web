@@ -85,6 +85,7 @@ export default function CompareSection() {
   const lethonRefs = useRef([]);
   const scanlineRef = useRef(null);
   const tableRef = useRef(null);
+  const containerRef = useRef(null);
   
   const [systemStatus, setSystemStatus] = useState('STANDBY');
   const [activeTab, setActiveTab] = useState('briar'); // 'briar' | 'signal' | 'wa'
@@ -158,18 +159,25 @@ export default function CompareSection() {
             },
           });
 
+          // 1. Entrance transition
+          tl.fromTo(containerRef.current,
+            { opacity: 0, y: 80, filter: 'blur(10px)' },
+            { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.5, ease: 'power3.out' },
+            0
+          );
+
           // System status state bindings in ScrollTrigger
           tl.to({}, {
             onStart: () => setSystemStatus('SCANNING_CAPABILITIES'),
             onReverseComplete: () => setSystemStatus('STANDBY'),
             duration: 0.1
-          }, 0);
+          }, 1.5);
 
           // Laser scan line sweep (linear movement across 4.0 seconds)
           tl.fromTo(scanlineRef.current, 
             { top: '0%', autoAlpha: 0 },
             { top: '100%', autoAlpha: 1, duration: 4.0, ease: 'none' },
-            0
+            1.5
           );
 
           // Synchronize each row reveal at the exact moment the scanline passes it
@@ -184,7 +192,7 @@ export default function CompareSection() {
               filter: 'blur(0px)',
               duration: 0.35,
               ease: 'power1.out'
-            }, rowTime);
+            }, 1.5 + rowTime);
 
             // Badges inside the row scale up slightly after row begins revealing
             const rowBadges = gsap.utils.toArray(`.${styles.badge}`, row);
@@ -194,7 +202,7 @@ export default function CompareSection() {
               stagger: 0.04,
               duration: 0.25,
               ease: 'back.out(1.4)'
-            }, rowTime + 0.1);
+            }, 1.5 + rowTime + 0.1);
 
             // Lethon cell glow background lights up
             if (lethonRefs.current[i]) {
@@ -202,18 +210,27 @@ export default function CompareSection() {
                 backgroundColor: 'rgba(0, 245, 160, 0.025)',
                 duration: 0.25,
                 ease: 'sine.inOut'
-              }, rowTime + 0.1);
+              }, 1.5 + rowTime + 0.1);
             }
           });
 
           // Fade out the scanline at the bottom
-          tl.to(scanlineRef.current, { autoAlpha: 0, duration: 0.4 }, 3.8);
+          tl.to(scanlineRef.current, { autoAlpha: 0, duration: 0.4 }, 5.3);
           
           tl.to({}, {
             onStart: () => setSystemStatus('SECURED'),
             onReverseComplete: () => setSystemStatus('SCANNING_CAPABILITIES'),
             duration: 0.1
-          }, 3.9);
+          }, 5.4);
+
+          // 2. Exit transition
+          tl.to(containerRef.current, {
+            opacity: 0,
+            y: -80,
+            filter: 'blur(10px)',
+            duration: 1.5,
+            ease: 'power3.in'
+          }, 5.5);
 
         } else if (isDesktopShort) {
           // Compact / Laptop screens: Play standard entry animation once
@@ -280,7 +297,7 @@ export default function CompareSection() {
 
   return (
     <section ref={sectionRef} className={styles.section} id="compare" data-scroll-section>
-      <div className="container">
+      <div className="container" ref={containerRef}>
         
         {/* Header HUD */}
         <div className={styles.header}>

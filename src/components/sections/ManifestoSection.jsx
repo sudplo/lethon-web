@@ -36,6 +36,7 @@ export default function ManifestoSection() {
   const phraseRefs = useRef([]);
   const ctasRef = useRef(null);
   const dividerRef = useRef(null);
+  const innerRef = useRef(null);
 
   useGSAP(() => {
     const q = gsap.utils.selector(sectionRef);
@@ -106,9 +107,16 @@ export default function ManifestoSection() {
           },
         });
 
+        // 1. Entrance transition
+        tl.fromTo(innerRef.current,
+          { opacity: 0, y: 80, filter: 'blur(10px)' },
+          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 2.0, ease: 'power3.out' },
+          0
+        );
+
         PHRASES.forEach((phrase, idx) => {
           const spans = allSpans[idx];
-          const startTime = idx * 3;
+          const startTime = 2.0 + (idx * 3);
 
           tl.addLabel(`phrase-${idx}`, startTime);
 
@@ -155,7 +163,7 @@ export default function ManifestoSection() {
 
   return (
     <section ref={sectionRef} className={styles.section} id="manifesto" data-scroll-section>
-      <div className={`container ${styles.inner}`}>
+      <div className={`container ${styles.inner}`} ref={innerRef}>
 
         <div className={styles.stack}>
           {PHRASES.map((ph, i) => (
