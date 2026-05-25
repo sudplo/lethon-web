@@ -35,7 +35,14 @@ export default function StatementSection() {
     const w2 = buildWords(line2Ref.current, ['what', 'it', 'doesn\'t', 'understand.']);
     const allWords = [...w1, ...w2];
     
-    gsap.set(allWords, { opacity: 0.15, filter: 'blur(5px)', scale: 0.98 });
+    // Set default hidden 3D state on mount to prevent layout flash
+    gsap.set(allWords, { 
+      autoAlpha: 0, 
+      y: 40, 
+      rotateX: -60, 
+      filter: 'blur(10px)',
+      transformOrigin: '50% 100%'
+    });
     gsap.set(subRef.current, { autoAlpha: 0, y: 15 });
 
     const mm = gsap.matchMedia();
@@ -49,92 +56,102 @@ export default function StatementSection() {
         const { isDesktop } = context.conditions;
 
         if (!isDesktop) {
-          gsap.fromTo(allWords, 
-            { opacity: 0.15, filter: 'blur(4px)', scale: 0.98 },
-            {
-              opacity: 1,
-              filter: 'blur(0px)',
-              scale: 1,
-              stagger: 0.06,
-              duration: 1.0,
-              ease: 'power2.out',
-              scrollTrigger: {
-                trigger: sectionRef.current,
-                start: 'top 80%',
-                toggleActions: 'play none none none',
-              }
+          gsap.set(allWords, { autoAlpha: 0, y: 30, rotateX: -45, filter: 'blur(5px)' });
+          gsap.set(subRef.current, { autoAlpha: 0, y: 15 });
+          
+          const tlMob = gsap.timeline({
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: 'top 75%',
+              toggleActions: 'play none none none',
             }
-          );
-          gsap.fromTo(subRef.current,
-            { autoAlpha: 0, y: 10 },
-            {
-              autoAlpha: 1,
-              y: 0,
-              duration: 0.8,
-              ease: 'power2.out',
-              scrollTrigger: {
-                trigger: subRef.current,
-                start: 'top 85%',
-                toggleActions: 'play none none none',
-              }
-            }
-          );
+          });
+          
+          tlMob.to(allWords, {
+            autoAlpha: 1,
+            y: 0,
+            rotateX: 0,
+            filter: 'blur(0px)',
+            stagger: 0.04,
+            duration: 0.9,
+            ease: 'expo.out'
+          });
+          
+          tlMob.to(subRef.current, {
+            autoAlpha: 1,
+            y: 0,
+            duration: 0.8,
+            ease: 'power2.out'
+          }, '-=0.3');
           return;
         }
 
         const block = sectionRef.current.querySelector(`.${styles.block}`);
+        
+        // Initial setup for desktop
+        gsap.set(allWords, { 
+          autoAlpha: 0, 
+          y: 45, 
+          rotateX: -60, 
+          filter: 'blur(10px)'
+        });
+        gsap.set(subRef.current, { 
+          autoAlpha: 0, 
+          y: 20,
+          '--line-scale': 0
+        });
+
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: sectionRef.current,
             start: 'top top',
-            end: '+=150%',
+            end: '+=240%',
             pin: true,
-            scrub: 1,
+            scrub: 1.8,
             anticipatePin: 1,
           },
         });
 
-        // 1. Entrance transition
+        // 1. Subtle entrance shift on the block container (kept fully visible to avoid flash)
         tl.fromTo(block, 
-          { opacity: 0, y: 40, filter: 'blur(10px)' },
-          { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.0, ease: 'power2.out' },
+          { scale: 0.97, rotateX: -4 },
+          { scale: 1, rotateX: 0, duration: 0.6, ease: 'power2.out' },
           0
         );
 
-        // Dynamic soft focus effect
-        allWords.forEach((word, i) => {
-          tl.to(word, {
-            opacity: 1,
-            filter: 'blur(0px)',
-            scale: 1,
-            color: '#fff',
-            duration: 0.6,
-            ease: 'power2.out'
-          }, 1.0 + i * 0.18)
-          .to(word, {
-            opacity: 0.35,
-            filter: 'blur(3.5px)',
-            scale: 0.98,
-            duration: 0.6,
-            ease: 'power2.inOut'
-          }, 1.0 + (i * 0.18) + 0.6);
-        });
+        // 2. 3D Unfolding Stagger Reveal
+        tl.to(allWords, {
+          autoAlpha: 1,
+          y: 0,
+          rotateX: 0,
+          filter: 'blur(0px)',
+          duration: 1.0,
+          stagger: 0.06,
+          ease: 'expo.out',
+        }, 0.2);
 
+        // 3. Subtext Reveal (triggers just as the text finishes revealing)
         tl.to(subRef.current, {
           autoAlpha: 1,
           y: 0,
+          '--line-scale': 1,
           duration: 0.8,
-          ease: 'power3.out'
-        }, '>-=0.3');
+          ease: 'power2.out'
+        }, 0.8);
 
-        // 2. Exit transition
+        // 4. Hold state for reading (occupies the main scroll portion)
+        tl.to({}, { duration: 3.0 });
+
+        // 5. 3D Dissolve Exit
         tl.to(block, {
           opacity: 0,
-          y: -40,
-          filter: 'blur(10px)',
+          y: -80,
+          scale: 1.04,
+          rotateX: 12,
+          filter: 'blur(15px)',
           duration: 1.0,
-          ease: 'power2.in'
-        }, '+=1.0');
+          ease: 'power2.inOut'
+        });
       }
     );
   }, { scope: sectionRef });

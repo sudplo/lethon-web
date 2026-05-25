@@ -11,6 +11,8 @@
 .block {
   max-width: 1200px;
   width: 100%;
+  perspective: 1200px;
+  transform-style: preserve-3d;
 }
 
 .line1,
@@ -24,6 +26,7 @@
   line-height: 1;
   letter-spacing: -0.02em;
   text-wrap: balance;
+  transform-style: preserve-3d;
 }
 
 .line1 {
@@ -54,18 +57,21 @@
   height: 1px;
   background: var(--color-accent);
   display: inline-block;
+  transform: scaleX(var(--line-scale, 1));
+  transform-origin: left;
+  will-change: transform;
 }
 
 .wordWrap {
   display: inline-flex;
   vertical-align: top;
   overflow: visible;
-  padding-bottom: 0.06em;
 }
 
 .wordInner {
   display: inline-block;
   will-change: transform, opacity, filter;
+  transform-origin: 50% 100%;
 }
 
 @media (max-width: 760px) {

@@ -5,7 +5,18 @@
   background-color: var(--bg-base);
   position: relative;
   overflow: hidden;
-  background: radial-gradient(circle at 50% 50%, rgba(0, 245, 160, 0.02) 0%, transparent 70%);
+}
+
+.bgGlow {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(0, 245, 160, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+  will-change: transform, opacity;
 }
 
 .inner {
@@ -14,6 +25,10 @@
   gap: 0;
   max-width: 1200px;
   width: 100%;
+  position: relative;
+  z-index: 2;
+  perspective: 1200px;
+  transform-style: preserve-3d;
 }
 
 .lineWrap {
@@ -30,6 +45,7 @@
   line-height: 1.05;
   letter-spacing: -0.03em;
   margin: 0;
+  transform-style: preserve-3d;
 }
 
 .line1 {
@@ -46,8 +62,20 @@
   flex-direction: column;
   gap: 0.5rem;
   padding-left: clamp(2rem, 5vw, 5rem);
-  border-left: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
   margin-top: clamp(2rem, 5vw, 4rem);
+  transform-style: preserve-3d;
+}
+
+.borderLine {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.15);
+  transform-origin: top;
+  will-change: transform;
 }
 
 .lineWrapSmall {
@@ -75,12 +103,13 @@
 .wordWrap {
   display: inline-flex;
   vertical-align: top;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .wordInner {
   display: inline-block;
-  will-change: transform;
+  will-change: transform, opacity, filter;
+  transform-origin: 50% 100%;
 }
 
 @media (max-width: 760px) {
