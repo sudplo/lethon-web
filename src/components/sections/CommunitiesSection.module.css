@@ -465,7 +465,7 @@
   }
 }
 
-@media (max-height: 800px) and (min-width: 901px) {
+@media (max-height: 950px) and (min-width: 901px) {
   .section {
     padding-block: clamp(3rem, 6vh, 4rem);
     min-height: auto;

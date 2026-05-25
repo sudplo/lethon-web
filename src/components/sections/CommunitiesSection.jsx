@@ -87,8 +87,8 @@ export default function CommunitiesSection() {
     // ── 3. LAYOUT SPECIFIC RESPONSIVE ANIMATIONS ──
     mm.add(
       {
-        isDesktopTall: '(min-width: 901px) and (min-height: 801px)',
-        isDesktopShort: '(min-width: 901px) and (max-height: 800px)',
+        isDesktopTall: '(min-width: 901px) and (min-height: 951px)',
+        isDesktopShort: '(min-width: 901px) and (max-height: 950px)',
         isMobile: '(max-width: 900px)',
         reduceMotion: '(prefers-reduced-motion: reduce)',
       },
