@@ -1,0 +1,39 @@
+.scene { background: var(--ink); }
+.stage { padding-block: calc(var(--header-h) + 28px) 56px; display: flex; flex-direction: column; justify-content: center; }
+:global(.scene.is-pinned) .stage { height: 100svh; min-height: 0; padding-block: calc(var(--header-h) + 8px) 16px; overflow: clip; }
+.grid { display: grid; gap: clamp(16px, 3svh, 28px); }
+.title { font-size: clamp(1.75rem, 6vw + 0.4rem, 3.4rem); line-height: 1.06; }
+.sub { margin-top: 12px; color: var(--muted); font-size: clamp(0.95rem, 1vw + 0.7rem, 1.15rem); max-width: 34ch; }
+.panel { position: relative; max-width: 34rem; width: 100%; }
+.bubbleRow { display: flex; justify-content: flex-end; margin-bottom: clamp(14px, 3svh, 24px); }
+.bubble {
+  display: grid; gap: 4px; max-width: 86%;
+  background: var(--jade); color: var(--jade-ink);
+  padding: 12px 16px 10px; border-radius: 20px 20px 6px 20px;
+  box-shadow: 0 10px 36px rgba(56, 214, 192, 0.22);
+}
+.msg { font-family: var(--display); font-weight: 700; font-size: clamp(1.25rem, 3vw + 0.6rem, 1.7rem); letter-spacing: -0.01em; line-height: 1.15; }
+.enc { display: inline-flex; align-items: center; gap: 6px; font-size: 0.74rem; font-weight: 600; opacity: 0.85; }
+.rowsWrap { position: relative; }
+.rows { position: relative; display: grid; gap: 0; padding-left: 4px; }
+.thread { position: absolute; left: 10px; top: 18px; bottom: 18px; width: 1px; background: linear-gradient(var(--line), var(--text)); opacity: 0.5; }
+.row {
+  position: relative; display: grid; grid-template-columns: 14px minmax(6.4rem, 0.4fr) 1fr; align-items: center; gap: 12px;
+  padding: clamp(8px, 1.6svh, 12px) 0;
+  border-bottom: 1px solid var(--line);
+}
+.row:last-child { border-bottom: 0; }
+.lamp { width: 12px; height: 12px; border-radius: 50%; background: var(--text); box-shadow: 0 0 12px 2px rgba(233, 237, 242, 0.45); justify-self: center; }
+.k { font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.v { font-weight: 600; font-size: clamp(0.95rem, 1vw + 0.7rem, 1.1rem); color: var(--text); overflow-wrap: anywhere; }
+.example { margin-top: 10px; font-size: 0.78rem; color: var(--muted); padding-left: 30px; }
+@media (max-width: 420px) {
+  .row { grid-template-columns: 14px 1fr; row-gap: 0; }
+  .k { grid-column: 2; }
+  .v { grid-column: 2; }
+  .lamp { grid-row: 1 / span 2; }
+}
+@media (min-width: 900px) {
+  .grid { grid-template-columns: 1fr 1fr; align-items: center; column-gap: 6vw; }
+  .panel { justify-self: end; }
+}

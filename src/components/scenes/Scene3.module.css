@@ -1,0 +1,13 @@
+.scene { background: #06080b; }
+.stage { padding-block: 96px; display: grid; align-items: center; position: relative; overflow: clip; }
+:global(.scene.is-pinned) .stage { height: 100svh; min-height: 0; padding-block: calc(var(--header-h) + 8px) 24px; }
+.lights { position: absolute; inset: 0; background: radial-gradient(70% 50% at 50% 40%, rgba(56, 214, 192, 0.16), transparent 70%), var(--ink); }
+.black { position: absolute; inset: 0; background: #06080b; opacity: 0; }
+.copy { position: relative; display: grid; justify-items: center; text-align: center; gap: 22px; }
+.signal { display: grid; justify-items: center; gap: 12px; }
+.chip {
+  font-family: var(--mono); font-size: 0.74rem; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #ffb3b3; border: 1px solid #5c2222; background: #2a1414; padding: 6px 12px; border-radius: 999px;
+}
+.title { font-size: clamp(2rem, 7vw + 0.4rem, 5rem); line-height: 1.04; max-width: 16ch; }
+.sub { color: var(--muted); font-size: clamp(1rem, 1vw + 0.7rem, 1.25rem); }

@@ -18,10 +18,10 @@ export default function Scene0() {
         gsap.to('[data-w]', { opacity: 1, y: 0, duration: 1.1, ease: 'power3.out', stagger: 0.07, delay: 0.5 });
         gsap.to('[data-cue]', { opacity: 1, duration: 1.2, delay: 2.2 });
         const tl = gsap.timeline({
-          scrollTrigger: { trigger: root.current, start: 'top top', end: '+=65%', scrub: true, pin: true },
+          scrollTrigger: { trigger: root.current, start: 'top top', end: '+=40%', scrub: true, pin: true },
         });
         tl.to('[data-cue]', { opacity: 0, duration: 0.2 }, 0)
-          .to('[data-title]', { opacity: 0, y: -50, duration: 0.5, ease: 'none' }, 0.5);
+          .to('[data-title]', { opacity: 0, y: -50, duration: 0.4, ease: 'none' }, 0.6);
         return () => root.current && root.current.classList.remove('is-pinned');
       });
       if (!window.matchMedia(FULL_MOTION).matches) html.classList.remove('motion');
