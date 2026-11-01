@@ -1,0 +1,183 @@
+// All site copy, in English. Same structure as es.js.
+// Golden rule: every sentence comes from the app's COMO-FUNCIONA.md.
+const en = {
+  lang: 'en',
+  meta: {
+    title: 'Lethon · Private messaging for Android',
+    description:
+      'Lethon is a private messaging app for Android. Chat over the internet without leaving a trail and, if the network goes down, keep talking phone to phone.',
+  },
+  ui: {
+    skip: 'Skip to content',
+    download: 'Download',
+    langLabel: 'Language',
+    langEs: 'Español',
+    langEn: 'English',
+    home: 'Lethon, home',
+    phoneExample: 'Example screen from the app, with made-up data.',
+  },
+  s0: {
+    title: 'Every message you send tells a story. Not always yours.',
+    cue: 'Scroll',
+    cueLabel: 'Keep scrolling to read the story',
+    dotLabel: 'A breathing point of light',
+  },
+  s1: {
+    title: 'The message is encrypted. Everything else is not.',
+    sub: 'In an ordinary messaging app, anyone watching from outside sees this.',
+    bubble: 'Meet at 8?',
+    bubbleMeta: 'End-to-end encrypted',
+    example: 'Example with made-up data.',
+    tags: [
+      { k: 'Who', v: 'Marta R.' },
+      { k: 'To whom', v: 'Dani' },
+      { k: 'At what time', v: '7:42 pm' },
+      { k: 'From where', v: 'IP 85.54.•••.•• · Valencia' },
+      { k: 'How often', v: '34 messages this week' },
+    ],
+  },
+  s2: {
+    title: 'Which one is yours? Not even we know.',
+    sub: 'Lethon switches the lights off, one by one.',
+    off: [
+      'No phone number: just a name and a password.',
+      'Each message goes to a single-use topic. Nobody can follow a conversation.',
+      'Fake bells at all hours: nobody knows when you use your phone.',
+      'Everything leaves through Tor, so nobody sees your IP. And it travels over a distributed network, not a single server.',
+      'Every message is the same size, and cover messages are identical to real ones.',
+    ],
+    crowdLabel: 'Many identical bubbles. None can be told apart from the rest.',
+  },
+  s3: {
+    title: 'What if one day there is no internet?',
+    sub: 'No signal. No data. No network.',
+    signalLabel: 'No connection',
+  },
+  s4: {
+    title: 'No antennas. No internet. Nobody in the middle.',
+    eyebrow: 'Nearby',
+    lead: 'Nearby is Lethon’s other world. Messages hop from phone to phone over Bluetooth and local WiFi, and the phones carrying them cannot read them.',
+    points: [
+      'It works even with the internet side switched off.',
+      'The message is split into packets that hop up to 7 times.',
+      'Nearby never turns itself on. You choose how many hours: 2, 4, 8 or 12.',
+    ],
+    counter: (n) => (n === 1 ? '1 phone carries it' : `${n} phones carry it`),
+    counterNote: 'Illustrative drawing. In the app, the counter is approximate.',
+    plazaLabel:
+      'A square seen from above. Each dot is a phone. A message hops from phone to phone until it arrives.',
+    status: { internet: 'Internet', off: 'off', radios: 'Bluetooth and WiFi', on: 'on' },
+  },
+  s5: {
+    eyebrow: 'Rooms',
+    title: 'A poster. A QR. A room.',
+    lead: 'For anyone coordinating something on the street: announcements for lots of people, with no internet.',
+    points: [
+      'Only organizers write. Every announcement is signed and encrypted.',
+      'Whoever reads is anonymous: no name, no alias.',
+      'The QR carries a pass. A nearby doorkeeper gives you the reading key.',
+      'The QR carries the room’s fingerprint: nobody can slip you into a fake room.',
+      'Changing the QR voids old passes. Those already inside keep reading.',
+    ],
+    posterTitle: 'Join the room',
+    posterSub: 'Scan with Lethon',
+    counter: (n) => `≈ ${n} have joined`,
+    counterNote: 'Approximate counter.',
+    roomLabel: 'Room',
+    sceneLabel:
+      'A poster with a QR code. A few silhouettes scan it and enter the room.',
+  },
+  s6: {
+    eyebrow: 'Why trust us',
+    title: 'We also tell you what we don’t do.',
+    lead: 'A security site that only tells the good news doesn’t deserve your trust.',
+    protects: {
+      title: 'What it protects',
+      items: [
+        'Your message is end-to-end encrypted: only your contact can read it.',
+        'Everything leaves through Tor: nobody sees your IP.',
+        'Each message travels on a single-use topic. Nobody can follow a conversation.',
+        'Messages are padded to a fixed size, and there is cover traffic identical to the real thing.',
+        'Alerts with the app closed don’t say who wrote to you or what. The server only sees that someone rang a bell in a bucket of about 1,000 people.',
+        'Nearby has its own identity, with no link to your internet account. Contacts are added in person, with a signed QR.',
+        'Panic wipes Nearby only, or everything.',
+      ],
+    },
+    doesnt: {
+      title: 'What it doesn’t',
+      items: [
+        'If someone takes your phone while it’s unlocked, the app can’t protect you.',
+        'While Nearby is on, anyone with a Bluetooth or WiFi scanner can see there is a phone with Lethon close by.',
+        'With few people around, Nearby has no network. Over distance, messages arrive when someone walks by, not instantly.',
+        'In a room, you can’t stop someone who already joined from reading: if needed, you create another room.',
+        'Android only. There is no iPhone version.',
+        'There are no calls or file sharing yet.',
+        'Lethon is still being tested. Its logic has about 2,500 automated tests, but it still has to be tried on real phones: Bluetooth, battery and the real network.',
+      ],
+    },
+    openTitle: 'Open source, no accounts',
+    openText:
+      'You can read how it’s built. You don’t sign up to any service: your identity is created on your phone.',
+    openLink: 'See the code on GitHub',
+    compareTitle: 'Two worlds that never mix',
+    compareLead: 'Lethon has two worlds. Each with its own identity, its own database and its own path.',
+    compare: {
+      cols: ['', 'Internet', 'Nearby'],
+      rows: [
+        ['What for', 'Chat with your contacts and communities from anywhere', 'Chat at a protest or a blackout, hopping from phone to phone'],
+        ['How it travels', 'A message network (Waku) through Tor', 'Bluetooth and local WiFi, phone to phone'],
+        ['Your identity', 'Your internet account', 'A separate Nearby profile (“Gaviota-42”), with no link to the other'],
+        ['Alerts with the app closed', 'Yes', 'No: Nearby only works while you have it on'],
+      ],
+    },
+    spy: {
+      title: 'This site doesn’t spy on you either',
+      lead: 'These numbers are not a promise: your browser calculates them, right now, by looking at what this page has loaded.',
+      cookies: 'cookies',
+      analytics: 'analytics',
+      thirdParty: 'requests to other domains',
+      total: (n) => `${n} ${n === 1 ? 'resource loaded' : 'resources loaded'}, all from this same domain.`,
+      totalBad: (n, t) => `${t} of ${n} resources come from another domain.`,
+      measuring: 'Measuring…',
+      storage: 'The only thing we store is your language, in your own browser.',
+    },
+  },
+  s7: {
+    title: 'Lethon, on your phone.',
+    sub: 'Private messaging for Android.',
+    button: 'Download for Android',
+    req: 'Requires Android 7 or later.',
+    where: 'Download it from the releases published on GitHub.',
+    shaLabel: 'APK SHA-256 fingerprint',
+    shaPending: 'PENDING',
+    shaPendingNote: 'It will be published with the first release.',
+    verify: 'How to check it',
+    verifySteps: [
+      'Download the APK from the releases page.',
+      'Calculate its fingerprint on your computer (for example, with “sha256sum lethon.apk” on Linux or macOS).',
+      'Compare it with the one above. If it doesn’t match, don’t install it.',
+    ],
+    monoLabel: 'The Lethon monogram: a lowercase “l” with a light beside it',
+  },
+  s8: {
+    title: 'Join the fleet',
+    lead: 'The fleet is the servers that alert your phone when a message arrives and the app is closed. They don’t know who wrote to you or what, and the one you get changes every day.',
+    node: {
+      title: 'Run a node',
+      text: 'If you have a server, you can start an alert node for the fleet. The documentation is in the app’s repository.',
+      cta: 'Read the documentation',
+    },
+    support: {
+      title: 'Support the project',
+      text: 'Try Lethon, tell us what breaks, improve the code or help more people find it. All the work is open.',
+      cta: 'Go to the project',
+    },
+  },
+  footer: {
+    tagline: 'Private messaging for Android.',
+    code: 'Code',
+    license: 'GPL-3.0 license',
+    noTrack: 'No cookies, no analytics.',
+  },
+};
+export default en;

@@ -1,0 +1,53 @@
+.scene { background: var(--ink); }
+.stage {
+  min-height: 100svh;
+  display: flex; flex-direction: column; justify-content: flex-end;
+  padding-block: calc(var(--header-h) + 24px) clamp(72px, 14svh, 140px);
+  overflow: clip;
+}
+:global(.scene.is-pinned) .stage { height: 100svh; }
+.glow {
+  position: absolute; left: 50%; top: 40svh; width: min(140vw, 1100px); aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(closest-side, rgba(56, 214, 192, 0.1), rgba(56, 214, 192, 0.03) 55%, transparent);
+  pointer-events: none;
+}
+/* El punto estático solo se ve si el hilo animado no está activo. */
+.dotWrap { position: absolute; left: 50%; top: 40svh; width: 0; height: 0; }
+:global(html.has-thread) .dotWrap { visibility: hidden; }
+.dot {
+  position: absolute; left: -6px; top: -6px; width: 12px; height: 12px; border-radius: 50%;
+  background: var(--jade); box-shadow: 0 0 14px 4px rgba(56, 214, 192, 0.55), 0 0 40px 10px rgba(56, 214, 192, 0.22);
+}
+.dot::after {
+  content: ''; position: absolute; inset: -2px; border-radius: 50%; border: 1px solid var(--jade);
+  animation: breathe 4.8s ease-in-out infinite;
+}
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(2.6); opacity: 0; }
+}
+.copy { position: relative; }
+.title {
+  font-size: clamp(2.1rem, 6.4vw + 0.6rem, 5.6rem);
+  line-height: 1.04;
+  max-width: 17ch;
+}
+.w { display: inline-block; white-space: pre; }
+:global(html.motion) .w { opacity: 0; transform: translateY(14px); }
+.cue {
+  position: absolute; left: 50%; bottom: clamp(18px, 4svh, 40px); transform: translateX(-50%);
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  font-family: var(--mono); font-size: 0.7rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted);
+}
+:global(html.motion) .cue { opacity: 0; }
+.cue i { width: 1px; height: 34px; background: linear-gradient(var(--jade), transparent); transform-origin: top; animation: cue 2.4s ease-in-out infinite; }
+@keyframes cue {
+  0% { transform: scaleY(0); opacity: 0; }
+  40% { transform: scaleY(1); opacity: 1; }
+  100% { transform: scaleY(1); opacity: 0; }
+}
+@media (min-width: 900px) {
+  .stage { justify-content: flex-end; }
+  .title { max-width: 18ch; }
+}

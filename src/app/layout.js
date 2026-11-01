@@ -1,74 +1,52 @@
-import "./globals.css";
-import Navigation from "@/components/Navigation";
-import GlobalCanvas from "@/components/canvas/GlobalCanvas";
-import SmoothScroll from "@/components/SmoothScroll";
-import PageChrome from "@/components/PageChrome";
+import './globals.css';
+import es from '@/content/es';
+
+const SITE = 'https://sudplo.github.io/lethon-web/';
 
 export const metadata = {
-  metadataBase: new URL("https://lethon-protocol.dev"),
-  title: "Lethon | Privacy by Architecture",
-  description:
-    "The network carries what it doesn't understand. Privacy by architecture, not by trust.",
-  robots: "index, follow",
-  authors: [{ name: "Lethon Protocol" }],
+  metadataBase: new URL(SITE),
+  title: es.meta.title,
+  description: es.meta.description,
+  applicationName: 'Lethon',
+  authors: [{ name: 'Lethon' }],
+  alternates: { canonical: SITE },
   openGraph: {
-    title: "Lethon | Privacy by Architecture",
-    description:
-      "The network carries what it doesn't understand. Privacy by architecture, not by trust.",
-    url: "https://lethon-protocol.dev",
-    siteName: "Lethon Protocol",
-    images: [{ url: "/og-image.png", width: 1200, height: 630, alt: "Lethon Protocol" }],
-    type: "website",
+    title: es.meta.title,
+    description: es.meta.description,
+    url: SITE,
+    siteName: 'Lethon',
+    type: 'website',
+    locale: 'es_ES',
+    alternateLocale: ['en_US'],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Lethon | Privacy by Architecture",
-    description:
-      "The network carries what it doesn't understand. Privacy by architecture, not by trust.",
-    images: ["/og-image.png"],
+    card: 'summary_large_image',
+    title: es.meta.title,
+    description: es.meta.description,
   },
 };
 
 export const viewport = {
-  width: "device-width",
+  width: 'device-width',
   initialScale: 1,
-  maximumScale: 5,
-  themeColor: "#030508",
+  themeColor: '#0C1015',
+  colorScheme: 'dark',
 };
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="es" data-world="internet">
       <head>
-        <link rel="canonical" href="https://lethon-protocol.dev" />
-        <meta name="theme-color" content="#030508" />
+        <link rel="preload" href="/lethon-web/fonts/familjen_grotesk.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+        <link rel="preload" href="/lethon-web/fonts/figtree.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
         <script
-          type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "Organization",
-              name: "Lethon Protocol",
-              url: "https://lethon-protocol.dev",
-              description: "Privacy by architecture, not by trust.",
-              sameAs: ["https://github.com/sudplo/lethon"],
-            }),
+            __html:
+              "try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches&&innerHeight>=560)document.documentElement.classList.add('motion')}catch(e){}",
           }}
         />
       </head>
-      <body>
-        <PageChrome />
-        <Navigation />
-        <GlobalCanvas />
-        <div className="vignette-overlay" />
-        <div className="ambient-glow" />
-        <div className="grain-overlay" />
-        <div id="smooth-wrapper">
-          <div id="smooth-content">
-            <SmoothScroll>{children}</SmoothScroll>
-          </div>
-        </div>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

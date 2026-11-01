@@ -1,0 +1,27 @@
+.thread {
+  position: fixed; left: 0; top: 0; z-index: 40;
+  width: 12px; height: 12px;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-100px, -100px);
+  will-change: transform;
+}
+:global(html.has-thread) .thread { opacity: var(--thread-o, 1); }
+.dot {
+  position: absolute; inset: 0; border-radius: 50%;
+  transition: opacity 0.7s ease;
+}
+.jade { background: var(--jade); box-shadow: 0 0 14px 4px rgba(56, 214, 192, 0.55), 0 0 40px 10px rgba(56, 214, 192, 0.22); }
+.amber { background: var(--amber); box-shadow: 0 0 14px 4px rgba(255, 181, 71, 0.55), 0 0 40px 10px rgba(255, 181, 71, 0.22); opacity: 0; }
+:global([data-world='cerca']) .jade { opacity: 0; }
+:global([data-world='cerca']) .amber { opacity: 1; }
+.dot::after {
+  content: ''; position: absolute; inset: -2px; border-radius: 50%; border: 1px solid currentColor;
+  animation: breathe 4.8s ease-in-out infinite;
+}
+.jade::after { color: var(--jade); }
+.amber::after { color: var(--amber); }
+@keyframes breathe {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(2.6); opacity: 0; }
+}

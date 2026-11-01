@@ -1,0 +1,30 @@
+.header {
+  position: fixed; inset: 0 0 auto 0; z-index: 50;
+  background: linear-gradient(to bottom, rgba(12, 16, 21, 0.92), rgba(12, 16, 21, 0.6) 70%, rgba(12, 16, 21, 0));
+  pointer-events: none;
+}
+.inner {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  height: var(--header-h);
+  max-width: 76rem; margin-inline: auto; padding-inline: var(--gutter);
+}
+.header a, .header button { pointer-events: auto; }
+.brand { display: inline-flex; align-items: center; gap: 8px; text-decoration: none; min-height: 44px; }
+.word { font-family: var(--display); font-weight: 700; font-size: 1.3rem; letter-spacing: -0.02em; }
+.right { display: flex; align-items: center; gap: 10px; }
+.lang { display: inline-flex; background: rgba(20, 26, 33, 0.85); border: 1px solid var(--line); border-radius: 999px; padding: 3px; }
+.lang button {
+  appearance: none; border: 0; background: transparent; cursor: pointer;
+  min-width: 40px; min-height: 36px; padding: 0 8px; border-radius: 999px;
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 500; letter-spacing: 0.06em; color: var(--muted);
+}
+.lang button[aria-pressed='true'] { background: var(--text); color: var(--ink); font-weight: 700; }
+.dl {
+  display: inline-flex; align-items: center; min-height: 44px; padding: 0 16px; border-radius: 999px;
+  background: var(--jade); color: var(--jade-ink); font-weight: 700; font-size: 0.9rem; text-decoration: none; white-space: nowrap;
+}
+:global([data-world='cerca']) .dl { background: var(--amber); color: var(--amber-ink); }
+@media (max-width: 380px) {
+  .word { display: none; }
+  .dl { padding: 0 12px; }
+}

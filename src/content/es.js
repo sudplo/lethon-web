@@ -1,0 +1,183 @@
+// Todos los textos de la web, en español. La estructura es idéntica en en.js.
+// Regla de oro: cada frase sale de docs/COMO-FUNCIONA.md de la app.
+const es = {
+  lang: 'es',
+  meta: {
+    title: 'Lethon · Mensajería privada para Android',
+    description:
+      'Lethon es una app de mensajería privada para Android. Chatea por internet sin dejar rastro y, si se cae la red, sigue hablando de móvil a móvil.',
+  },
+  ui: {
+    skip: 'Saltar al contenido',
+    download: 'Descargar',
+    langLabel: 'Idioma',
+    langEs: 'Español',
+    langEn: 'English',
+    home: 'Lethon, inicio',
+    phoneExample: 'Pantalla de ejemplo de la app, con datos inventados.',
+  },
+  s0: {
+    title: 'Cada mensaje que envías cuenta una historia. No siempre la tuya.',
+    cue: 'Baja',
+    cueLabel: 'Sigue bajando para leer la historia',
+    dotLabel: 'Un punto de luz que respira',
+  },
+  s1: {
+    title: 'El mensaje va cifrado. Todo lo demás, no.',
+    sub: 'En una app de mensajería corriente, quien mira por fuera ve esto.',
+    bubble: '¿Quedamos a las 8?',
+    bubbleMeta: 'Cifrado de punta a punta',
+    example: 'Ejemplo con datos inventados.',
+    tags: [
+      { k: 'Quién', v: 'Marta R.' },
+      { k: 'A quién', v: 'Dani' },
+      { k: 'A qué hora', v: '19:42' },
+      { k: 'Desde dónde', v: 'IP 85.54.•••.•• · Valencia' },
+      { k: 'Cada cuánto', v: '34 mensajes esta semana' },
+    ],
+  },
+  s2: {
+    title: '¿Cuál es la tuya? Ni nosotros lo sabemos.',
+    sub: 'Lethon apaga las luces, una a una.',
+    off: [
+      'Sin número de teléfono: solo un nombre y una contraseña.',
+      'Cada mensaje va a un tema de un solo uso. Nadie puede seguir una conversación.',
+      'Timbres falsos a todas horas: nadie sabe cuándo usas el móvil.',
+      'Todo sale por Tor, así que nadie ve tu IP. Y viaja por una red repartida, no por un servidor único.',
+      'Todos los mensajes miden lo mismo, y los mensajes de tapadera son idénticos a los reales.',
+    ],
+    crowdLabel: 'Muchas burbujas idénticas. Ninguna se distingue de las demás.',
+  },
+  s3: {
+    title: '¿Y si un día no hay internet?',
+    sub: 'Sin señal. Sin datos. Sin red.',
+    signalLabel: 'Sin conexión',
+  },
+  s4: {
+    title: 'Sin antenas. Sin internet. Sin nadie en medio.',
+    eyebrow: 'Cerca',
+    lead: 'Cerca es el otro mundo de Lethon. Los mensajes saltan de móvil en móvil por Bluetooth y WiFi local, y los móviles que los llevan no pueden leerlos.',
+    points: [
+      'Funciona aunque la parte de internet esté apagada.',
+      'El mensaje se trocea en paquetes que saltan hasta 7 veces.',
+      'Cerca nunca se enciende solo. Eliges tú cuántas horas: 2, 4, 8 o 12.',
+    ],
+    counter: (n) => (n === 1 ? 'Lo lleva 1 móvil' : `Lo llevan ${n} móviles`),
+    counterNote: 'Dibujo de ejemplo. En la app, el contador es aproximado.',
+    plazaLabel:
+      'Una plaza vista desde arriba. Cada punto es un móvil. Un mensaje salta de móvil en móvil hasta llegar.',
+    status: { internet: 'Internet', off: 'apagado', radios: 'Bluetooth y WiFi', on: 'encendidos' },
+  },
+  s5: {
+    eyebrow: 'Salas',
+    title: 'Un cartel. Un QR. Una sala.',
+    lead: 'Para quien coordina algo en la calle: avisos para mucha gente, sin internet.',
+    points: [
+      'Solo escriben los organizadores. Cada aviso va firmado y cifrado.',
+      'Quien lee es anónimo: sin nombre ni alias.',
+      'El QR lleva un pase. Un portero cercano te da la llave de lectura.',
+      'El QR lleva la huella de la sala: nadie puede meterte en una sala falsa.',
+      'Cambiar el QR anula los pases viejos. Quien ya está dentro sigue leyendo.',
+    ],
+    posterTitle: 'Entra en la sala',
+    posterSub: 'Escanea con Lethon',
+    counter: (n) => `≈ ${n} han entrado`,
+    counterNote: 'Contador aproximado.',
+    roomLabel: 'Sala',
+    sceneLabel:
+      'Un cartel con un código QR. Unas siluetas lo escanean y entran en la sala.',
+  },
+  s6: {
+    eyebrow: 'Por qué fiarte',
+    title: 'Te contamos también lo que no hacemos.',
+    lead: 'Una web de seguridad que solo cuenta lo bueno no merece que la creas.',
+    protects: {
+      title: 'Lo que protege',
+      items: [
+        'Tu mensaje va cifrado de punta a punta: solo tu contacto puede leerlo.',
+        'Todo sale por Tor: nadie ve tu IP.',
+        'Cada mensaje viaja por un tema de un solo uso. Nadie puede seguir una conversación.',
+        'Los mensajes se rellenan a un tamaño fijo, y hay tráfico de tapadera idéntico al real.',
+        'Los avisos con la app cerrada no dicen quién te escribe ni qué. El servidor solo ve que alguien tocó un timbre en un cubo de unas 1.000 personas.',
+        'Cerca tiene su propia identidad, sin vínculo con tu cuenta de internet. Los contactos se añaden en persona, con un QR firmado.',
+        'El pánico borra solo Cerca, o todo.',
+      ],
+    },
+    doesnt: {
+      title: 'Lo que no',
+      items: [
+        'Si te quitan el móvil desbloqueado, la app no puede protegerte.',
+        'Mientras Cerca está encendido, quien tenga un escáner Bluetooth o WiFi puede ver que hay un móvil con Lethon cerca.',
+        'Con poca gente cerca, Cerca no tiene red. A distancia, los mensajes llegan cuando alguien cruza, no al instante.',
+        'En una sala, nadie puede dejar de leer a quien ya entró: si hace falta, se crea otra sala.',
+        'Solo Android. No hay versión para iPhone.',
+        'Todavía no hay llamadas ni envío de ficheros.',
+        'Lethon está en pruebas. Su lógica tiene unas 2.500 pruebas automáticas, pero aún falta probarla en móviles reales: Bluetooth, batería y red de verdad.',
+      ],
+    },
+    openTitle: 'Código abierto, sin cuentas',
+    openText:
+      'Puedes leer cómo está hecho. No te registras en ningún servicio: tu identidad se crea en tu móvil.',
+    openLink: 'Ver el código en GitHub',
+    compareTitle: 'Dos mundos que nunca se mezclan',
+    compareLead: 'Lethon tiene dos mundos. Cada uno con su identidad, su base de datos y su camino.',
+    compare: {
+      cols: ['', 'Internet', 'Cerca'],
+      rows: [
+        ['Para qué', 'Chatear con tus contactos y comunidades desde cualquier sitio', 'Chatear en una protesta o un apagón, saltando de móvil en móvil'],
+        ['Por dónde viaja', 'Una red de mensajes (Waku) a través de Tor', 'Bluetooth y WiFi local, de móvil a móvil'],
+        ['Tu identidad', 'Tu cuenta de internet', 'Un perfil Cerca aparte («Gaviota-42»), sin ningún vínculo con la otra'],
+        ['Avisos con la app cerrada', 'Sí', 'No: Cerca solo funciona mientras lo tienes encendido'],
+      ],
+    },
+    spy: {
+      title: 'Esta web tampoco te espía',
+      lead: 'Estas cifras no son una promesa: las calcula tu navegador, ahora mismo, mirando lo que ha cargado esta página.',
+      cookies: 'cookies',
+      analytics: 'analíticas',
+      thirdParty: 'peticiones a otros dominios',
+      total: (n) => `${n} ${n === 1 ? 'recurso cargado' : 'recursos cargados'}, todos de este mismo dominio.`,
+      totalBad: (n, t) => `${t} de ${n} recursos vienen de otro dominio.`,
+      measuring: 'Midiendo…',
+      storage: 'Lo único que guardamos es tu idioma, en tu propio navegador.',
+    },
+  },
+  s7: {
+    title: 'Lethon, en tu móvil.',
+    sub: 'Mensajería privada para Android.',
+    button: 'Descargar para Android',
+    req: 'Requiere Android 7 o superior.',
+    where: 'Se descarga desde las versiones publicadas en GitHub.',
+    shaLabel: 'Huella SHA-256 del APK',
+    shaPending: 'PENDIENTE',
+    shaPendingNote: 'Se publicará junto a la primera versión.',
+    verify: 'Cómo comprobarlo',
+    verifySteps: [
+      'Descarga el APK desde la página de versiones.',
+      'Calcula su huella en tu equipo (por ejemplo, con «sha256sum lethon.apk» en Linux o macOS).',
+      'Compárala con la de arriba. Si no coincide, no lo instales.',
+    ],
+    monoLabel: 'El monograma de Lethon: una «l» con una luz al lado',
+  },
+  s8: {
+    title: 'Únete a la flota',
+    lead: 'La flota son los servidores que avisan a tu móvil cuando llega un mensaje y la app está cerrada. No saben quién te escribe ni qué, y el que te toca cambia cada día.',
+    node: {
+      title: 'Monta un nodo',
+      text: 'Si tienes un servidor, puedes poner en marcha un nodo de avisos de la flota. La documentación está en el repositorio de la app.',
+      cta: 'Ver la documentación',
+    },
+    support: {
+      title: 'Apoya el proyecto',
+      text: 'Prueba Lethon, cuéntanos qué falla, mejora el código o ayuda a que lo conozca más gente. Todo el trabajo es abierto.',
+      cta: 'Ir al proyecto',
+    },
+  },
+  footer: {
+    tagline: 'Mensajería privada para Android.',
+    code: 'Código',
+    license: 'Licencia GPL-3.0',
+    noTrack: 'Sin cookies ni analíticas.',
+  },
+};
+export default es;
